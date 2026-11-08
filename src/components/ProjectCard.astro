@@ -1,8 +1,9 @@
 ---
 /**
- * Card for one entry of the `projects` collection: image, title, description, tags, star count and
- * a link to the GitHub repo. Stars and description come from `repoStats()`: GitHub's values when the
- * prebuild fetcher reached it, the entry's `stars` and `blurb` otherwise. The title links to `href` (a site path, e.g. a project page) when given.
+ * Card for one entry of the `projects` collection: image, title, blurb, tags, star count and a link
+ * to the GitHub repo. The star count comes from `repoStats()`: GitHub's count when the prebuild
+ * fetcher reached it, the entry's `stars` otherwise. The blurb is always the hand-written one. The
+ * title links to `href` (a site path, e.g. a project page) when given.
  * An entry marked `archived` gets an "Archived" label (`.project-card__archived`) after the title.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
@@ -19,9 +20,9 @@ interface Props {
 }
 
 const { project, href } = Astro.props;
-const { title, repo, tags, image, archived } = project.data;
-// Stars and description as fetched from GitHub at build time, falling back to the frontmatter.
-const { stars, description } = repoStats(project.data);
+const { title, blurb, repo, tags, image, archived } = project.data;
+// The star count as fetched from GitHub at build time, falling back to the frontmatter.
+const { stars } = repoStats(project.data);
 const repoUrl = `https://github.com/${repo}`;
 const starCount = stars?.toLocaleString('en-US');
 ---
@@ -30,7 +31,7 @@ const starCount = stars?.toLocaleString('en-US');
 	{image && <Image class="project-card__image" src={image} alt="" />}
 	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
 	{archived && <p class="project-card__archived">Archived</p>}
-	<p class="project-card__blurb">{description}</p>
+	<p class="project-card__blurb">{blurb}</p>
 	{
 		tags.length > 0 && (
 			<ul class="project-card__tags">

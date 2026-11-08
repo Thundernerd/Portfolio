@@ -48,11 +48,16 @@ describe('ProjectCard', () => {
 		expect(html).toMatch(/<data[^>]*value="1234"[^>]*>1,234<\/data>\s*<span[^>]*>stars<\/span>/);
 	});
 
-	it('prefers the stars and description fetched from GitHub over the frontmatter', async () => {
+	it('prefers the star count fetched from GitHub over the frontmatter', async () => {
 		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2 }) });
 		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
-		expect(html).toContain('Description from GitHub.');
-		expect(html).not.toContain('Serialize interface references in the Unity inspector.');
+		expect(html).not.toMatch(/<data[^>]*value="2"/);
+	});
+
+	it('keeps the hand-written blurb even when GitHub has a description', async () => {
+		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched' }) });
+		expect(html).toContain('Serialize interface references in the Unity inspector.');
+		expect(html).not.toContain('Description from GitHub.');
 	});
 
 	it('uses singular wording for one star', async () => {
@@ -69,5 +74,18 @@ describe('ProjectCard', () => {
 		expect(await render({ project: projectEntry() })).not.toContain('Archived');
 		const html = await render({ project: projectEntry({ archived: true }) });
 		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+	});
+
+	it('shows both the archived label and the fetched star count on an archived project', async () => {
+		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2, archived: true }) });
+		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
+		expect(html).toContain('Serialize interface references in the Unity inspector.');
+	});
+
+	it('shows the archived label but no star badge when an archived project has no star count', async () => {
+		const html = await render({ project: projectEntry({ archived: true }) });
+		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+		expect(html).not.toContain('project-card__stars');
 	});
 });
