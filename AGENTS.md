@@ -1,12 +1,14 @@
 ## Checks
 
-Before committing, run `npm run check` (type-check via `astro check`) and `npm run build`; both must pass.
+Before committing, run `npm test` (Vitest), `npm run check` (type-check via `astro check`) and
+`npm run build`; all must pass.
 
 ## Base path
 
 The site is served from `https://thundernerd.github.io/Portfolio/` (`base: '/Portfolio'` in
-`astro.config.mjs`). Build internal links and asset URLs from `import.meta.env.BASE_URL`; never
-hard-code a root-relative `/...` path.
+`astro.config.mjs`). Build every internal link and asset URL with `withBase()` from
+`src/lib/url.ts` (for example `withBase('favicon.svg')`); never hard-code a root-relative `/...` path
+or concatenate `import.meta.env.BASE_URL` by hand, since its trailing `/` is not guaranteed.
 
 ## Development
 

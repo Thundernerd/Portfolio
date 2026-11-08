@@ -19,11 +19,11 @@ Run from the repo root (Node `>=22.23.4`):
 ## Base path
 
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
-asset URLs from `import.meta.env.BASE_URL` rather than hard-coding a leading `/`.
+asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a leading `/`.
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs `npm run check` and `npm run build` on pushes to `main` and on pull requests
+`.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to `main` and on pull requests
 (using [`withastro/action`](https://github.com/withastro/action)). Pushes to `main` then publish
 `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
 (Settings → Pages).
