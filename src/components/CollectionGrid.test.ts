@@ -1,15 +1,12 @@
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import CollectionGrid from './CollectionGrid.astro';
-import { gameEntry, projectEntry } from './test-fixtures';
+import { type AstroContainer, createContainer, gameEntry, projectEntry } from './test-fixtures';
 
 describe('CollectionGrid', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
-		vi.stubEnv('BASE_URL', '/Portfolio/');
-		container = await AstroContainer.create();
+		container = await createContainer();
 	});
-	afterEach(() => vi.unstubAllEnvs());
 
 	const render = (props: Record<string, unknown>) => container.renderToString(CollectionGrid, { props });
 	const titlesIn = (html: string) => [...html.matchAll(/<h3[^>]*>(?:\s*<a[^>]*>)?([^<]+)/g)].map((m) => m[1].trim());
@@ -57,7 +54,7 @@ describe('CollectionGrid', () => {
 	});
 
 	it('renders slotted intro copy under the heading', async () => {
-		const html = await render({ id: 'mods', title: 'Mods', items: [] }, );
+		const html = await render({ id: 'mods', title: 'Mods', items: [] });
 		expect(html).not.toContain('collection-grid__intro');
 		const withIntro = await container.renderToString(CollectionGrid, {
 			props: { id: 'mods', title: 'Mods', items: [] },

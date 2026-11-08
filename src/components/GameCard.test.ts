@@ -1,15 +1,12 @@
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import GameCard from './GameCard.astro';
-import { fixtureImage, gameEntry } from './test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, gameEntry } from './test-fixtures';
 
 describe('GameCard', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
-		vi.stubEnv('BASE_URL', '/Portfolio/');
-		container = await AstroContainer.create();
+		container = await createContainer();
 	});
-	afterEach(() => vi.unstubAllEnvs());
 
 	const render = (props: Record<string, unknown>) => container.renderToString(GameCard, { props });
 

@@ -1,6 +1,23 @@
+import { experimental_AstroContainer } from 'astro/container';
 import type { CollectionEntry } from 'astro:content';
+import { afterEach, vi } from 'vitest';
 
-/** Test fixtures shaped like parsed content entries, so component tests don't depend on real content. */
+/** Test helpers and fixtures shaped like parsed content entries, so component tests don't depend on real content. */
+
+export type AstroContainer = experimental_AstroContainer;
+
+/**
+ * Creates a container for rendering components to HTML, with the site's `/Portfolio/` base path
+ * stubbed for the calling test. Call it from `beforeEach`.
+ */
+export async function createContainer(): Promise<AstroContainer> {
+	vi.stubEnv('BASE_URL', '/Portfolio/');
+	return experimental_AstroContainer.create();
+}
+
+afterEach(() => {
+	vi.unstubAllEnvs();
+});
 
 export const fixtureImage = { src: '/fixtures/cover.png', width: 640, height: 360, format: 'png' } as const;
 

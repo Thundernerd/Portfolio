@@ -1,14 +1,12 @@
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import Hero from './Hero.astro';
+import { type AstroContainer, createContainer } from './test-fixtures';
 
 describe('Hero', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
-		vi.stubEnv('BASE_URL', '/Portfolio/');
-		container = await AstroContainer.create();
+		container = await createContainer();
 	});
-	afterEach(() => vi.unstubAllEnvs());
 
 	it('renders the title as the page heading with the tagline', async () => {
 		const html = await container.renderToString(Hero, {

@@ -1,14 +1,12 @@
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import Contact from './Contact.astro';
+import { type AstroContainer, createContainer } from './test-fixtures';
 
 describe('Contact', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
-		vi.stubEnv('BASE_URL', '/Portfolio/');
-		container = await AstroContainer.create();
+		container = await createContainer();
 	});
-	afterEach(() => vi.unstubAllEnvs());
 
 	const links = [
 		{ label: 'GitHub', href: 'https://github.com/Thundernerd' },
