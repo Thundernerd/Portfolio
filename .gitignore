@@ -2,6 +2,8 @@
 dist/
 # generated types
 .astro/
+# GitHub stats written by the prebuild step (scripts/fetch-github.mjs)
+src/data/github-stats.json
 
 # dependencies
 node_modules/

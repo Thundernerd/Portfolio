@@ -28,6 +28,9 @@ jobs:
       # `github-pages` artifact.
       - name: Check, build and upload site
         uses: withastro/action@v6
+        # Raises the GitHub API rate limit for the prebuild stats fetch (scripts/fetch-github.mjs).
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           build-cmd: npm run check && npm test && npm run build
 
