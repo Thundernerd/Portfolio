@@ -13,10 +13,10 @@ hard-code a root-relative `/...` path.
 When starting the dev server, use background mode:
 
 ```
-astro dev --background
+npm run dev -- --background
 ```
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+Manage the background server with `npx astro dev stop`, `npx astro dev status`, and `npx astro dev logs`.
 
 ## Documentation
 
