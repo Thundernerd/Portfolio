@@ -26,7 +26,7 @@ function json(status: number, body: unknown, headers: Record<string, string> = {
 	return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', ...headers } });
 }
 
-const silent = { warn: () => {}, info: () => {} };
+const silent = { warn: () => {} };
 
 async function readOut() {
 	return JSON.parse(await readFile(outFile, 'utf8'));

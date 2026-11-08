@@ -12,8 +12,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 /**
- * @typedef {{ stars: number, description: string | null }} RepoStats
- * @typedef {{ warn: (message: string) => void, info: (message: string) => void }} Log
+ * @typedef {import('../src/lib/github-stats').RepoStats} RepoStats
+ * @typedef {{ warn: (message: string) => void }} Log
  * @typedef {object} RunOptions
  * @property {string} contentDir Directory searched (recursively) for `.md`/`.mdx` entries.
  * @property {string} outFile JSON file the stats are written to.
