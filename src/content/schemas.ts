@@ -19,7 +19,7 @@ export const gameSchema = ({ image }: SchemaContext) =>
 		blurb: z.string(),
 	});
 
-export const projectKinds = ['featured', 'zeepkist-mod', 'unity-plugin', 'tool'] as const;
+const projectKinds = ['featured', 'zeepkist-mod', 'unity-plugin', 'tool'] as const;
 
 /** Frontmatter of a project in `src/content/projects/`: featured work and the mod/plugin collections. */
 export const projectSchema = ({ image }: SchemaContext) =>
