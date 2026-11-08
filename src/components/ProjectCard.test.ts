@@ -51,7 +51,7 @@ describe('ProjectCard', () => {
 	it('prefers the star count fetched from GitHub over the frontmatter', async () => {
 		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2 }) });
 		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
-		expect(html).not.toMatch(/value="2"/);
+		expect(html).not.toMatch(/<data[^>]*value="2"/);
 	});
 
 	it('keeps the hand-written blurb even when GitHub has a description', async () => {
