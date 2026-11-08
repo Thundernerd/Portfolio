@@ -14,7 +14,7 @@ export interface Todo {
 }
 
 /** `TODO` as a whole word, so `TODO:` and `TODO(name)` count but `TODOS` and `MASTODON` don't. */
-const hasTodo = (line: string) => /\bTODO\b/.test(line);
+export const hasTodo = (line: string) => /\bTODO\b/.test(line);
 
 /**
  * Finds every `TODO` placeholder in the raw source of content entries, keyed by file path

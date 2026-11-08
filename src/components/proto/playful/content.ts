@@ -1,6 +1,5 @@
+import { hasTodo as isTodo } from '../../../content/todos';
 import type { Entry } from './art';
-
-const isTodo = (text: string) => /\bTODO\b/.test(text);
 
 /** The first plain-prose paragraph of a Markdown body that isn't a TODO, a comment, a heading or a list. */
 function firstFinishedParagraph(body: string | undefined): string | undefined {
