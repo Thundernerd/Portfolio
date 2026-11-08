@@ -87,6 +87,21 @@ describe('fetch-github run()', () => {
 		expect(await readOut()).toEqual({ 'Thundernerd/Blank': { stars: 2, description: null } });
 	});
 
+	it('stops requesting once a request times out, as the API is unreachable', async () => {
+		await project('1.md', 'repo: Thundernerd/First');
+		await project('2.md', 'repo: Thundernerd/Second');
+		let calls = 0;
+		const fetch = async () => {
+			calls += 1;
+			throw new DOMException('The operation was aborted due to timeout', 'TimeoutError');
+		};
+
+		await run({ contentDir, outFile, fetch, env: {}, log: silent });
+
+		expect(calls).toBe(1);
+		expect(await readOut()).toEqual({});
+	});
+
 	it('leaves out a repo the API answers with an error status', async () => {
 		await project('gone.md', 'repo: Thundernerd/Deleted');
 		const fetch = async () => json(404, { message: 'Not Found' });
@@ -99,6 +114,7 @@ describe('fetch-github run()', () => {
 	it.each([
 		['403 with no requests remaining', 403, { 'x-ratelimit-remaining': '0' }],
 		['429', 429, {}],
+		['403 secondary rate limit with retry-after', 403, { 'x-ratelimit-remaining': '42', 'retry-after': '60' }],
 	])('stops requesting once rate-limited (%s), keeping what it already fetched', async (_, status, headers) => {
 		await project('1.md', 'repo: Thundernerd/First');
 		await project('2.md', 'repo: Thundernerd/Second');

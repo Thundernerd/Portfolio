@@ -61,9 +61,14 @@ function repoOf(source) {
 	return repo && ownerAndName.test(repo) ? repo : undefined;
 }
 
-/** @param {Response} response */
+/**
+ * A primary (`x-ratelimit-remaining: 0`) or secondary (`retry-after`) rate limit; see
+ * https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+ * @param {Response} response
+ */
 function isRateLimited(response) {
-	return response.status === 429 || (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0');
+	if (response.status === 429) return true;
+	return response.status === 403 && (response.headers.get('x-ratelimit-remaining') === '0' || response.headers.has('retry-after'));
 }
 
 /** @param {RunOptions} options */
@@ -92,6 +97,11 @@ export async function run({ contentDir, outFile, fetch, env, log }) {
 			const description = typeof body.description === 'string' && body.description !== '' ? body.description : null;
 			stats[repo] = { stars: body.stargazers_count, description };
 		} catch (error) {
+			// A hung connection would cost the timeout again for every remaining repo; give up instead.
+			if (error instanceof Error && error.name === 'TimeoutError') {
+				log.warn(`fetch-github: ${repo}: timed out; remaining repos use frontmatter values`);
+				break;
+			}
 			log.warn(`fetch-github: ${repo}: ${error instanceof Error ? error.message : error}; using frontmatter values`);
 		}
 	}
