@@ -5,7 +5,7 @@ import { type AstroContainer, createContainer, fixtureImage, projectEntry } from
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
 vi.mock('../lib/github-stats', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('../lib/github-stats')>();
-	const fetched = { 'fixture-owner/fetched': { stars: 4321, description: 'Description from GitHub.' } };
+	const fetched = { 'fixture-owner/fetched': { stars: 4321 } };
 	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
 });
 
@@ -52,12 +52,6 @@ describe('ProjectCard', () => {
 		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2 }) });
 		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
 		expect(html).not.toMatch(/<data[^>]*value="2"/);
-	});
-
-	it('keeps the hand-written blurb even when GitHub has a description', async () => {
-		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched' }) });
-		expect(html).toContain('Serialize interface references in the Unity inspector.');
-		expect(html).not.toContain('Description from GitHub.');
 	});
 
 	it('uses singular wording for one star', async () => {

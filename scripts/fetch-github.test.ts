@@ -33,7 +33,7 @@ async function readOut() {
 }
 
 describe('fetch-github run()', () => {
-	it('writes stars and description for a repo referenced in the content', async () => {
+	it('writes only the star count for a repo referenced in the content', async () => {
 		await project('zeepsdk.md', 'title: ZeepSDK\nrepo: donderjoekel/ZeepSDK\nkind: zeepkist-mod\nblurb: SDK.');
 		const requested: string[] = [];
 		const fetch = async (url: string | URL | Request) => {
@@ -44,7 +44,7 @@ describe('fetch-github run()', () => {
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(requested).toEqual(['https://api.github.com/repos/donderjoekel/ZeepSDK']);
-		expect(await readOut()).toEqual({ 'donderjoekel/ZeepSDK': { stars: 42, description: 'A modding SDK' } });
+		expect(await readOut()).toEqual({ 'donderjoekel/ZeepSDK': { stars: 42 } });
 	});
 
 	it('leaves out a repo whose request fails, keeping the others and warning', async () => {
@@ -53,12 +53,12 @@ describe('fetch-github run()', () => {
 		const warnings: string[] = [];
 		const fetch = async (url: string | URL | Request) => {
 			if (String(url).endsWith('/Offline')) throw new TypeError('fetch failed');
-			return json(200, { stargazers_count: 7, description: null });
+			return json(200, { stargazers_count: 7 });
 		};
 
 		await run({ contentDir, outFile, fetch, env: {}, log: { ...silent, warn: (m) => warnings.push(m) } });
 
-		expect(await readOut()).toEqual({ 'Thundernerd/Online': { stars: 7, description: null } });
+		expect(await readOut()).toEqual({ 'Thundernerd/Online': { stars: 7 } });
 		expect(warnings.join('\n')).toContain('Thundernerd/Offline');
 	});
 
@@ -69,22 +69,13 @@ describe('fetch-github run()', () => {
 		let calls = 0;
 		const fetch = async () => {
 			calls += 1;
-			return json(200, { stargazers_count: 1, description: null });
+			return json(200, { stargazers_count: 1 });
 		};
 
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(calls).toBe(0);
 		expect(await readOut()).toEqual({});
-	});
-
-	it('records an empty GitHub description as no description', async () => {
-		await project('a.md', 'repo: Thundernerd/Blank');
-		const fetch = async () => json(200, { stargazers_count: 2, description: '' });
-
-		await run({ contentDir, outFile, fetch, env: {}, log: silent });
-
-		expect(await readOut()).toEqual({ 'Thundernerd/Blank': { stars: 2, description: null } });
 	});
 
 	it('stops requesting once a request times out, as the API is unreachable', async () => {
@@ -130,7 +121,7 @@ describe('fetch-github run()', () => {
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(calls).toBe(2);
-		expect(Object.values(await readOut())).toEqual([{ stars: 1, description: 'first' }]);
+		expect(Object.values(await readOut())).toEqual([{ stars: 1 }]);
 	});
 
 	it.each([
@@ -141,7 +132,7 @@ describe('fetch-github run()', () => {
 		let authorization: string | null = 'unset';
 		const fetch = async (_url: string | URL | Request, init?: RequestInit) => {
 			authorization = new Headers(init?.headers).get('authorization');
-			return json(200, { stargazers_count: 0, description: null });
+			return json(200, { stargazers_count: 0 });
 		};
 
 		await run({ contentDir, outFile, fetch, env, log: silent });
@@ -175,7 +166,7 @@ describe('fetch-github run()', () => {
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(requested).toEqual(['https://api.github.com/repos/Thundernerd/Shared']);
-		expect(await readOut()).toEqual({ 'Thundernerd/Shared': { stars: 3, description: 'shared' } });
+		expect(await readOut()).toEqual({ 'Thundernerd/Shared': { stars: 3 } });
 	});
 
 	it.each([

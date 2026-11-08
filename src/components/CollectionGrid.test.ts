@@ -5,7 +5,7 @@ import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectE
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
 vi.mock('../lib/github-stats', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('../lib/github-stats')>();
-	const fetched = { 'fixture-owner/fetched': { stars: 50, description: null } };
+	const fetched = { 'fixture-owner/fetched': { stars: 50 } };
 	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
 });
 

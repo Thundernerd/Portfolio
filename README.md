@@ -24,12 +24,11 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 ## GitHub stats
 
 `npm run build` first runs `scripts/fetch-github.mjs` (the `prebuild` step), which fetches the star
-count and description of every `repo` in `src/content/` from the GitHub API into
-`src/data/github-stats.json` (gitignored). Read them in pages with `repoStats()` from
-`src/lib/github-stats.ts`. No token is needed; set `GITHUB_TOKEN` to raise the rate limit. A repo that
-can't be fetched (offline, rate-limited, not found) falls back to the entry's frontmatter `stars` and
-`blurb`, and so does every repo under `npm run dev`, which doesn't run the fetcher. Project cards
-take only the star count from `repoStats()` and always show the hand-written `blurb`.
+count of every `repo` in `src/content/` from the GitHub API into `src/data/github-stats.json`
+(gitignored). Read it in pages with `repoStats()` from `src/lib/github-stats.ts`. No token is needed;
+set `GITHUB_TOKEN` to raise the rate limit. A repo that can't be fetched (offline, rate-limited, not
+found) falls back to the entry's frontmatter `stars`, and so does every repo under `npm run dev`,
+which doesn't run the fetcher. Project cards always show the hand-written `blurb`.
 
 ## Content TODOs
 
