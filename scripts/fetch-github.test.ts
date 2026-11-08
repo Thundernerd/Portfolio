@@ -62,6 +62,22 @@ describe('fetch-github run()', () => {
 		expect(warnings.join('\n')).toContain('Thundernerd/Offline');
 	});
 
+	it('skips repo values that are not a GitHub owner/name', async () => {
+		await project('url.md', 'repo: https://github.com/donderjoekel/ZeepSDK');
+		await project('traversal.md', 'repo: Thundernerd/..');
+		await project('bare.md', 'repo: ZeepSDK');
+		let calls = 0;
+		const fetch = async () => {
+			calls += 1;
+			return json(200, { stargazers_count: 1, description: null });
+		};
+
+		await run({ contentDir, outFile, fetch, env: {}, log: silent });
+
+		expect(calls).toBe(0);
+		expect(await readOut()).toEqual({});
+	});
+
 	it('records an empty GitHub description as no description', async () => {
 		await project('a.md', 'repo: Thundernerd/Blank');
 		const fetch = async () => json(200, { stargazers_count: 2, description: '' });

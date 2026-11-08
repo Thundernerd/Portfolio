@@ -47,10 +47,18 @@ async function reposIn(dir) {
 	return [...repos];
 }
 
-/** @param {string} source */
+// Same pattern as `repo` in src/content/schemas.ts, which the build enforces later; values it would
+// reject are not sent to the API.
+const ownerAndName = /^[A-Za-z0-9-]+\/(?!\.\.?$)[\w.-]+$/;
+
+/**
+ * The `repo` frontmatter value of a content file, if it is a GitHub `owner/name`.
+ * @param {string} source
+ */
 function repoOf(source) {
 	const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
-	return frontmatter.match(/^repo:\s*['"]?([^'"\s#]+)/m)?.[1];
+	const repo = frontmatter.match(/^repo:\s*['"]?([^'"\s#]+)/m)?.[1];
+	return repo && ownerAndName.test(repo) ? repo : undefined;
 }
 
 /** @param {Response} response */
