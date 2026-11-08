@@ -21,6 +21,15 @@ Run from the repo root (Node `>=22.23.4`):
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
 asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a leading `/`.
 
+## GitHub stats
+
+`npm run build` first runs `scripts/fetch-github.mjs` (the `prebuild` step), which fetches the star
+count and description of every `repo` in `src/content/` from the GitHub API into
+`src/data/github-stats.json` (gitignored). Read them in pages with `repoStats()` from
+`src/lib/github-stats.ts`. No token is needed; set `GITHUB_TOKEN` to raise the rate limit. A repo that
+can't be fetched (offline, rate-limited, not found) falls back to the entry's frontmatter `stars` and
+`blurb`, and so does every repo under `npm run dev`, which doesn't run the fetcher.
+
 ## Deploy
 
 `.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to `main` and on pull requests
