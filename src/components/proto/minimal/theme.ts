@@ -32,7 +32,9 @@ function storeTheme(storage: ThemeStorage | undefined, theme: Theme): void {
 	}
 }
 
+/** What the controller needs from the page. */
 export interface ThemeControllerOptions {
+	/** Where the pick is remembered: `localStorage`, or `undefined` when accessing it threw. */
 	storage: ThemeStorage | undefined;
 	/** Whether `prefers-color-scheme: dark` matches. */
 	prefersDark: boolean;
@@ -40,6 +42,7 @@ export interface ThemeControllerOptions {
 	apply: (theme: Theme) => void;
 }
 
+/** The toggle's state: the theme in effect and whether the visitor picked it. */
 export interface ThemeController {
 	/** The theme in effect: the remembered pick, or the system preference. */
 	readonly theme: Theme;
@@ -52,6 +55,10 @@ export interface ThemeController {
 	systemChanged(prefersDark: boolean): void;
 }
 
+/**
+ * Creates the toggle's state, starting from the remembered pick or else the system preference.
+ * Storage errors never escape: a pick that can't be stored lasts for the page view.
+ */
 export function createThemeController({ storage, prefersDark, apply }: ThemeControllerOptions): ThemeController {
 	const stored = readStoredTheme(storage);
 	let picked = stored !== null;
