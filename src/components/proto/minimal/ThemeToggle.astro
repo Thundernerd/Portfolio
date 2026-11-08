@@ -1,0 +1,46 @@
+---
+/**
+ * The light/dark toggle of the minimal prototype: a toggle button (pressed = dark) that switches the
+ * `data-theme` on `<html>` and remembers the pick (see `theme.ts`). It stays hidden without JavaScript,
+ * where the page simply follows `prefers-color-scheme`. Pair it with `ThemeInit` in the `<head>`.
+ */
+---
+
+<button class="mn-toggle" type="button" aria-pressed="false" data-theme-toggle hidden>
+	<span class="mn-toggle__track" aria-hidden="true"><span class="mn-toggle__thumb"></span></span>
+	<span class="mn-toggle__label">Dark mode</span>
+</button>
+
+<script>
+	import { createThemeController, type ThemeStorage } from './theme';
+
+	const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+	if (button) {
+		let storage: ThemeStorage | undefined;
+		try {
+			storage = window.localStorage;
+		} catch {
+			// Storage is blocked; the toggle still works for this page view.
+		}
+		const root = document.documentElement;
+		const system = window.matchMedia('(prefers-color-scheme: dark)');
+		const controller = createThemeController({
+			storage,
+			prefersDark: system.matches,
+			apply: (theme) => {
+				root.dataset.theme = theme;
+			},
+		});
+		const show = () => button.setAttribute('aria-pressed', String(controller.theme === 'dark'));
+		show();
+		button.hidden = false;
+		button.addEventListener('click', () => {
+			controller.toggle();
+			show();
+		});
+		system.addEventListener('change', (event) => {
+			controller.systemChanged(event.matches);
+			show();
+		});
+	}
+</script>

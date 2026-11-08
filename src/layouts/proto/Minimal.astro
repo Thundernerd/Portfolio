@@ -1,0 +1,61 @@
+---
+/**
+ * Layout of Prototype B, "minimal developer" (`/proto/minimal`): typography first, monospace
+ * accents, little imagery and a light/dark toggle that follows `prefers-color-scheme` by default.
+ */
+import ThemeInit from '../../components/proto/minimal/ThemeInit.astro';
+import ThemeToggle from '../../components/proto/minimal/ThemeToggle.astro';
+import { withBase } from '../../lib/url';
+import '../../styles/proto/minimal.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description } = Astro.props;
+const nav = [
+	{ label: 'games', href: '#games' },
+	{ label: 'projects', href: '#featured' },
+	{ label: 'mods', href: '#zeepkist-mods' },
+	{ label: 'plugins', href: '#unity-plugins' },
+	{ label: 'contact', href: '#contact' },
+];
+---
+
+<html lang="en" class="mn">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		{description && <meta name="description" content={description} />}
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<ThemeInit />
+	</head>
+	<body>
+		<a class="mn-skip" href="#main">Skip to content</a>
+		<header class="mn-header">
+			<div class="mn-header__inner">
+				<a class="mn-brand" href={withBase('proto/minimal/')}>
+					<span class="mn-brand__prompt" aria-hidden="true">~/</span>christiaan
+				</a>
+				<nav class="mn-nav" aria-label="Sections">
+					<ul>
+						{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+					</ul>
+				</nav>
+				<ThemeToggle />
+			</div>
+		</header>
+		<main id="main" class="mn-main">
+			<slot />
+		</main>
+		<footer class="mn-footer">
+			<p>Prototype B · minimal developer</p>
+			<p>Built with Astro · <a href="https://github.com/Thundernerd/Portfolio">source</a></p>
+		</footer>
+	</body>
+</html>
