@@ -62,6 +62,15 @@ describe('fetch-github run()', () => {
 		expect(warnings.join('\n')).toContain('Thundernerd/Offline');
 	});
 
+	it('records an empty GitHub description as no description', async () => {
+		await project('a.md', 'repo: Thundernerd/Blank');
+		const fetch = async () => json(200, { stargazers_count: 2, description: '' });
+
+		await run({ contentDir, outFile, fetch, env: {}, log: silent });
+
+		expect(await readOut()).toEqual({ 'Thundernerd/Blank': { stars: 2, description: null } });
+	});
+
 	it('leaves out a repo the API answers with an error status', async () => {
 		await project('gone.md', 'repo: Thundernerd/Deleted');
 		const fetch = async () => json(404, { message: 'Not Found' });

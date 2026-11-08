@@ -81,7 +81,7 @@ export async function run({ contentDir, outFile, fetch, env, log }) {
 				log.warn(`fetch-github: ${repo}: unexpected response; using frontmatter values`);
 				continue;
 			}
-			const description = typeof body.description === 'string' ? body.description : null;
+			const description = typeof body.description === 'string' && body.description !== '' ? body.description : null;
 			stats[repo] = { stars: body.stargazers_count, description };
 		} catch (error) {
 			log.warn(`fetch-github: ${repo}: ${error instanceof Error ? error.message : error}; using frontmatter values`);
