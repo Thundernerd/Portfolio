@@ -2,7 +2,8 @@
 /**
  * A titled section listing a collection as a grid of cards: `games` entries as `GameCard`s (newest
  * first) or `projects` entries as `ProjectCard`s (most GitHub stars first, unknown counts last).
- * Ties fall back to title order. The default slot holds optional intro copy under the heading.
+ * Ties fall back to title order. `itemHref` links each card to a page on this site. The default
+ * slot holds optional intro copy under the heading.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--grid-gap`, `--grid-min` (minimum card width).
@@ -19,18 +20,21 @@ interface Props {
 	id: string;
 	title: string;
 	items: Game[] | Project[];
+	/** The site path each card's title links to (e.g. its detail page); cards are unlinked without it. */
+	itemHref?: (entry: Game | Project) => string | undefined;
 }
 
-const { id, title, items } = Astro.props;
+const { id, title, items, itemHref } = Astro.props;
 const headingId = `${id}-heading`;
 
+const entries: (Game | Project)[] = items;
 const byTitle = (a: Game | Project, b: Game | Project) => a.data.title.localeCompare(b.data.title, 'en');
-const isGame = (entry: Game | Project): entry is Game => entry.collection === 'games';
-const sorted: (Game | Project)[] = [...items].sort((a, b) => {
-	if (isGame(a) && isGame(b)) return b.data.year - a.data.year || byTitle(a, b);
-	if (!isGame(a) && !isGame(b)) return (b.data.stars ?? -1) - (a.data.stars ?? -1) || byTitle(a, b);
-	return 0;
-});
+const games = entries
+	.filter((entry): entry is Game => entry.collection === 'games')
+	.sort((a, b) => b.data.year - a.data.year || byTitle(a, b));
+const projects = entries
+	.filter((entry): entry is Project => entry.collection === 'projects')
+	.sort((a, b) => (b.data.stars ?? -1) - (a.data.stars ?? -1) || byTitle(a, b));
 ---
 
 <section class="collection-grid" id={id} aria-labelledby={headingId}>
@@ -43,7 +47,20 @@ const sorted: (Game | Project)[] = [...items].sort((a, b) => {
 		)
 	}
 	<ul class="collection-grid__list">
-		{sorted.map((entry) => <li class="collection-grid__item">{isGame(entry) ? <GameCard game={entry} /> : <ProjectCard project={entry} />}</li>)}
+		{
+			games.map((game) => (
+				<li class="collection-grid__item">
+					<GameCard game={game} href={itemHref?.(game)} />
+				</li>
+			))
+		}
+		{
+			projects.map((project) => (
+				<li class="collection-grid__item">
+					<ProjectCard project={project} href={itemHref?.(project)} />
+				</li>
+			))
+		}
 	</ul>
 </section>
 

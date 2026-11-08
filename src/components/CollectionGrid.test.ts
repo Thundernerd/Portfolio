@@ -53,6 +53,16 @@ describe('CollectionGrid', () => {
 		expect(titlesIn(html)).toEqual(['Good Job!', 'FRU']);
 	});
 
+	it('links each card to the page itemHref gives it', async () => {
+		const html = await render({
+			id: 'featured',
+			title: 'Featured',
+			items: [projectEntry({ title: 'ZeepSDK' }, 'zeepsdk')],
+			itemHref: (entry: { id: string }) => `projects/${entry.id}/`,
+		});
+		expect(html).toMatch(/<h3[^>]*>\s*<a[^>]*href="\/Portfolio\/projects\/zeepsdk\/"[^>]*>ZeepSDK<\/a>/);
+	});
+
 	it('renders slotted intro copy under the heading', async () => {
 		const html = await render({ id: 'mods', title: 'Mods', items: [] });
 		expect(html).not.toContain('collection-grid__intro');
