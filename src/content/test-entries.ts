@@ -1,6 +1,7 @@
 import { parse } from 'yaml';
 import { gameSchema, projectSchema } from './schemas';
 import { testSchemaContext } from './test-context';
+import { closingFence, sourceLines } from './todos';
 
 // Astro's content layer is not populated under Vitest, so tests read the entry files directly.
 // This is the one place that mirrors the collections' glob loaders in src/content.config.ts.
@@ -17,8 +18,10 @@ export function rawEntries(): Record<string, string> {
 
 /** Splits an entry's source into its parsed YAML frontmatter and its Markdown body. */
 function splitEntry(source: string): { frontmatter: unknown; body: string } {
-	const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(source);
-	return { frontmatter: parse(match?.[1] ?? '') ?? {}, body: source.slice(match?.[0].length ?? 0) };
+	const lines = sourceLines(source);
+	const end = closingFence(lines);
+	const frontmatter = parse(lines.slice(1, Math.max(end, 1)).join('\n'));
+	return { frontmatter: frontmatter ?? {}, body: lines.slice(end + 1).join('\n') };
 }
 
 const collection = (name: 'games' | 'projects') =>
