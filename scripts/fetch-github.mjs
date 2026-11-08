@@ -1,7 +1,7 @@
 // @ts-check
 /**
- * Prebuild step: fetches star counts and descriptions from the GitHub API for every `repo` in the
- * content and writes them to `src/data/github-stats.json`, which `src/lib/github-stats.ts` reads.
+ * Prebuild step: fetches star counts from the GitHub API for every `repo` in the content and writes
+ * them to `src/data/github-stats.json`, which `src/lib/github-stats.ts` reads.
  *
  * It never fails the build over GitHub: no token is required (`GITHUB_TOKEN` is used when set), and a
  * repo that can't be fetched (offline, rate-limited, missing) is left out of the file, so the site
@@ -94,8 +94,7 @@ export async function run({ contentDir, outFile, fetch, env, log }) {
 				log.warn(`fetch-github: ${repo}: unexpected response; using frontmatter values`);
 				continue;
 			}
-			const description = typeof body.description === 'string' && body.description !== '' ? body.description : null;
-			stats[repo] = { stars: body.stargazers_count, description };
+			stats[repo] = { stars: body.stargazers_count };
 		} catch (error) {
 			// A hung connection would cost the timeout again for every remaining repo; give up instead.
 			if (error instanceof Error && error.name === 'TimeoutError') {

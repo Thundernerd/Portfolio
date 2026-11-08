@@ -1,31 +1,27 @@
-/** Stars and description of a GitHub repo, as written by `scripts/fetch-github.mjs`. */
+/** Star count of a GitHub repo, as written by `scripts/fetch-github.mjs`. */
 export interface RepoStats {
 	stars: number;
-	description: string | null;
 }
 
 /** The project frontmatter fields the GitHub stats can stand in for. */
 export interface RepoProject {
 	repo: string;
-	blurb: string;
 	stars?: number;
 }
 
 /** What to show for a project: GitHub's values where fetched, its frontmatter otherwise. */
 export interface ResolvedRepoStats {
 	stars: number | undefined;
-	description: string;
 }
 
 /**
- * Resolves a project's stars and description from the `fetched` stats, falling back to its frontmatter
- * `stars` and `blurb` when the fetcher couldn't reach GitHub for that repo.
+ * Resolves a project's star count from the `fetched` stats, falling back to its frontmatter `stars`
+ * when the fetcher couldn't reach GitHub for that repo.
  */
 export function resolveRepoStats(project: RepoProject, fetched: Record<string, RepoStats>): ResolvedRepoStats {
 	const stats = fetched[project.repo];
 	return {
 		stars: stats?.stars ?? project.stars,
-		description: stats?.description ?? project.blurb,
 	};
 }
 
@@ -37,7 +33,7 @@ const generated = import.meta.glob<Record<string, RepoStats>>('../data/github-st
 });
 const fetchedStats: Record<string, RepoStats> = Object.values(generated)[0] ?? {};
 
-/** A project's stars and description: as fetched at build time, or from its frontmatter. */
+/** A project's star count: as fetched at build time, or from its frontmatter. */
 export function repoStats(project: RepoProject): ResolvedRepoStats {
 	return resolveRepoStats(project, fetchedStats);
 }
