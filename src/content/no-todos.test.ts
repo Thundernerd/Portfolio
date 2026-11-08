@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findTodos } from './todos';
+import { findTodos, formatTodo } from './todos';
 
 // Launch guard: no content entry may still hold a TODO placeholder. Content is still being filled
 // in, so it only runs when CHECK_TODOS is set (`CHECK_TODOS=1 npm test`); before launch, drop the
@@ -14,7 +14,7 @@ const entries = import.meta.glob<string>('./{games,projects}/**/*.{md,mdx}', {
 
 describe('content entries', () => {
 	it.skipIf(!process.env.CHECK_TODOS)('hold no TODO placeholders', () => {
-		const todos = findTodos(entries).map(({ file, line, section, key, text }) => `${file}:${line} (${key ?? section}): ${text}`);
+		const todos = findTodos(entries).map(formatTodo);
 		expect(todos).toEqual([]);
 	});
 });
@@ -74,5 +74,19 @@ describe('findTodos', () => {
 	it('ignores words that merely contain TODO', () => {
 		const entry = clean.replace('I built the gameplay systems.', 'Posted on MASTODON; see TODOS.md.');
 		expect(findTodos({ './games/fru.md': entry })).toEqual([]);
+	});
+});
+
+describe('formatTodo', () => {
+	it('names the file, line and key of a frontmatter TODO', () => {
+		expect(
+			formatTodo({ file: './games/fru.md', line: 5, section: 'frontmatter', key: 'studio', text: "studio: 'TODO: studio'" }),
+		).toBe("./games/fru.md:5 (studio): studio: 'TODO: studio'");
+	});
+
+	it('names the section when the TODO has no key', () => {
+		expect(formatTodo({ file: './games/fru.md', line: 15, section: 'body', text: 'TODO: describe it.' })).toBe(
+			'./games/fru.md:15 (body): TODO: describe it.',
+		);
 	});
 });

@@ -39,3 +39,8 @@ export function findTodos(sources: Record<string, string>): Todo[] {
 		});
 	});
 }
+
+/** One line per TODO for the guard's failure report: `file:line (key or section): text`. */
+export function formatTodo({ file, line, section, key, text }: Todo): string {
+	return `${file}:${line} (${key ?? section}): ${text}`;
+}
