@@ -12,10 +12,11 @@ Run from the repo root (Node `>=22.23.4`):
 | `npm install`     | Install dependencies                                    |
 | `npm run dev`     | Start the dev server at `localhost:4321/Portfolio/`     |
 | `npm run check`   | Type-check `.astro` and TypeScript files (`astro check`) |
+| `npm test`        | Run the unit tests (Vitest)                             |
 | `npm run build`   | Build the production site to `./dist/`                  |
 | `npm run preview` | Preview the production build locally                    |
 
 ## Base path
 
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
-asset URLs from `import.meta.env.BASE_URL` rather than hard-coding a leading `/`.
+asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a leading `/`.
