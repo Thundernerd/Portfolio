@@ -8,7 +8,7 @@ Before committing, run `npm test` (Vitest), `npm run check` (type-check via `ast
 The site is served from `https://thundernerd.github.io/Portfolio/` (`base: '/Portfolio'` in
 `astro.config.mjs`). Build every internal link and asset URL with `withBase()` from
 `src/lib/url.ts` (for example `withBase('favicon.svg')`); never hard-code a root-relative `/...` path
-or concatenate `import.meta.env.BASE_URL` by hand, since it has no trailing `/`.
+or concatenate `import.meta.env.BASE_URL` by hand, since its trailing `/` is not guaranteed.
 
 ## Development
 
