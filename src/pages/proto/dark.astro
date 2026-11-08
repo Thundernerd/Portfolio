@@ -1,0 +1,12 @@
+---
+import { getCollection } from 'astro:content';
+import DarkHome from '../../components/proto/dark/DarkHome.astro';
+import Dark from '../../layouts/proto/Dark.astro';
+
+const games = await getCollection('games');
+const projects = await getCollection('projects');
+---
+
+<Dark title="Thundernerd · Game developer & programmer">
+	<DarkHome games={games} projects={projects} />
+</Dark>
