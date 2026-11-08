@@ -1,7 +1,7 @@
 ---
 /**
- * Card for one entry of the `games` collection: cover, title, role, studio, year, platforms, blurb,
- * and links to the trailer and store pages. The title links to `href` (a site path, e.g. a game
+ * Card for one entry of the `games` collection: cover, title, role, studio, year (when known),
+ * platforms, blurb, and links to the trailer and store pages. The title links to `href` (a site path, e.g. a game
  * page) when given. Each link is described by the title, so "Trailer" stays meaningful out of
  * context; the title's id is `game-<entry id>-title`.
  *
@@ -35,12 +35,16 @@ const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...stor
 			<dt>Studio</dt>
 			<dd class="game-card__studio">{studio}</dd>
 		</div>
-		<div class="game-card__fact">
-			<dt>Year</dt>
-			<dd class="game-card__year">
-				<time datetime={String(year)}>{year}</time>
-			</dd>
-		</div>
+		{
+			year !== undefined && (
+				<div class="game-card__fact">
+					<dt>Year</dt>
+					<dd class="game-card__year">
+						<time datetime={String(year)}>{year}</time>
+					</dd>
+				</div>
+			)
+		}
 	</dl>
 	<ul class="game-card__platforms">
 		{platforms.map((platform) => <li class="game-card__platform">{platform}</li>)}

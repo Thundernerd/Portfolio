@@ -1,6 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CollectionGrid from './CollectionGrid.astro';
 import { type AstroContainer, createContainer, gameEntry, projectEntry } from './test-fixtures';
+
+// Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
+vi.mock('../lib/github-stats', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('../lib/github-stats')>();
+	const fetched = { 'fixture-owner/fetched': { stars: 50, description: null } };
+	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
+});
 
 describe('CollectionGrid', () => {
 	let container: AstroContainer;
@@ -38,6 +45,31 @@ describe('CollectionGrid', () => {
 			],
 		});
 		expect(titlesIn(html)).toEqual(['WASD', 'RTM', 'Tester', 'Zworpshop']);
+	});
+
+	it('orders projects by their fetched star counts when GitHub was reachable', async () => {
+		const html = await render({
+			id: 'mods',
+			title: 'Mods',
+			items: [
+				projectEntry({ title: 'RTM', stars: 10 }, 'rtm'),
+				projectEntry({ title: 'WASD', repo: 'fixture-owner/fetched', stars: 1 }, 'wasd'),
+			],
+		});
+		expect(titlesIn(html)).toEqual(['WASD', 'RTM']);
+	});
+
+	it('puts undated games last, ordering them by title', async () => {
+		const html = await render({
+			id: 'games',
+			title: 'Games',
+			items: [
+				gameEntry({ title: 'Nailed It! Baking Bash', year: undefined }, 'nailed-it'),
+				gameEntry({ title: 'FRU', year: undefined }, 'fru'),
+				gameEntry({ title: 'Good Job!', year: 2020 }, 'good-job'),
+			],
+		});
+		expect(titlesIn(html)).toEqual(['Good Job!', 'FRU', 'Nailed It! Baking Bash']);
 	});
 
 	it('renders games as game cards, newest first', async () => {

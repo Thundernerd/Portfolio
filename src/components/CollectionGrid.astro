@@ -1,7 +1,8 @@
 ---
 /**
  * A titled section listing a collection as a grid of cards: `games` entries as `GameCard`s (newest
- * first) or `projects` entries as `ProjectCard`s (most GitHub stars first, unknown counts last).
+ * first, undated last) or `projects` entries as `ProjectCard`s (most GitHub stars first, as resolved
+ * by `repoStats()`, unknown counts last).
  * Ties fall back to title order. `itemHref` links each card to a page on this site. The default
  * slot holds optional intro copy under the heading.
  *
@@ -11,6 +12,7 @@
 import type { CollectionEntry } from 'astro:content';
 import GameCard from './GameCard.astro';
 import ProjectCard from './ProjectCard.astro';
+import { repoStats } from '../lib/github-stats';
 
 type Game = CollectionEntry<'games'>;
 type Project = CollectionEntry<'projects'>;
@@ -31,10 +33,11 @@ const entries: (Game | Project)[] = items;
 const byTitle = (a: Game | Project, b: Game | Project) => a.data.title.localeCompare(b.data.title, 'en');
 const games = entries
 	.filter((entry): entry is Game => entry.collection === 'games')
-	.sort((a, b) => b.data.year - a.data.year || byTitle(a, b));
+	.sort((a, b) => (b.data.year ?? -Infinity) - (a.data.year ?? -Infinity) || byTitle(a, b));
+const starsOf = (project: Project) => repoStats(project.data).stars ?? -1;
 const projects = entries
 	.filter((entry): entry is Project => entry.collection === 'projects')
-	.sort((a, b) => (b.data.stars ?? -1) - (a.data.stars ?? -1) || byTitle(a, b));
+	.sort((a, b) => starsOf(b) - starsOf(a) || byTitle(a, b));
 ---
 
 <section class="collection-grid" id={id} aria-labelledby={headingId}>

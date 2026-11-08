@@ -20,6 +20,13 @@ describe('GameCard', () => {
 		expect(html).toContain('A puzzle game about being the boss’s kid.');
 	});
 
+	it('leaves out the year when it is not known', async () => {
+		const html = await render({ game: gameEntry({ year: undefined }) });
+		expect(html).toMatch(/<dt[^>]*>Studio<\/dt>/);
+		expect(html).not.toContain('Year');
+		expect(html).not.toContain('<time');
+	});
+
 	it('lists every platform', async () => {
 		const html = await render({ game: gameEntry({ platforms: ['Nintendo Switch', 'PC'] }) });
 		expect(html).toMatch(/<li[^>]*>Nintendo Switch<\/li>\s*<li[^>]*>PC<\/li>/);

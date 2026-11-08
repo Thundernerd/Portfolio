@@ -30,7 +30,8 @@ export function projectEntry(
 		collection: 'projects',
 		data: {
 			title: 'SerializableInterface',
-			repo: 'Thundernerd/Unity3D-SerializableInterface',
+			// A fictional owner, so stats fetched from GitHub for real repos never apply to fixtures.
+			repo: 'fixture-owner/serializable-interface',
 			kind: 'unity-plugin',
 			tags: [],
 			blurb: 'Serialize interface references in the Unity inspector.',
