@@ -10,6 +10,6 @@ studio: 'TODO: studio'
 blurb: 'TODO: one-line description of FRU.'
 ---
 
-I co-founded the studio behind FRU and worked on it as a programmer.
+I was a co-founder and programmer on FRU.
 
 TODO: describe what I built on FRU (systems, tech, responsibilities).
