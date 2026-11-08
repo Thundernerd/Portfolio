@@ -9,6 +9,8 @@ describe('MinimalHome', () => {
 	});
 
 	const render = (props: Record<string, unknown>) => container.renderToString(MinimalHome, { props });
+	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
+	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 	const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
 
 	it('renders the hero, then every section in the agreed order', async () => {
@@ -41,9 +43,7 @@ describe('MinimalHome', () => {
 
 	/** The text of each project card's inline stats line, in page order. */
 	const statsLines = (html: string) =>
-		[...html.matchAll(/<ul class="mn-stats"[^>]*>([\s\S]*?)<\/ul>/g)].map((m) =>
-			m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
-		);
+		[...html.matchAll(/<ul class="mn-stats"[^>]*>([\s\S]*?)<\/ul>/g)].map((m) => textOf(m[1]));
 
 	it('shows the language and star count inline after each project blurb', async () => {
 		const html = await render({
@@ -112,7 +112,7 @@ describe('MinimalHome', () => {
 			],
 		});
 		const facts = /<ul class="mn-facts"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? '';
-		const items = [...facts.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
+		const items = [...facts.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => textOf(m[1]));
 		expect(items).toEqual(['2 released games', '3 open-source projects', '1,234 GitHub stars']);
 	});
 
@@ -127,7 +127,7 @@ describe('MinimalHome', () => {
 			],
 		});
 		const panel = /<div class="hero__media"[^>]*>([\s\S]*?)<\/div>/.exec(html)?.[1] ?? '';
-		const rows = [...panel.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+		const rows = [...panel.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => textOf(m[1]));
 		expect(rows).toEqual(['C# 2', 'Rust 1']);
 	});
 });
