@@ -4,12 +4,17 @@ export interface Todo {
 	file: string;
 	/** 1-based line number in the file. */
 	line: number;
-	/** The frontmatter key the line sets, `'frontmatter'` for any other frontmatter line (such as a
-	 * YAML comment), or `'body'`. */
-	field: string;
+	/** Whether the TODO is in the YAML frontmatter or the Markdown body. */
+	section: 'frontmatter' | 'body';
+	/** The top-level frontmatter key whose value holds the TODO; absent for a YAML comment line
+	 * and in the body. */
+	key?: string;
 	/** The line itself, trimmed. */
 	text: string;
 }
+
+/** `TODO` as a whole word, so `TODO:` and `TODO(name)` count but `TODOS` and `MASTODON` don't. */
+const hasTodo = (line: string) => /\bTODO\b/.test(line);
 
 /**
  * Finds every `TODO` placeholder in the raw source of content entries, keyed by file path
@@ -17,14 +22,20 @@ export interface Todo {
  */
 export function findTodos(sources: Record<string, string>): Todo[] {
 	return Object.entries(sources).flatMap(([file, source]) => {
-		const lines = source.split(/\r?\n/);
-		// Index of the closing `---` fence, or 0 when the file has no frontmatter.
-		const frontmatterEnd = lines[0] === '---' ? lines.indexOf('---', 1) : 0;
-		return lines.flatMap((raw, index) => {
-			if (!raw.includes('TODO')) return [];
-			const field =
-				index < frontmatterEnd ? (/^([\w-]+):/.exec(raw)?.[1] ?? 'frontmatter') : 'body';
-			return [{ file, line: index + 1, field, text: raw.trim() }];
+		const lines = source.replace(/^\uFEFF/, '').split(/\r?\n/);
+		const isFence = (line: string) => line.trimEnd() === '---';
+		// Index of the closing `---` fence, or -1 when the file has no (closed) frontmatter.
+		const frontmatterEnd = isFence(lines[0]) ? lines.findIndex((line, index) => index > 0 && isFence(line)) : -1;
+		// The top-level key the current frontmatter line belongs to: indented lines (block scalars,
+		// list items, nested maps) continue the key above them.
+		let key: string | undefined;
+		return lines.flatMap((raw, index): Todo[] => {
+			if (index >= frontmatterEnd) {
+				return hasTodo(raw) ? [{ file, line: index + 1, section: 'body', text: raw.trim() }] : [];
+			}
+			if (!/^\s/.test(raw)) key = /^([\w-]+):/.exec(raw)?.[1];
+			if (!hasTodo(raw)) return [];
+			return [{ file, line: index + 1, section: 'frontmatter', ...(key && { key }), text: raw.trim() }];
 		});
 	});
 }
