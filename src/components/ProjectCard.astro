@@ -4,6 +4,9 @@
  * a link to the GitHub repo. Stars and description come from `repoStats()`: GitHub's values when the
  * prebuild fetcher reached it, the entry's `stars` and `blurb` otherwise. The title links to `href` (a site path, e.g. a project page) when given.
  *
+ * Slots: `media` replaces the image when filled; `extra` renders right after the blurb (e.g. more
+ * repo stats).
+ *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--card-gap`, `--card-tags-gap`.
  */
@@ -23,12 +26,15 @@ const { title, repo, tags, image } = project.data;
 const { stars, description } = repoStats(project.data);
 const repoUrl = `https://github.com/${repo}`;
 const starCount = stars?.toLocaleString('en-US');
+// Filled `media` slot content replaces the image; a slot that renders empty counts as unfilled.
+const media = Astro.slots.has('media') ? (await Astro.slots.render('media')).trim() : '';
 ---
 
 <article class="project-card" data-kind={project.data.kind}>
-	{image && <Image class="project-card__image" src={image} alt="" />}
+	{media ? <Fragment set:html={media} /> : image && <Image class="project-card__image" src={image} alt="" />}
 	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
 	<p class="project-card__blurb">{description}</p>
+	<slot name="extra" />
 	{
 		tags.length > 0 && (
 			<ul class="project-card__tags">

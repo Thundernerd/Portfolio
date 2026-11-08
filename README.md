@@ -46,3 +46,8 @@ list resets) inside `@layer components`, so any unlayered layout CSS wins over i
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
 component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
+
+`GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example
+with a trailer embed) and `extra` renders after the blurb (for example more repo stats). Fill them
+directly (`<Fragment slot="extra">...</Fragment>`), or from a `CollectionGrid` with the `itemMedia`
+and `itemExtra` props, which return trusted HTML per entry (or `undefined` to leave the slot empty).

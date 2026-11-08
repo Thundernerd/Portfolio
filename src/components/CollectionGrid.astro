@@ -3,8 +3,9 @@
  * A titled section listing a collection as a grid of cards: `games` entries as `GameCard`s (newest
  * first, undated last) or `projects` entries as `ProjectCard`s (most GitHub stars first, as resolved
  * by `repoStats()`, unknown counts last).
- * Ties fall back to title order. `itemHref` links each card to a page on this site. The default
- * slot holds optional intro copy under the heading.
+ * Ties fall back to title order. `itemHref` links each card to a page on this site; `itemMedia` and
+ * `itemExtra` fill each card's `media` and `extra` slots. The default slot holds optional intro copy
+ * under the heading.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--grid-gap`, `--grid-min` (minimum card width).
@@ -24,9 +25,13 @@ interface Props {
 	items: Game[] | Project[];
 	/** The site path each card's title links to (e.g. its detail page); cards are unlinked without it. */
 	itemHref?: (entry: Game | Project) => string | undefined;
+	/** Trusted HTML for each card's `media` slot, replacing its cover or image; cards without it keep theirs. */
+	itemMedia?: (entry: Game | Project) => string | undefined;
+	/** Trusted HTML for each card's `extra` slot (after the blurb); the slot stays empty without it. */
+	itemExtra?: (entry: Game | Project) => string | undefined;
 }
 
-const { id, title, items, itemHref } = Astro.props;
+const { id, title, items, itemHref, itemMedia, itemExtra } = Astro.props;
 const headingId = `${id}-heading`;
 
 const entries: (Game | Project)[] = items;
@@ -53,14 +58,20 @@ const projects = entries
 		{
 			games.map((game) => (
 				<li class="collection-grid__item">
-					<GameCard game={game} href={itemHref?.(game)} />
+					<GameCard game={game} href={itemHref?.(game)}>
+						<Fragment slot="media" set:html={itemMedia?.(game)} />
+						<Fragment slot="extra" set:html={itemExtra?.(game)} />
+					</GameCard>
 				</li>
 			))
 		}
 		{
 			projects.map((project) => (
 				<li class="collection-grid__item">
-					<ProjectCard project={project} href={itemHref?.(project)} />
+					<ProjectCard project={project} href={itemHref?.(project)}>
+						<Fragment slot="media" set:html={itemMedia?.(project)} />
+						<Fragment slot="extra" set:html={itemExtra?.(project)} />
+					</ProjectCard>
 				</li>
 			))
 		}

@@ -64,4 +64,21 @@ describe('GameCard', () => {
 		expect(await render({ game: gameEntry() })).not.toContain('<img');
 		expect(await render({ game: gameEntry({ cover: fixtureImage }) })).toMatch(/<img[^>]*\salt(=""|[\s>])/);
 	});
+
+	it('renders slotted media, such as a trailer embed, in place of the cover', async () => {
+		const html = await container.renderToString(GameCard, {
+			props: { game: gameEntry({ cover: fixtureImage }) },
+			slots: { media: '<iframe src="https://www.youtube.com/embed/abc" title="Good Job! trailer"></iframe>' },
+		});
+		expect(html).not.toContain('<img');
+		expect(html).toMatch(/<article[^>]*>\s*<iframe[^>]*src="https:\/\/www.youtube.com\/embed\/abc"/);
+	});
+
+	it('renders slotted extra content right after the blurb', async () => {
+		const html = await container.renderToString(GameCard, {
+			props: { game: gameEntry({ storeLinks: [{ label: 'Nintendo eShop', url: 'https://www.nintendo.com/good-job' }] }) },
+			slots: { extra: '<p class="awards">Best Puzzle Game</p>' },
+		});
+		expect(html).toMatch(/boss’s kid.<\/p>\s*<p class="awards">Best Puzzle Game<\/p>\s*<ul class="game-card__links"/);
+	});
 });

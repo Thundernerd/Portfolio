@@ -64,4 +64,21 @@ describe('ProjectCard', () => {
 		const html = await render({ project: projectEntry({ image: fixtureImage }) });
 		expect(html).toMatch(/<img[^>]*\salt(=""|[\s>])/);
 	});
+
+	it('renders slotted media in place of the image', async () => {
+		const html = await container.renderToString(ProjectCard, {
+			props: { project: projectEntry({ image: fixtureImage }) },
+			slots: { media: '<video src="/fixtures/demo.mp4"></video>' },
+		});
+		expect(html).not.toContain('<img');
+		expect(html).toMatch(/<article[^>]*>\s*<video src="\/fixtures\/demo.mp4"><\/video>/);
+	});
+
+	it('renders slotted extra content, such as more repo stats, right after the blurb', async () => {
+		const html = await container.renderToString(ProjectCard, {
+			props: { project: projectEntry({ tags: ['Unity'] }) },
+			slots: { extra: '<p class="forks">12 forks</p>' },
+		});
+		expect(html).toMatch(/Unity inspector.<\/p>\s*<p class="forks">12 forks<\/p>\s*<ul class="project-card__tags"/);
+	});
 });
