@@ -28,6 +28,11 @@ describe('games schema', () => {
 		expect(gameSchema(context).parse(placeholder)).toEqual({ ...placeholder, storeLinks: [] });
 	});
 
+	it('accepts a game whose release year is not known yet', () => {
+		const { year, ...withoutYear } = validGame;
+		expect(gameSchema(context).parse(withoutYear)).toEqual(withoutYear);
+	});
+
 	it.each([
 		['no platforms', { platforms: [] }],
 		['a fractional year', { year: 2016.5 }],
