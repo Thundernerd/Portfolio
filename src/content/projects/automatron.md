@@ -5,4 +5,5 @@ kind: unity-plugin
 tags: [Unity, C#]
 blurb: An automation tool for Unity3D.
 stars: 12
+archived: true
 ---

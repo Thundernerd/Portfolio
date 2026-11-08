@@ -1,8 +1,10 @@
 ---
 /**
- * Card for one entry of the `projects` collection: image, title, description, tags, star count and
- * a link to the GitHub repo. Stars and description come from `repoStats()`: GitHub's values when the
- * prebuild fetcher reached it, the entry's `stars` and `blurb` otherwise. The title links to `href` (a site path, e.g. a project page) when given.
+ * Card for one entry of the `projects` collection: image, title, blurb, tags, star count and a link
+ * to the GitHub repo. The star count comes from `repoStats()`: GitHub's count when the prebuild
+ * fetcher reached it, the entry's `stars` otherwise. The blurb is always the hand-written one. The
+ * title links to `href` (a site path, e.g. a project page) when given.
+ * An entry marked `archived` gets an "Archived" label (`.project-card__archived`) after the title.
  *
  * Slots: `media` (wrapped in `.project-card__media`) replaces the image when filled; `extra`
  * renders right after the blurb (e.g. more repo stats).
@@ -21,9 +23,9 @@ interface Props {
 }
 
 const { project, href } = Astro.props;
-const { title, repo, tags, image } = project.data;
-// Stars and description as fetched from GitHub at build time, falling back to the frontmatter.
-const { stars, description } = repoStats(project.data);
+const { title, blurb, repo, tags, image, archived } = project.data;
+// The star count as fetched from GitHub at build time, falling back to the frontmatter.
+const { stars } = repoStats(project.data);
 const repoUrl = `https://github.com/${repo}`;
 const starCount = stars?.toLocaleString('en-US');
 // Filled `media` slot content replaces the image. A slot that renders to nothing counts as unfilled, since
@@ -42,7 +44,8 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 		)
 	}
 	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
-	<p class="project-card__blurb">{description}</p>
+	{archived && <p class="project-card__archived">Archived</p>}
+	<p class="project-card__blurb">{blurb}</p>
 	<slot name="extra" />
 	{
 		tags.length > 0 && (
