@@ -61,8 +61,7 @@ describe('projects schema', () => {
 		expect(projectSchema(context).parse(minimal)).toEqual({ ...minimal, tags: [], archived: false });
 	});
 
-	it('treats a project as maintained unless it is marked archived', () => {
-		expect(projectSchema(context).parse(validProject).archived).toBe(false);
+	it('keeps a project marked archived (projects default to not archived, as above)', () => {
 		expect(projectSchema(context).parse({ ...validProject, archived: true }).archived).toBe(true);
 	});
 
