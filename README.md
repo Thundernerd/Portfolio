@@ -23,7 +23,7 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs `npm run check` and `npm run build` on pushes to `main` and on pull requests
+`.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to `main` and on pull requests
 (using [`withastro/action`](https://github.com/withastro/action)). Pushes to `main` then publish
 `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
 (Settings → Pages).

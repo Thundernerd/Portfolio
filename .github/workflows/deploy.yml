@@ -29,7 +29,7 @@ jobs:
       - name: Check, build and upload site
         uses: withastro/action@v6
         with:
-          build-cmd: npm run check && npm run build
+          build-cmd: npm run check && npm test && npm run build
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
