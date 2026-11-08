@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { z } from 'astro/zod';
-import type { SchemaContext } from 'astro:content';
 import { gameSchema, projectSchema } from './schemas';
-
-// Astro's image() helper resolves files at build time; outside Astro, stand in a plain path.
-const context = { image: () => z.string() } as unknown as SchemaContext;
+import { testSchemaContext as context } from './test-context';
 
 const validGame = {
 	title: 'FRU',
