@@ -5,8 +5,8 @@
  * page) when given. Each link is described by the title, so "Trailer" stays meaningful out of
  * context; the title's id is `game-<entry id>-title`.
  *
- * Slots: `media` replaces the cover when filled (e.g. with a trailer embed); `extra` renders right
- * after the blurb.
+ * Slots: `media` (wrapped in `.game-card__media`) replaces the cover when filled (e.g. with a
+ * trailer embed); `extra` renders right after the blurb.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--card-gap`, `--card-tags-gap`.
@@ -24,12 +24,21 @@ const { game, href } = Astro.props;
 const { title, platforms, role, studio, year, cover, trailer, storeLinks, blurb } = game.data;
 const titleId = `game-${game.id}-title`;
 const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...storeLinks];
-// Filled `media` slot content replaces the cover; a slot that renders empty counts as unfilled.
-const media = Astro.slots.has('media') ? (await Astro.slots.render('media')).trim() : '';
+// Filled `media` slot content replaces the cover. A slot that renders to nothing counts as unfilled, since
+// `Astro.slots.has` is also true for `set:html={undefined}` (as `CollectionGrid` passes) or a false condition.
+const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media')).trim() !== '';
 ---
 
 <article class="game-card">
-	{media ? <Fragment set:html={media} /> : cover && <Image class="game-card__cover" src={cover} alt="" />}
+	{
+		hasMedia ? (
+			<div class="game-card__media">
+				<slot name="media" />
+			</div>
+		) : (
+			cover && <Image class="game-card__cover" src={cover} alt="" />
+		)
+	}
 	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
 	<dl class="game-card__meta">
 		<div class="game-card__fact">

@@ -68,10 +68,10 @@ describe('ProjectCard', () => {
 	it('renders slotted media in place of the image', async () => {
 		const html = await container.renderToString(ProjectCard, {
 			props: { project: projectEntry({ image: fixtureImage }) },
-			slots: { media: '<video src="/fixtures/demo.mp4"></video>' },
+			slots: { media: '<video src="https://example.com/demo.mp4"></video>' },
 		});
 		expect(html).not.toContain('<img');
-		expect(html).toMatch(/<article[^>]*>\s*<video src="\/fixtures\/demo.mp4"><\/video>/);
+		expect(html).toMatch(/<article[^>]*>\s*<div class="project-card__media"[^>]*>\s*<video src="https:\/\/example.com\/demo.mp4"><\/video>/);
 	});
 
 	it('renders slotted extra content, such as more repo stats, right after the blurb', async () => {

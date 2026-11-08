@@ -71,7 +71,7 @@ describe('GameCard', () => {
 			slots: { media: '<iframe src="https://www.youtube.com/embed/abc" title="Good Job! trailer"></iframe>' },
 		});
 		expect(html).not.toContain('<img');
-		expect(html).toMatch(/<article[^>]*>\s*<iframe[^>]*src="https:\/\/www.youtube.com\/embed\/abc"/);
+		expect(html).toMatch(/<article[^>]*>\s*<div class="game-card__media"[^>]*>\s*<iframe[^>]*src="https:\/\/www.youtube.com\/embed\/abc"/);
 	});
 
 	it('renders slotted extra content right after the blurb', async () => {

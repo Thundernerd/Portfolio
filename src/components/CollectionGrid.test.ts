@@ -127,7 +127,7 @@ describe('CollectionGrid', () => {
 			itemMedia: (entry: { id: string }) => (entry.id === 'good-job' ? '<iframe src="https://www.youtube.com/embed/abc"></iframe>' : undefined),
 		});
 		const [goodJob, fru] = html.split('<article').slice(1);
-		expect(goodJob).toMatch(/^[^>]*>\s*<iframe src="https:\/\/www.youtube.com\/embed\/abc"><\/iframe>/);
+		expect(goodJob).toMatch(/^[^>]*>\s*<div class="game-card__media"[^>]*>\s*<iframe src="https:\/\/www.youtube.com\/embed\/abc"><\/iframe>/);
 		expect(goodJob).not.toContain('<img');
 		expect(fru).toContain('<img');
 	});
