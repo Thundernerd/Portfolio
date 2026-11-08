@@ -22,7 +22,7 @@ asset URLs from `import.meta.env.BASE_URL` rather than hard-coding a leading `/`
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs `npm run check` and `npm run build` on every push and pull request
+`.github/workflows/deploy.yml` runs `npm run check` and `npm run build` on pushes to `main` and on pull requests
 (using [`withastro/action`](https://github.com/withastro/action)). Pushes to `main` then publish
 `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
 (Settings → Pages).

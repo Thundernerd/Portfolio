@@ -1,4 +1,4 @@
-# Builds the site on every push and pull request, and deploys it to GitHub Pages
+# Builds the site on pushes to main and on pull requests, and deploys it to GitHub Pages
 # (https://thundernerd.github.io/Portfolio/) on pushes to main.
 name: Deploy to GitHub Pages
 
@@ -11,10 +11,11 @@ on:
 permissions:
   contents: read
 
-# Allow one deployment at a time, and don't cancel a deployment that is already running.
+# One run per ref at a time. A new commit on a pull request supersedes its older build;
+# runs on main queue instead, so a deployment in progress is never cancelled.
 concurrency:
   group: pages-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
