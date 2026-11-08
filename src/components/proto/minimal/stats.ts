@@ -18,6 +18,14 @@ const LANGUAGE_COLOURS: Record<string, string> = {
 	Shell: '#89e051',
 };
 
+/** A project's language: the first of its tags that is a programming language, if any. */
+export function projectLanguage(project: CollectionEntry<'projects'>): string | undefined {
+	return project.data.tags.find((tag) => tag in LANGUAGE_COLOURS);
+}
+
+/** The colour GitHub uses for `language`. */
+export const languageColour = (language: string) => LANGUAGE_COLOURS[language];
+
 const escapeHtml = (text: string) =>
 	text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
@@ -26,7 +34,7 @@ const escapeHtml = (text: string) =>
  * count (from `repoStats()`), or `undefined` when it has neither.
  */
 export function repoStatsHtml(project: CollectionEntry<'projects'>): string | undefined {
-	const language = project.data.tags.find((tag) => tag in LANGUAGE_COLOURS);
+	const language = projectLanguage(project);
 	const { stars } = repoStats(project.data);
 	const items: string[] = [];
 	if (language) {

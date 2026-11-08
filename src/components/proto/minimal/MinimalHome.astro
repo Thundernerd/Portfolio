@@ -13,7 +13,7 @@ import Hero from '../../Hero.astro';
 import { repoStats } from '../../../lib/github-stats';
 import { monogramHtml } from './monogram';
 import { presentableGame, presentableProject } from './placeholders';
-import { repoStatsHtml } from './stats';
+import { languageColour, projectLanguage, repoStatsHtml } from './stats';
 
 type Game = CollectionEntry<'games'>;
 type Project = CollectionEntry<'projects'>;
@@ -33,6 +33,13 @@ const ofKind = (kind: Project['data']['kind']) => projects.filter((project) => p
 // `tool` projects have no section in the agreed order, so they are left out of the page and the facts.
 const shown = projects.filter((project) => project.data.kind !== 'tool');
 const totalStars = shown.reduce((sum, project) => sum + (repoStats(project.data).stars ?? 0), 0);
+// How many of the shown projects use each language, most used first.
+const languageCounts = new Map<string, number>();
+for (const language of shown.map(projectLanguage)) {
+	if (language) languageCounts.set(language, (languageCounts.get(language) ?? 0) + 1);
+}
+const languages = [...languageCounts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b, 'en'));
+const mostUsed = languages[0]?.[1] ?? 1;
 const plural = (count: number, one: string, many: string) => `${count.toLocaleString('en-US')} ${count === 1 ? one : many}`;
 const facts = [
 	plural(games.length, 'released game', 'released games'),
@@ -57,6 +64,22 @@ const facts = [
 	<ul class="mn-facts">
 		{facts.map((fact) => <li>{fact}</li>)}
 	</ul>
+	{
+		languages.length > 0 && (
+			<figure slot="media" class="mn-langs">
+				<figcaption class="mn-langs__caption">Projects by language</figcaption>
+				<ul class="mn-langs__list">
+					{languages.map(([language, count]) => (
+						<li class="mn-langs__row" style={`--share: ${count / mostUsed}; --lang-colour: ${languageColour(language)}`}>
+							<span class="mn-langs__name">{language}</span>
+							<span class="mn-langs__bar" aria-hidden="true" />
+							<data class="mn-langs__count" value={count}>{count}</data>
+						</li>
+					))}
+				</ul>
+			</figure>
+		)
+	}
 </Hero>
 
 <CollectionGrid id="games" title="Released games" items={games} itemMedia={gameMedia}>

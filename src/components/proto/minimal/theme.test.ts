@@ -71,4 +71,20 @@ describe('createThemeController', () => {
 		expect(controller.toggle()).toBe('dark');
 		expect(applied).toEqual(['dark']);
 	});
+
+	it('follows a change of the system preference until the visitor picks a theme', () => {
+		const { controller, applied } = setup(memoryStorage(), false);
+		controller.systemChanged(true);
+		expect(controller.theme).toBe('dark');
+		controller.toggle();
+		controller.systemChanged(true);
+		expect(controller.theme).toBe('light');
+		expect(applied).toEqual(['light']);
+	});
+
+	it('ignores system changes when a pick was remembered from an earlier visit', () => {
+		const { controller } = setup(memoryStorage({ 'proto-minimal-theme': 'light' }), false);
+		controller.systemChanged(true);
+		expect(controller.theme).toBe('light');
+	});
 });

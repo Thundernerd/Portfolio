@@ -115,4 +115,19 @@ describe('MinimalHome', () => {
 		const items = [...facts.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
 		expect(items).toEqual(['2 released games', '3 open-source projects', '1,234 GitHub stars']);
 	});
+
+	it('breaks the projects down by language beside the hero, most used first', async () => {
+		const html = await render({
+			games: [],
+			projects: [
+				projectEntry({ tags: ['Rust', 'Tauri'] }, 'a'),
+				projectEntry({ tags: ['Unity', 'C#'] }, 'b'),
+				projectEntry({ tags: ['C#', 'BepInEx'] }, 'c'),
+				projectEntry({ tags: ['NuGet'] }, 'd'),
+			],
+		});
+		const panel = /<div class="hero__media"[^>]*>([\s\S]*?)<\/div>/.exec(html)?.[1] ?? '';
+		const rows = [...panel.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+		expect(rows).toEqual(['C# 2', 'Rust 1']);
+	});
 });

@@ -45,19 +45,30 @@ export interface ThemeController {
 	readonly theme: Theme;
 	/** Switches to the other theme, applies and remembers it, and returns it. */
 	toggle(): Theme;
+	/**
+	 * Reports a change of `prefers-color-scheme`. Until the visitor picks a theme the page follows it
+	 * (through CSS, so nothing is applied); after a pick it is ignored.
+	 */
+	systemChanged(prefersDark: boolean): void;
 }
 
 export function createThemeController({ storage, prefersDark, apply }: ThemeControllerOptions): ThemeController {
-	let theme: Theme = readStoredTheme(storage) ?? (prefersDark ? 'dark' : 'light');
+	const stored = readStoredTheme(storage);
+	let picked = stored !== null;
+	let theme: Theme = stored ?? (prefersDark ? 'dark' : 'light');
 	return {
 		get theme() {
 			return theme;
 		},
 		toggle() {
 			theme = theme === 'dark' ? 'light' : 'dark';
+			picked = true;
 			apply(theme);
 			storeTheme(storage, theme);
 			return theme;
+		},
+		systemChanged(systemPrefersDark) {
+			if (!picked) theme = systemPrefersDark ? 'dark' : 'light';
 		},
 	};
 }
