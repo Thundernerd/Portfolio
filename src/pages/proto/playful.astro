@@ -1,10 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
+import { type CollectionEntry, getCollection } from 'astro:content';
 import Playful from '../../layouts/proto/Playful.astro';
 
 const games = await getCollection('games');
 const projects = await getCollection('projects');
-const ofKind = (kind: string) => projects.filter((project) => project.data.kind === kind);
+const ofKind = (kind: CollectionEntry<'projects'>['data']['kind']) => projects.filter((project) => project.data.kind === kind);
 ---
 
 <Playful games={games} featured={ofKind('featured')} mods={ofKind('zeepkist-mod')} plugins={ofKind('unity-plugin')} />

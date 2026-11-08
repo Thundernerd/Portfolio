@@ -1,6 +1,4 @@
-import type { CollectionEntry } from 'astro:content';
-
-type Entry = CollectionEntry<'games'> | CollectionEntry<'projects'>;
+import type { Entry } from './art';
 
 const isTodo = (text: string) => /\bTODO\b/.test(text);
 

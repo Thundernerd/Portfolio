@@ -1,6 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
-type Entry = CollectionEntry<'games'> | CollectionEntry<'projects'>;
+/** Any card entry: a game or a project. */
+export type Entry = CollectionEntry<'games'> | CollectionEntry<'projects'>;
 
 /** Up to three letters standing in for a title: first and last word initials ("Zeepkist GTR" → "ZG"). */
 export function initials(title: string): string {
