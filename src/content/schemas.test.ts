@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { z } from 'astro/zod';
-import type { SchemaContext } from 'astro:content';
 import { gameSchema, projectSchema } from './schemas';
-
-// Astro's image() helper resolves files at build time; outside Astro, stand in a plain path.
-const context = { image: () => z.string() } as unknown as SchemaContext;
+import { testSchemaContext as context } from './test-context';
 
 const validGame = {
 	title: 'FRU',
@@ -26,6 +22,11 @@ describe('games schema', () => {
 	it('accepts a game without media or links yet, defaulting to no store links', () => {
 		const { cover, trailer, storeLinks, ...placeholder } = validGame;
 		expect(gameSchema(context).parse(placeholder)).toEqual({ ...placeholder, storeLinks: [] });
+	});
+
+	it('accepts a game whose release year is not known yet', () => {
+		const { year, ...withoutYear } = validGame;
+		expect(gameSchema(context).parse(withoutYear)).toEqual(withoutYear);
 	});
 
 	it.each([
