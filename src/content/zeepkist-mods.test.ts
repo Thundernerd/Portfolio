@@ -1,32 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'astro/zod';
-import { parse } from 'yaml';
 import type { SchemaContext } from 'astro:content';
 import { projectSchema } from './schemas';
 
 // Astro's image() helper resolves files at build time; outside Astro, stand in a plain path.
 const context = { image: () => z.string() } as unknown as SchemaContext;
 
-const sources = import.meta.glob<string>('./projects/*.{md,mdx}', {
-	query: '?raw',
-	import: 'default',
+// Same files as the `projects` collection's glob loader in src/content.config.ts.
+const files = import.meta.glob<{ frontmatter: Record<string, unknown> }>('./projects/**/*.{md,mdx}', {
 	eager: true,
 });
 
-/** Every project entry's frontmatter, parsed with the collection schema. */
-function loadProjects() {
-	return Object.entries(sources).map(([file, source]) => {
-		const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(source)?.[1];
-		if (frontmatter === undefined) throw new Error(`${file} has no frontmatter`);
-		return { file, data: projectSchema(context).parse(parse(frontmatter)) };
-	});
-}
+const projects = Object.values(files).map((mod) => projectSchema(context).parse(mod.frontmatter));
 
 describe('Zeepkist mods collection', () => {
 	it('lists the expected mods, each once', () => {
-		const repos = loadProjects()
-			.filter(({ data }) => data.kind === 'zeepkist-mod')
-			.map(({ data }) => data.repo)
+		const repos = projects
+			.filter((project) => project.kind === 'zeepkist-mod')
+			.map((project) => project.repo)
 			.sort();
 		expect(repos).toEqual(
 			[
