@@ -379,8 +379,8 @@ html {
 	pointer-events: none;
 }
 
-.pf-arcade__canvas:focus ~ .pf-arcade__attract,
-.pf-arcade.is-paused .pf-arcade__attract {
+/* "Press start" hides once the visitor is playing; "Paused" stays up while paused. */
+.pf-arcade:not(.is-paused) .pf-arcade__canvas:focus ~ .pf-arcade__attract {
 	visibility: hidden;
 }
 
@@ -393,14 +393,11 @@ html {
 }
 
 .pf-arcade__help {
+	display: grid;
 	margin: 0;
 	font-size: 0.8125rem;
 	line-height: 1.45;
 	color: var(--pf-muted);
-}
-
-.pf-arcade__help-keys {
-	display: none;
 }
 
 .pf-arcade__toggle {
@@ -470,14 +467,11 @@ html {
 	box-shadow: 0 1px 0 var(--pf-line);
 }
 
-/* A mouse and keyboard: explain the keys and hide the touch pad. */
+/* A mouse and keyboard: hide the touch pad and its help. */
 @media (hover: hover) and (pointer: fine) {
 	.pf-arcade__pad,
 	.pf-arcade__help-touch {
 		display: none;
-	}
-	.pf-arcade__help-keys {
-		display: inline;
 	}
 }
 
@@ -886,10 +880,11 @@ html {
 	}
 
 	.pf-hero__eyebrow {
-		animation: pf-blink 1.2s steps(2, jump-none) infinite;
+		animation: pf-blink 1.2s steps(2, jump-none) 5;
 	}
 
-	.pf-arcade__attract {
+	/* Blinks only while the scene runs: not when paused or scrolled away. */
+	.pf-arcade:not(.is-paused, .is-offscreen) .pf-arcade__attract {
 		animation: pf-blink 1s steps(2, jump-none) infinite;
 	}
 

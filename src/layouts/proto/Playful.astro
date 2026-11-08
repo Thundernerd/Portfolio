@@ -11,6 +11,7 @@ import Hero from '../../components/Hero.astro';
 import KartHero from '../../components/proto/playful/KartHero.astro';
 import { artTile } from '../../components/proto/playful/art';
 import { softenTodos } from '../../components/proto/playful/content';
+import { KONAMI_LABELS } from '../../components/proto/playful/konami';
 import { repoStats } from '../../lib/github-stats';
 import { withBase } from '../../lib/url';
 import '../../styles/proto/playful.css';
@@ -30,7 +31,10 @@ const featured = props.featured.map(softenTodos);
 const mods = props.mods.map(softenTodos);
 const plugins = props.plugins.map(softenTodos);
 
-const totalStars = (projects: Project[]) => projects.reduce((sum, project) => sum + (repoStats(project.data).stars ?? 0), 0);
+const starsOf = (project: Project) => repoStats(project.data).stars ?? 0;
+const totalStars = (projects: Project[]) => projects.reduce((sum, project) => sum + starsOf(project), 0);
+/** The best-starred project, as the hero game's high score to beat. */
+const hiScore = Math.max(0, ...[...featured, ...mods, ...plugins].map(starsOf));
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
 /** A HUD readout; `star` ones get a ★ icon (drawn in CSS, as the pixel font has no star glyph). */
 type Readout = { text: string; star?: boolean };
@@ -75,7 +79,7 @@ const contactLinks = [
 					{sections.map((section, index) => (
 						<li><a href={`#${section.id}`}><span aria-hidden="true">{index + 1}·</span>{section.title}</a></li>
 					))}
-					<li><a href="#contact"><span aria-hidden="true">5·</span>Contact</a></li>
+					<li><a href="#contact"><span aria-hidden="true">{sections.length + 1}·</span>Contact</a></li>
 				</ul>
 			</nav>
 		</header>
@@ -94,7 +98,7 @@ const contactLinks = [
 					I build games and the systems behind them: shipped titles on Xbox, Switch and mobile, a records backend
 					for Zeepkist, and Unity plugins with hundreds of GitHub stars.
 				</p>
-				<KartHero slot="media" />
+				<KartHero slot="media" hiScore={hiScore} />
 			</Hero>
 
 			{sections.map((section, index) => (
@@ -115,7 +119,7 @@ const contactLinks = [
 		</main>
 
 		<footer class="pf-footer">
-			<p>Psst… try the <span class="pf-footer__code">{['↑', '↑', '↓', '↓', '←', '→', '←', '→', 'B', 'A'].map((key) => <kbd>{key}</kbd>)}</span> code.</p>
+			<p>Psst… try the <span class="pf-footer__code">{KONAMI_LABELS.map((key) => <kbd>{key}</kbd>)}</span> code.</p>
 		</footer>
 
 		<div class="pf-toast" role="status" aria-live="polite" data-pf-announcer></div>

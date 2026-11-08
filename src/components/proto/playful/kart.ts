@@ -27,6 +27,9 @@ export interface Input {
 	jump: boolean;
 }
 
+/** No control held. */
+export const NO_INPUT: Readonly<Input> = { left: false, right: false, jump: false };
+
 export interface Star {
 	x: number;
 	y: number;
@@ -110,5 +113,5 @@ export function autopilot(game: Game): Input {
 		const ahead = star.x - kart.x;
 		return ahead > 0 && ahead < JUMP_LEAD && star.y < GROUND_Y - KART_HEIGHT - STAR_RADIUS;
 	});
-	return { left: false, right: false, jump };
+	return { ...NO_INPUT, jump };
 }

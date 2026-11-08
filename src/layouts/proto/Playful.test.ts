@@ -78,17 +78,28 @@ describe('Playful prototype layout', () => {
 		expect(html).toMatch(/<p class="game-card__blurb"[^>]*>I was a co-founder and programmer on FRU.<\/p>/);
 	});
 
-	it('puts the playable kart scene in the hero with its controls explained and a pause button', async () => {
+	it('puts the playable kart scene in the hero as an operable widget, with its controls explained and a pause button', async () => {
 		const html = await render();
 		const hero = html.slice(html.indexOf('class="hero"'), html.indexOf('id="games"'));
-		expect(hero).toMatch(/<canvas[^>]*role="img"[^>]*aria-label="[^"]+"/);
-		expect(hero).toMatch(/<button[^>]*aria-pressed="false"[^>]*>[\s\S]*?Pause/);
+		expect(hero).toMatch(/<canvas[^>]*tabindex="0"[^>]*role="application"[^>]*aria-label="[^"]+"/);
+		expect(hero).toMatch(/<button[^>]*data-pf-toggle[^>]*>[\s\S]*?Pause/);
+		expect(hero).not.toMatch(/aria-pressed/);
 		expect(hero).toMatch(/arrow keys/i);
 	});
 
-	it('has a polite live region to announce the score and the easter egg', async () => {
+	it('shows the best star count among the projects as the high score to beat', async () => {
+		const html = await render({
+			plugins: [
+				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin', stars: 133 }, 'extended-event'),
+				projectEntry({ title: 'SerializableInterface', kind: 'unity-plugin', stars: 412 }, 'serializable-interface'),
+			],
+		});
+		expect(html).toMatch(/class="pf-arcade__hi"[^>]*>HI <span[^>]*>★<\/span> 412</);
+	});
+
+	it('has a polite live region for announcing the easter egg', async () => {
 		const html = await render();
-		expect(html).toMatch(/<[^>]*aria-live="polite"/);
+		expect(html).toMatch(/<div[^>]*role="status"[^>]*aria-live="polite"[^>]*data-pf-announcer/);
 	});
 
 	it('opens each collection with a numbered stage readout of its size and star total', async () => {

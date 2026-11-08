@@ -9,6 +9,13 @@
  * (sent by the Konami code) switches turbo mode on.
  */
 import { HEIGHT, WIDTH } from './kart';
+
+interface Props {
+	/** The score shown to beat in the HUD. */
+	hiScore: number;
+}
+
+const { hiScore } = Astro.props;
 ---
 
 <figure class="pf-arcade" data-pf-arcade>
@@ -18,21 +25,22 @@ import { HEIGHT, WIDTH } from './kart';
 			width={WIDTH}
 			height={HEIGHT}
 			tabindex="0"
-			role="img"
-			aria-label="Mini-game: a soapbox kart rolling down a neon road, collecting stars. Focus it and use the arrow keys to play."
+			role="application"
+			aria-roledescription="mini-game"
+			aria-label="Soapbox kart rolling down a neon road, collecting stars"
 			aria-describedby="pf-arcade-help"></canvas>
 		<div class="pf-arcade__hud" aria-hidden="true">
 			<span>1UP <span data-pf-score>000000</span></span>
-			<span class="pf-arcade__hi">HI <span class="pf-glyph">★</span> 300</span>
+			<span class="pf-arcade__hi">HI <span class="pf-glyph">★</span> {hiScore}</span>
 		</div>
-		<p class="pf-arcade__attract" aria-hidden="true">Press start</p>
+		<p class="pf-arcade__attract" aria-hidden="true" data-pf-attract>Press start</p>
 	</div>
 	<figcaption class="pf-arcade__bar">
 		<p class="pf-arcade__help" id="pf-arcade-help">
-			<span class="pf-arcade__help-keys">Click the screen, then use the arrow keys or WASD: ← → to steer, ↑ or Space to jump.</span>
-			<span class="pf-arcade__help-touch">Use the pad to steer and jump.</span>
+			<span class="pf-arcade__help-touch">Tap the screen or use the pad to steer and jump.</span>
+			<span>Click the screen, then use the arrow keys or WASD: ← → to steer, ↑ or Space to jump.</span>
 		</p>
-		<button class="pf-arcade__toggle" type="button" aria-pressed="false" data-pf-toggle>
+		<button class="pf-arcade__toggle" type="button" data-pf-toggle>
 			<span class="pf-arcade__toggle-icon" aria-hidden="true"></span>
 			<span data-pf-toggle-label>Pause</span>
 		</button>
@@ -45,7 +53,12 @@ import { HEIGHT, WIDTH } from './kart';
 </figure>
 
 <script>
-	import { GROUND_Y, HEIGHT, WIDTH, autopilot, createGame, step, type Game, type Input } from './kart';
+	import { GROUND_Y, HEIGHT, NO_INPUT, WIDTH, autopilot, createGame, step, type Game, type Input } from './kart';
+
+	/** How long a "+1" popup floats above the kart, in seconds. */
+	const POPUP_LIFE = 0.8;
+	/** Seconds without input before the autopilot takes the wheel (arcade attract mode). */
+	const ATTRACT_AFTER = 4;
 
 	const root = document.querySelector<HTMLElement>('[data-pf-arcade]');
 	const canvas = root?.querySelector('canvas');
@@ -56,11 +69,13 @@ import { HEIGHT, WIDTH } from './kart';
 		const scoreEl = root.querySelector<HTMLElement>('[data-pf-score]')!;
 		const toggle = root.querySelector<HTMLButtonElement>('[data-pf-toggle]')!;
 		const toggleLabel = root.querySelector<HTMLElement>('[data-pf-toggle-label]')!;
+		const attract = root.querySelector<HTMLElement>('[data-pf-attract]')!;
 		const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
 		const game: Game = createGame({ seed: 20160501 });
-		const held: Input = { left: false, right: false, jump: false };
-		/** Seconds since the visitor last touched the controls; past a few, the autopilot drives. */
+		const held: Input = { ...NO_INPUT };
+		const releaseAll = () => Object.assign(held, NO_INPUT);
+		/** Seconds since the visitor last touched the controls. */
 		let idle = Infinity;
 		let pausedByUser = reducedMotion.matches;
 		let onScreen = true;
@@ -73,15 +88,15 @@ import { HEIGHT, WIDTH } from './kart';
 		function loop(now: number) {
 			const dt = Math.min(0.05, (now - last) / 1000 || 0);
 			last = now;
-			idle += dt;
-			const input = idle > 4 ? autopilot(game) : held;
+			idle = held.left || held.right || held.jump ? 0 : idle + dt;
+			const input = idle > ATTRACT_AFTER ? autopilot(game) : held;
 			const before = game.score;
 			step(game, input, dt);
 			if (game.score > before) {
 				popups.push({ x: game.kart.x, y: game.kart.y - 30, age: 0, text: `+${game.score - before}` });
 				scoreEl.textContent = String(game.score).padStart(6, '0');
 			}
-			popups = popups.filter((p) => (p.age += dt) < 0.8);
+			popups = popups.map((p) => ({ ...p, age: p.age + dt })).filter((p) => p.age < POPUP_LIFE);
 			draw(now / 1000);
 			frame = running() ? requestAnimationFrame(loop) : 0;
 		}
@@ -94,8 +109,8 @@ import { HEIGHT, WIDTH } from './kart';
 
 		function setPaused(paused: boolean) {
 			pausedByUser = paused;
-			toggle.setAttribute('aria-pressed', String(paused));
 			toggleLabel.textContent = paused ? 'Play' : 'Pause';
+			attract.textContent = paused ? 'Paused' : 'Press start';
 			root.classList.toggle('is-paused', paused);
 			if (paused) {
 				cancelAnimationFrame(frame);
@@ -208,7 +223,7 @@ import { HEIGHT, WIDTH } from './kart';
 			ctx.font = '8px "Press Start 2P", monospace';
 			ctx.textAlign = 'center';
 			for (const p of popups) {
-				ctx.fillStyle = `rgba(255, 255, 255, ${1 - p.age / 0.8})`;
+				ctx.fillStyle = `rgba(255, 255, 255, ${1 - p.age / POPUP_LIFE})`;
 				ctx.fillText(p.text, p.x, p.y - p.age * 30);
 			}
 		}
@@ -235,12 +250,14 @@ import { HEIGHT, WIDTH } from './kart';
 			const control = keyMap[event.key];
 			if (control) held[control] = false;
 		});
-		canvas.addEventListener('blur', () => Object.assign(held, { left: false, right: false, jump: false }));
-		canvas.addEventListener('pointerdown', () => {
-			canvas.focus();
-			press('jump', true);
-			setTimeout(() => (held.jump = false), 120);
-		});
+		canvas.addEventListener('blur', releaseAll);
+		/** A press with no hold to end it (a tap, a keyboard click): let go after a beat. */
+		const tap = (control: keyof Input) => {
+			press(control, true);
+			setTimeout(() => (held[control] = false), 150);
+		};
+		// `click` rather than `pointerdown`, so a finger scrolling past the hero doesn't jump or unpause.
+		canvas.addEventListener('click', () => tap('jump'));
 		for (const button of root.querySelectorAll<HTMLButtonElement>('[data-pf-hold]')) {
 			const control = button.dataset.pfHold as keyof Input;
 			button.addEventListener('pointerdown', (event) => {
@@ -251,12 +268,16 @@ import { HEIGHT, WIDTH } from './kart';
 				button.addEventListener(type, () => (held[control] = false));
 			}
 			button.addEventListener('contextmenu', (event) => event.preventDefault());
+			// Enter or Space on a focused pad button fires a click with no pointer behind it.
+			button.addEventListener('click', (event) => event.detail === 0 && tap(control));
 		}
 
 		toggle.addEventListener('click', () => setPaused(!pausedByUser));
-		reducedMotion.addEventListener('change', () => setPaused(reducedMotion.matches));
+		// Turning reduced motion on pauses; turning it off leaves the visitor's own choice alone.
+		reducedMotion.addEventListener('change', () => reducedMotion.matches && setPaused(true));
 		new IntersectionObserver(([entry]) => {
 			onScreen = entry.isIntersecting;
+			root.classList.toggle('is-offscreen', !onScreen);
 			if (onScreen) resume();
 		}).observe(canvas);
 		document.addEventListener('visibilitychange', resume);
