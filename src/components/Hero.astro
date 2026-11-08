@@ -1,0 +1,61 @@
+---
+/**
+ * Page-opening hero: the site title (the page's `<h1>`), a tagline, optional intro copy (default
+ * slot), call-to-action links and an optional `media` slot (key art, video, canvas).
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--hero-gap`, `--hero-actions-gap`.
+ */
+import { resolveHref } from '../lib/href';
+import type { Link } from './types';
+
+interface Props {
+	title: string;
+	tagline?: string;
+	/** Site paths go through `withBase()`; absolute URLs and `#fragments` pass through. */
+	actions?: Link[];
+}
+
+const { title, tagline, actions = [] } = Astro.props;
+---
+
+<header class="hero">
+	<div class="hero__content">
+		<h1 class="hero__title">{title}</h1>
+		{tagline && <p class="hero__tagline">{tagline}</p>}
+		<slot />
+		{
+			actions.length > 0 && (
+				<ul class="hero__actions">
+					{actions.map((action) => (
+						<li>
+							<a class="hero__action" href={resolveHref(action.href)}>{action.label}</a>
+						</li>
+					))}
+				</ul>
+			)
+		}
+	</div>
+	{
+		Astro.slots.has('media') && (
+			<div class="hero__media">
+				<slot name="media" />
+			</div>
+		)
+	}
+</header>
+
+<style>
+	.hero {
+		display: grid;
+		gap: var(--hero-gap, 2rem);
+	}
+	.hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--hero-actions-gap, 1rem);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

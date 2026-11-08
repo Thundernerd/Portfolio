@@ -27,3 +27,12 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 (using [`withastro/action`](https://github.com/withastro/action)). Pushes to `main` then publish
 `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
 (Settings → Pages).
+
+## Section components
+
+`src/components/` holds the shared, unstyled building blocks the pages and style prototypes compose:
+`Hero`, `GameCard`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
+BEM-style classes (`.hero__title`, `.project-card__stars`, ...) and only structural CSS (layout,
+list resets). Astro scopes that CSS at zero specificity, so a layout restyles them with plain class
+selectors or the custom properties each component documents (for example `--grid-min`, `--card-gap`).
+Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.

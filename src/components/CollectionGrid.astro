@@ -1,0 +1,59 @@
+---
+/**
+ * A titled section listing a collection as a grid of cards: `games` entries as `GameCard`s (newest
+ * first) or `projects` entries as `ProjectCard`s (most GitHub stars first, unknown counts last).
+ * Ties fall back to title order. The default slot holds optional intro copy under the heading.
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--grid-gap`, `--grid-min` (minimum card width).
+ */
+import type { CollectionEntry } from 'astro:content';
+import GameCard from './GameCard.astro';
+import ProjectCard from './ProjectCard.astro';
+
+type Game = CollectionEntry<'games'>;
+type Project = CollectionEntry<'projects'>;
+
+interface Props {
+	/** Anchor id of the section; the heading gets `${id}-heading`. */
+	id: string;
+	title: string;
+	items: Game[] | Project[];
+}
+
+const { id, title, items } = Astro.props;
+const headingId = `${id}-heading`;
+
+const byTitle = (a: Game | Project, b: Game | Project) => a.data.title.localeCompare(b.data.title, 'en');
+const isGame = (entry: Game | Project): entry is Game => entry.collection === 'games';
+const sorted: (Game | Project)[] = [...items].sort((a, b) => {
+	if (isGame(a) && isGame(b)) return b.data.year - a.data.year || byTitle(a, b);
+	if (!isGame(a) && !isGame(b)) return (b.data.stars ?? -1) - (a.data.stars ?? -1) || byTitle(a, b);
+	return 0;
+});
+---
+
+<section class="collection-grid" id={id} aria-labelledby={headingId}>
+	<h2 class="collection-grid__title" id={headingId}>{title}</h2>
+	{
+		Astro.slots.has('default') && (
+			<div class="collection-grid__intro">
+				<slot />
+			</div>
+		)
+	}
+	<ul class="collection-grid__list">
+		{sorted.map((entry) => <li class="collection-grid__item">{isGame(entry) ? <GameCard game={entry} /> : <ProjectCard project={entry} />}</li>)}
+	</ul>
+</section>
+
+<style>
+	.collection-grid__list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 16rem), 100%), 1fr));
+		gap: var(--grid-gap, 1.5rem);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>

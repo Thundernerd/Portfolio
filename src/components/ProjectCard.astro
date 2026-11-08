@@ -1,0 +1,75 @@
+---
+/**
+ * Card for one entry of the `projects` collection: image, title, blurb, tags, star count and a link
+ * to the GitHub repo. The title links to `href` (a site path, e.g. a project page) when given, and
+ * to the repo otherwise.
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--card-gap`, `--card-tags-gap`.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { resolveHref } from '../lib/href';
+
+interface Props {
+	project: CollectionEntry<'projects'>;
+	href?: string;
+}
+
+const { project, href } = Astro.props;
+const { title, repo, blurb, tags, image, stars } = project.data;
+const repoUrl = `https://github.com/${repo}`;
+const titleHref = href === undefined ? repoUrl : resolveHref(href);
+const starCount = stars?.toLocaleString('en-US');
+---
+
+<article class="project-card" data-kind={project.data.kind}>
+	{image && <Image class="project-card__image" src={image} alt="" />}
+	<h3 class="project-card__title">
+		<a href={titleHref}>{title}</a>
+	</h3>
+	<p class="project-card__blurb">{blurb}</p>
+	{
+		tags.length > 0 && (
+			<ul class="project-card__tags">
+				{tags.map((tag) => (
+					<li class="project-card__tag">{tag}</li>
+				))}
+			</ul>
+		)
+	}
+	<p class="project-card__meta">
+		<a class="project-card__repo" href={repoUrl}>{repo}</a>
+		{
+			stars !== undefined && (
+				<span
+					class="project-card__stars"
+					data-stars={stars}
+					aria-label={`${starCount} GitHub ${stars === 1 ? 'star' : 'stars'}`}
+				>
+					{starCount}
+				</span>
+			)
+		}
+	</p>
+</article>
+
+<style>
+	.project-card {
+		display: flex;
+		flex-direction: column;
+		gap: var(--card-gap, 0.75rem);
+	}
+	.project-card__image {
+		max-width: 100%;
+		height: auto;
+	}
+	.project-card__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--card-tags-gap, 0.5rem);
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+</style>
