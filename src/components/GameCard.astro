@@ -47,23 +47,25 @@ const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...stor
 </article>
 
 <style>
-	.game-card {
-		display: flex;
-		flex-direction: column;
-		gap: var(--card-gap, 0.75rem);
-	}
-	.game-card__cover {
-		max-width: 100%;
-		height: auto;
-	}
-	.game-card__meta,
-	.game-card__platforms,
-	.game-card__links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--card-tags-gap, 0.5rem);
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	@layer components {
+		.game-card {
+			display: flex;
+			flex-direction: column;
+			gap: var(--card-gap, 0.75rem);
+		}
+		.game-card__cover {
+			max-width: 100%;
+			height: auto;
+		}
+		.game-card__meta,
+		.game-card__platforms,
+		.game-card__links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--card-tags-gap, 0.5rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
 	}
 </style>

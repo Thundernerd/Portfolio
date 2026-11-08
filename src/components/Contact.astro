@@ -38,19 +38,21 @@ const headingId = `${id}-heading`;
 </section>
 
 <style>
-	.contact {
-		display: grid;
-		gap: var(--contact-gap, 1rem);
-	}
-	.contact__address {
-		font-style: normal;
-	}
-	.contact__links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--contact-links-gap, 1rem);
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	@layer components {
+		.contact {
+			display: grid;
+			gap: var(--contact-gap, 1rem);
+		}
+		.contact__address {
+			font-style: normal;
+		}
+		.contact__links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--contact-links-gap, 1rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
 	}
 </style>

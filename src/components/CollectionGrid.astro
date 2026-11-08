@@ -48,12 +48,14 @@ const sorted: (Game | Project)[] = [...items].sort((a, b) => {
 </section>
 
 <style>
-	.collection-grid__list {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 16rem), 100%), 1fr));
-		gap: var(--grid-gap, 1.5rem);
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	@layer components {
+		.collection-grid__list {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 16rem), 100%), 1fr));
+			gap: var(--grid-gap, 1.5rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
 	}
 </style>

@@ -33,6 +33,7 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 `src/components/` holds the shared, unstyled building blocks the pages and style prototypes compose:
 `Hero`, `GameCard`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
 BEM-style classes (`.hero__title`, `.project-card__stars`, ...) and only structural CSS (layout,
-list resets). Astro scopes that CSS at zero specificity, so a layout restyles them with plain class
-selectors or the custom properties each component documents (for example `--grid-min`, `--card-gap`).
+list resets) inside `@layer components`, so any unlayered layout CSS wins over it regardless of
+Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
+component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
