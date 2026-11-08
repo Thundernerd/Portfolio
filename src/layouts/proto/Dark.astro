@@ -1,0 +1,56 @@
+---
+/**
+ * Prototype A layout (`/proto/dark`): clean dark theme with game-style accents. Owns the document
+ * shell, the banner and footer; the page composes the shared section components inside `<main>`.
+ */
+import { withBase } from '../../lib/url';
+import '../../styles/proto/dark.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description } = Astro.props;
+const nav = [
+	{ label: 'Games', href: '#games' },
+	{ label: 'Projects', href: '#featured' },
+	{ label: 'Mods', href: '#zeepkist-mods' },
+	{ label: 'Plugins', href: '#unity-plugins' },
+	{ label: 'Contact', href: '#contact' },
+];
+---
+
+<html lang="en" class="dark">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
+		<meta name="generator" content={Astro.generator} />
+		{description && <meta name="description" content={description} />}
+		<title>{title}</title>
+	</head>
+	<body class="dark">
+		<a class="dark__skip" href="#main">Skip to content</a>
+		<header class="dark__banner">
+			<a class="dark__brand" href={withBase('proto/dark/')} aria-label="Thundernerd, home">
+				<span class="dark__brand-mark" aria-hidden="true">T</span>
+				<span class="dark__brand-name">Thundernerd</span>
+			</a>
+			<nav class="dark__nav" aria-label="Sections">
+				<ul>
+					{nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+				</ul>
+			</nav>
+		</header>
+		<main id="main" class="dark__main">
+			<slot />
+		</main>
+		<footer class="dark__footer">
+			<p>Prototype A · clean dark. Built with Astro.</p>
+		</footer>
+	</body>
+</html>

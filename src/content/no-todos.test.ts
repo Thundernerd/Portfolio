@@ -1,13 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { rawEntries } from './test-entries';
 import { findTodos, formatTodo } from './todos';
 
 // Launch guard: opt-in until launch, see "Content TODOs" in README.md. Reads the raw files so TODOs
-// in YAML comments count too; the glob mirrors the collections in src/content.config.ts.
-const entries = import.meta.glob<string>('./{games,projects}/**/*.{md,mdx}', {
-	query: '?raw',
-	import: 'default',
-	eager: true,
-});
+// in YAML comments count too.
+const entries = rawEntries();
 
 describe('content entries', () => {
 	it.skipIf(!process.env.CHECK_TODOS)('hold no TODO placeholders', () => {
