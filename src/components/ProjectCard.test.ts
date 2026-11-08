@@ -54,7 +54,6 @@ describe('ProjectCard', () => {
 		expect(html).not.toMatch(/<data[^>]*value="2"/);
 	});
 
-
 	it('uses singular wording for one star', async () => {
 		expect(await render({ project: projectEntry({ stars: 1 }) })).toMatch(/>1<\/data>\s*<span[^>]*>star<\/span>/);
 	});

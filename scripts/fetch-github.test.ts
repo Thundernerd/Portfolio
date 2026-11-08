@@ -78,7 +78,6 @@ describe('fetch-github run()', () => {
 		expect(await readOut()).toEqual({});
 	});
 
-
 	it('stops requesting once a request times out, as the API is unreachable', async () => {
 		await project('1.md', 'repo: Thundernerd/First');
 		await project('2.md', 'repo: Thundernerd/Second');
