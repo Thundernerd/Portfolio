@@ -11,8 +11,8 @@ export const gameSchema = ({ image }: SchemaContext) =>
 		platforms: z.array(z.string()).nonempty(),
 		role: z.string(),
 		studio: z.string(),
-		year: z.number().int(),
-		// Media and links are optional so entries can land before the assets exist.
+		// The year, media and links are optional so entries can land before they're confirmed.
+		year: z.number().int().optional(),
 		cover: image().optional(),
 		trailer: webUrl().optional(),
 		storeLinks: z.array(z.object({ label: z.string(), url: webUrl() })).default([]),
