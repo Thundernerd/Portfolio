@@ -1,0 +1,88 @@
+---
+/**
+ * Card for one entry of the `games` collection: cover, title, role, studio, year (when known),
+ * platforms, blurb, and links to the trailer and store pages. The title links to `href` (a site path, e.g. a game
+ * page) when given. Each link is described by the title, so "Trailer" stays meaningful out of
+ * context; the title's id is `game-<entry id>-title`.
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--card-gap`, `--card-tags-gap`.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { resolveHref } from '../lib/url';
+
+interface Props {
+	game: CollectionEntry<'games'>;
+	href?: string;
+}
+
+const { game, href } = Astro.props;
+const { title, platforms, role, studio, year, cover, trailer, storeLinks, blurb } = game.data;
+const titleId = `game-${game.id}-title`;
+const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...storeLinks];
+---
+
+<article class="game-card">
+	{cover && <Image class="game-card__cover" src={cover} alt="" />}
+	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
+	<dl class="game-card__meta">
+		<div class="game-card__fact">
+			<dt>Role</dt>
+			<dd class="game-card__role">{role}</dd>
+		</div>
+		<div class="game-card__fact">
+			<dt>Studio</dt>
+			<dd class="game-card__studio">{studio}</dd>
+		</div>
+		{
+			year !== undefined && (
+				<div class="game-card__fact">
+					<dt>Year</dt>
+					<dd class="game-card__year">
+						<time datetime={String(year)}>{year}</time>
+					</dd>
+				</div>
+			)
+		}
+	</dl>
+	<ul class="game-card__platforms">
+		{platforms.map((platform) => <li class="game-card__platform">{platform}</li>)}
+	</ul>
+	<p class="game-card__blurb">{blurb}</p>
+	{
+		links.length > 0 && (
+			<ul class="game-card__links">
+				{links.map((link) => (
+					<li>
+						<a class="game-card__link" href={link.url} aria-describedby={titleId}>{link.label}</a>
+					</li>
+				))}
+			</ul>
+		)
+	}
+</article>
+
+<style>
+	@layer components {
+		.game-card {
+			display: flex;
+			flex-direction: column;
+			gap: var(--card-gap, 0.75rem);
+		}
+		.game-card__cover {
+			max-width: 100%;
+			height: auto;
+		}
+		.game-card__meta,
+		.game-card__platforms,
+		.game-card__links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--card-tags-gap, 0.5rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+	}
+</style>

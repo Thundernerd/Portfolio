@@ -1,0 +1,74 @@
+---
+/**
+ * Card for one entry of the `projects` collection: image, title, description, tags, star count and
+ * a link to the GitHub repo. Stars and description come from `repoStats()`: GitHub's values when the
+ * prebuild fetcher reached it, the entry's `stars` and `blurb` otherwise. The title links to `href` (a site path, e.g. a project page) when given.
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--card-gap`, `--card-tags-gap`.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { repoStats } from '../lib/github-stats';
+import { resolveHref } from '../lib/url';
+
+interface Props {
+	project: CollectionEntry<'projects'>;
+	href?: string;
+}
+
+const { project, href } = Astro.props;
+const { title, repo, tags, image } = project.data;
+// Stars and description as fetched from GitHub at build time, falling back to the frontmatter.
+const { stars, description } = repoStats(project.data);
+const repoUrl = `https://github.com/${repo}`;
+const starCount = stars?.toLocaleString('en-US');
+---
+
+<article class="project-card" data-kind={project.data.kind}>
+	{image && <Image class="project-card__image" src={image} alt="" />}
+	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
+	<p class="project-card__blurb">{description}</p>
+	{
+		tags.length > 0 && (
+			<ul class="project-card__tags">
+				{tags.map((tag) => (
+					<li class="project-card__tag">{tag}</li>
+				))}
+			</ul>
+		)
+	}
+	<p class="project-card__meta">
+		<a class="project-card__repo" href={repoUrl}>{repo}</a>
+		{
+			stars !== undefined && (
+				<span class="project-card__stars">
+					<data class="project-card__star-count" value={stars}>{starCount}</data>
+					<span class="project-card__star-label">{stars === 1 ? 'star' : 'stars'}</span>
+				</span>
+			)
+		}
+	</p>
+</article>
+
+<style>
+	@layer components {
+		.project-card {
+			display: flex;
+			flex-direction: column;
+			gap: var(--card-gap, 0.75rem);
+		}
+		.project-card__image {
+			max-width: 100%;
+			height: auto;
+		}
+		.project-card__tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--card-tags-gap, 0.5rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+	}
+</style>

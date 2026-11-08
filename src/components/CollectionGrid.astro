@@ -1,0 +1,81 @@
+---
+/**
+ * A titled section listing a collection as a grid of cards: `games` entries as `GameCard`s (newest
+ * first, undated last) or `projects` entries as `ProjectCard`s (most GitHub stars first, as resolved
+ * by `repoStats()`, unknown counts last).
+ * Ties fall back to title order. `itemHref` links each card to a page on this site. The default
+ * slot holds optional intro copy under the heading.
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--grid-gap`, `--grid-min` (minimum card width).
+ */
+import type { CollectionEntry } from 'astro:content';
+import GameCard from './GameCard.astro';
+import ProjectCard from './ProjectCard.astro';
+import { repoStats } from '../lib/github-stats';
+
+type Game = CollectionEntry<'games'>;
+type Project = CollectionEntry<'projects'>;
+
+interface Props {
+	/** Anchor id of the section; the heading gets `${id}-heading`. */
+	id: string;
+	title: string;
+	items: Game[] | Project[];
+	/** The site path each card's title links to (e.g. its detail page); cards are unlinked without it. */
+	itemHref?: (entry: Game | Project) => string | undefined;
+}
+
+const { id, title, items, itemHref } = Astro.props;
+const headingId = `${id}-heading`;
+
+const entries: (Game | Project)[] = items;
+const byTitle = (a: Game | Project, b: Game | Project) => a.data.title.localeCompare(b.data.title, 'en');
+const games = entries
+	.filter((entry): entry is Game => entry.collection === 'games')
+	.sort((a, b) => (b.data.year ?? -Infinity) - (a.data.year ?? -Infinity) || byTitle(a, b));
+const starsOf = (project: Project) => repoStats(project.data).stars ?? -1;
+const projects = entries
+	.filter((entry): entry is Project => entry.collection === 'projects')
+	.sort((a, b) => starsOf(b) - starsOf(a) || byTitle(a, b));
+---
+
+<section class="collection-grid" id={id} aria-labelledby={headingId}>
+	<h2 class="collection-grid__title" id={headingId}>{title}</h2>
+	{
+		Astro.slots.has('default') && (
+			<div class="collection-grid__intro">
+				<slot />
+			</div>
+		)
+	}
+	<ul class="collection-grid__list">
+		{
+			games.map((game) => (
+				<li class="collection-grid__item">
+					<GameCard game={game} href={itemHref?.(game)} />
+				</li>
+			))
+		}
+		{
+			projects.map((project) => (
+				<li class="collection-grid__item">
+					<ProjectCard project={project} href={itemHref?.(project)} />
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<style>
+	@layer components {
+		.collection-grid__list {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(min(var(--grid-min, 16rem), 100%), 1fr));
+			gap: var(--grid-gap, 1.5rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+	}
+</style>

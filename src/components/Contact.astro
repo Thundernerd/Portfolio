@@ -1,0 +1,58 @@
+---
+/**
+ * Contact section: a heading, optional copy (default slot) and the contact links (GitHub, LinkedIn,
+ * email, CV...) inside an `<address>`.
+ *
+ * Structural only. Layouts style it through the classes below or these custom properties:
+ * `--contact-gap`, `--contact-links-gap`.
+ */
+import { resolveHref } from '../lib/url';
+import type { Link } from './types';
+
+interface Props {
+	/** Site paths go through `withBase()`; absolute URLs (`https:`, `mailto:`) pass through. */
+	links: Link[];
+	/** Anchor id of the section; the heading gets `${id}-heading`. */
+	id?: string;
+	title?: string;
+}
+
+const { links, id = 'contact', title = 'Contact' } = Astro.props;
+const headingId = `${id}-heading`;
+---
+
+<section class="contact" id={id} aria-labelledby={headingId}>
+	<h2 class="contact__title" id={headingId}>{title}</h2>
+	<slot />
+	<address class="contact__address">
+		<ul class="contact__links">
+			{
+				links.map((link) => (
+					<li>
+						<a class="contact__link" href={resolveHref(link.href)}>{link.label}</a>
+					</li>
+				))
+			}
+		</ul>
+	</address>
+</section>
+
+<style>
+	@layer components {
+		.contact {
+			display: grid;
+			gap: var(--contact-gap, 1rem);
+		}
+		.contact__address {
+			font-style: normal;
+		}
+		.contact__links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--contact-links-gap, 1rem);
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+	}
+</style>
