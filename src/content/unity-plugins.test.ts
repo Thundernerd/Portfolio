@@ -1,22 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { loadProjects } from './test-entries';
 
-// getCollection() has no data store under Vitest, so read the entries' frontmatter directly.
-// `npm run build` already validates every entry against projectSchema; this test only checks
-// that the expected plugins are present, so two top-level scalars are all it needs.
-const sources = import.meta.glob<string>('./projects/**/*.{md,mdx}', {
-	query: '?raw',
-	import: 'default',
-	eager: true,
-});
-
-const frontmatterField = (source: string, field: string) => {
-	const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
-	return frontmatter.match(new RegExp(`^${field}:\\s*(.+?)\\s*$`, 'm'))?.[1];
-};
-
-const unityPluginRepos = Object.values(sources)
-	.filter((source) => frontmatterField(source, 'kind') === 'unity-plugin')
-	.map((source) => frontmatterField(source, 'repo'));
+const unityPluginRepos = loadProjects()
+	.filter((project) => project.kind === 'unity-plugin')
+	.map((project) => project.repo);
 
 describe('Unity plugins collection', () => {
 	it.each([
