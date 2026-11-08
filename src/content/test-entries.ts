@@ -20,7 +20,12 @@ export function rawEntries(): Record<string, string> {
 function splitEntry(source: string): { frontmatter: unknown; body: string } {
 	const lines = sourceLines(source);
 	const end = closingFence(lines);
-	const frontmatter = parse(lines.slice(1, Math.max(end, 1)).join('\n'));
+	// The options Astro's own frontmatter parser uses, so entries parse here as they do in the build.
+	const frontmatter = parse(lines.slice(1, Math.max(end, 1)).join('\n'), {
+		schema: 'core',
+		merge: true,
+		customTags: ['timestamp'],
+	});
 	return { frontmatter: frontmatter ?? {}, body: lines.slice(end + 1).join('\n') };
 }
 
