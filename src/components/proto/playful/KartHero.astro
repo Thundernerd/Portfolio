@@ -1,0 +1,293 @@
+---
+/**
+ * The playful prototype's hero scene: a pixel-art soapbox kart (a nod to Zeepkist) rolling down a
+ * synthwave road, collecting stars. Visitors steer it with the arrow keys / WASD once the canvas
+ * has focus, or with the touch pad; left alone it drives itself. The rules live in `kart.ts`.
+ *
+ * Motion stops when the scene scrolls out of view, when the visitor presses Pause, and from the
+ * start under `prefers-reduced-motion` (Play opts back in). A `pf:turbo` event on `document`
+ * (sent by the Konami code) switches turbo mode on.
+ */
+import { HEIGHT, WIDTH } from './kart';
+
+interface Props {
+	/** The score shown to beat in the HUD. */
+	hiScore: number;
+}
+
+const { hiScore } = Astro.props;
+---
+
+<figure class="pf-arcade" data-pf-arcade>
+	<div class="pf-arcade__screen">
+		<canvas
+			class="pf-arcade__canvas"
+			width={WIDTH}
+			height={HEIGHT}
+			tabindex="0"
+			role="application"
+			aria-roledescription="mini-game"
+			aria-label="Soapbox kart rolling down a neon road, collecting stars"
+			aria-describedby="pf-arcade-help"></canvas>
+		<div class="pf-arcade__hud" aria-hidden="true">
+			<span>1UP <span data-pf-score>000000</span></span>
+			<span class="pf-arcade__hi">HI <span class="pf-glyph">★</span> {hiScore}</span>
+		</div>
+		<p class="pf-arcade__attract" aria-hidden="true" data-pf-attract>Press start</p>
+	</div>
+	<figcaption class="pf-arcade__bar">
+		<p class="pf-arcade__help" id="pf-arcade-help">
+			<span class="pf-arcade__help-touch">Tap the screen or use the pad to steer and jump.</span>
+			<span>Click the screen, then use the arrow keys or WASD: ← → to steer, ↑ or Space to jump.</span>
+		</p>
+		<button class="pf-arcade__toggle" type="button" data-pf-toggle>
+			<span class="pf-arcade__toggle-icon" aria-hidden="true"></span>
+			<span data-pf-toggle-label>Pause</span>
+		</button>
+	</figcaption>
+	<div class="pf-arcade__pad" role="group" aria-label="Touch controls">
+		<button type="button" class="pf-arcade__pad-button" data-pf-hold="left" aria-label="Steer left">◀</button>
+		<button type="button" class="pf-arcade__pad-button pf-arcade__pad-button--jump" data-pf-hold="jump" aria-label="Jump">▲</button>
+		<button type="button" class="pf-arcade__pad-button" data-pf-hold="right" aria-label="Steer right">▶</button>
+	</div>
+</figure>
+
+<script>
+	import { GROUND_Y, HEIGHT, NO_INPUT, WIDTH, autopilot, createGame, step, type Game, type Input } from './kart';
+
+	/** How long a "+1" popup floats above the kart, in seconds. */
+	const POPUP_LIFE = 0.8;
+	/** Seconds without input before the autopilot takes the wheel (arcade attract mode). */
+	const ATTRACT_AFTER = 4;
+
+	const root = document.querySelector<HTMLElement>('[data-pf-arcade]');
+	const canvas = root?.querySelector('canvas');
+	const ctx = canvas?.getContext('2d');
+	if (root && canvas && ctx) start(root, canvas, ctx);
+
+	function start(root: HTMLElement, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+		const scoreEl = root.querySelector<HTMLElement>('[data-pf-score]')!;
+		const toggle = root.querySelector<HTMLButtonElement>('[data-pf-toggle]')!;
+		const toggleLabel = root.querySelector<HTMLElement>('[data-pf-toggle-label]')!;
+		const attract = root.querySelector<HTMLElement>('[data-pf-attract]')!;
+		const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+		const game: Game = createGame({ seed: 20160501 });
+		const held: Input = { ...NO_INPUT };
+		const releaseAll = () => Object.assign(held, NO_INPUT);
+		/** Seconds since the visitor last touched the controls. */
+		let idle = Infinity;
+		let pausedByUser = reducedMotion.matches;
+		let onScreen = true;
+		let frame = 0;
+		let last = 0;
+		let popups: { x: number; y: number; age: number; text: string }[] = [];
+
+		const running = () => !pausedByUser && onScreen && !document.hidden;
+
+		function loop(now: number) {
+			const dt = Math.min(0.05, (now - last) / 1000 || 0);
+			last = now;
+			idle = held.left || held.right || held.jump ? 0 : idle + dt;
+			const input = idle > ATTRACT_AFTER ? autopilot(game) : held;
+			const before = game.score;
+			step(game, input, dt);
+			if (game.score > before) {
+				popups.push({ x: game.kart.x, y: game.kart.y - 30, age: 0, text: `+${game.score - before}` });
+				scoreEl.textContent = String(game.score).padStart(6, '0');
+			}
+			popups = popups.map((p) => ({ ...p, age: p.age + dt })).filter((p) => p.age < POPUP_LIFE);
+			draw(now / 1000);
+			frame = running() ? requestAnimationFrame(loop) : 0;
+		}
+
+		function resume() {
+			if (frame || !running()) return;
+			last = performance.now();
+			frame = requestAnimationFrame(loop);
+		}
+
+		function setPaused(paused: boolean) {
+			pausedByUser = paused;
+			toggleLabel.textContent = paused ? 'Play' : 'Pause';
+			attract.textContent = paused ? 'Paused' : 'Press start';
+			root.classList.toggle('is-paused', paused);
+			if (paused) {
+				cancelAnimationFrame(frame);
+				frame = 0;
+			} else resume();
+		}
+
+		// ── Drawing ─────────────────────────────────────────────────────────────
+		const px = (x: number, y: number, w: number, h: number, color: string) => {
+			ctx.fillStyle = color;
+			ctx.fillRect(Math.round(x), Math.round(y), w, h);
+		};
+
+		function drawSky() {
+			const sky = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+			sky.addColorStop(0, '#120a2e');
+			sky.addColorStop(0.6, '#4a1460');
+			sky.addColorStop(1, '#ff5ea8');
+			ctx.fillStyle = sky;
+			ctx.fillRect(0, 0, WIDTH, GROUND_Y);
+			// A striped synthwave sun.
+			const cx = 228, cy = 92, r = 34;
+			for (let y = -r; y < r; y++) {
+				if (y > 4 && (y + 40) % 7 < 2 + (y - 4) / 8) continue;
+				const half = Math.sqrt(r * r - y * y);
+				px(cx - half, cy + y, half * 2, 1, y < 0 ? '#ffd23f' : '#ff9a3e');
+			}
+			// Twinkling background stars, fixed in the sky.
+			for (let i = 0; i < 28; i++) {
+				const x = (i * 97) % WIDTH, y = (i * 53) % 70;
+				px(x, y, 1, 1, i % 3 ? '#8f7ad8' : '#ffffff');
+			}
+		}
+
+		function drawHills(offset: number, base: number, amp: number, color: string, period: number) {
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.moveTo(0, GROUND_Y);
+			for (let x = 0; x <= WIDTH; x += 4) {
+				const t = (x + offset) / period;
+				const y = base - amp * (Math.sin(t) * 0.6 + Math.sin(t * 2.3 + 1) * 0.4);
+				ctx.lineTo(x, Math.round(y / 2) * 2);
+			}
+			ctx.lineTo(WIDTH, GROUND_Y);
+			ctx.fill();
+		}
+
+		function drawRoad() {
+			px(0, GROUND_Y, WIDTH, HEIGHT - GROUND_Y, '#1b1036');
+			px(0, GROUND_Y, WIDTH, 2, '#3ee8ff');
+			const dash = 24;
+			const shift = game.distance % (dash * 2);
+			for (let x = -shift; x < WIDTH; x += dash * 2) px(x, GROUND_Y + 13, dash, 2, '#ffd23f');
+			// Perspective grid lines running into the road.
+			for (let x = -shift * 1.5; x < WIDTH + 40; x += 40) px(x, HEIGHT - 2, 2, 2, '#5b3a9a');
+		}
+
+		// An 11 × 10 pixel star; `x` marks the highlight.
+		const STAR_SPRITE = [
+			'.....#.....',
+			'....#x#....',
+			'....#x#....',
+			'###########',
+			'.#########.',
+			'..#######..',
+			'..#######..',
+			'.####.####.',
+			'.###...###.',
+			'##.......##',
+		];
+
+		function drawStar(x: number, y: number, t: number) {
+			const top = Math.round(y - 5 + Math.sin(t * 4 + x / 20) * 1.5);
+			const left = Math.round(x - 5);
+			const body = game.turbo ? '#ffffff' : '#ffd23f';
+			STAR_SPRITE.forEach((row, dy) => {
+				for (let dx = 0; dx < row.length; dx++) {
+					if (row[dx] !== '.') px(left + dx, top + dy, 1, 1, row[dx] === 'x' ? '#fff7c2' : body);
+				}
+			});
+		}
+
+		function drawKart(t: number) {
+			const { x, y } = game.kart;
+			const body = game.turbo ? '#ffd23f' : '#ff7a3e';
+			const trim = game.turbo ? '#fff3a8' : '#ffb27a';
+			if (game.turbo) {
+				const colors = ['#ff5ea8', '#ffd23f', '#7cff6b', '#3ee8ff'];
+				colors.forEach((c, i) => px(x - 40, y - 16 + i * 3, 26, 3, c));
+			}
+			px(x - 14, y - 12, 28, 6, body); // soapbox body
+			px(x - 14, y - 12, 28, 1, trim);
+			px(x + 10, y - 16, 4, 4, body); // nose
+			px(x - 3, y - 20, 8, 8, '#3ee8ff'); // helmet
+			px(x + 2, y - 18, 3, 2, '#120a2e'); // visor
+			const spin = Math.floor(t * 12) % 2;
+			for (const wx of [x - 9, x + 9]) {
+				px(wx - 4, y - 7, 8, 7, '#0b0718');
+				px(wx - 1 + spin, y - 4, 2, 1, '#bfb3ff');
+			}
+		}
+
+		function draw(t: number) {
+			drawSky();
+			drawHills(game.distance * 0.2, 120, 22, '#2a1550', 46);
+			drawHills(game.distance * 0.5 + 300, 140, 14, '#3b1a6b', 30);
+			drawRoad();
+			for (const star of game.stars) drawStar(star.x, star.y, t);
+			drawKart(t);
+			ctx.font = '8px "Press Start 2P", monospace';
+			ctx.textAlign = 'center';
+			for (const p of popups) {
+				ctx.fillStyle = `rgba(255, 255, 255, ${1 - p.age / POPUP_LIFE})`;
+				ctx.fillText(p.text, p.x, p.y - p.age * 30);
+			}
+		}
+
+		// ── Input ───────────────────────────────────────────────────────────────
+		const keyMap: Record<string, keyof Input> = {
+			ArrowLeft: 'left', a: 'left', A: 'left',
+			ArrowRight: 'right', d: 'right', D: 'right',
+			ArrowUp: 'jump', w: 'jump', W: 'jump', ' ': 'jump',
+		};
+		const press = (control: keyof Input, down: boolean) => {
+			held[control] = down;
+			idle = 0;
+			if (down && pausedByUser && !reducedMotion.matches) setPaused(false);
+		};
+		canvas.addEventListener('keydown', (event) => {
+			const control = keyMap[event.key];
+			if (!control) return;
+			event.preventDefault(); // keep the arrows and Space from scrolling the page while playing
+			press(control, true);
+			if (!frame) draw(performance.now() / 1000);
+		});
+		canvas.addEventListener('keyup', (event) => {
+			const control = keyMap[event.key];
+			if (control) held[control] = false;
+		});
+		canvas.addEventListener('blur', releaseAll);
+		/** A press with no hold to end it (a tap, a keyboard click): let go after a beat. */
+		const tap = (control: keyof Input) => {
+			press(control, true);
+			setTimeout(() => (held[control] = false), 150);
+		};
+		// `click` rather than `pointerdown`, so a finger scrolling past the hero doesn't jump or unpause.
+		canvas.addEventListener('click', () => tap('jump'));
+		for (const button of root.querySelectorAll<HTMLButtonElement>('[data-pf-hold]')) {
+			const control = button.dataset.pfHold as keyof Input;
+			button.addEventListener('pointerdown', (event) => {
+				button.setPointerCapture(event.pointerId);
+				press(control, true);
+			});
+			for (const type of ['pointerup', 'pointercancel', 'lostpointercapture'] as const) {
+				button.addEventListener(type, () => (held[control] = false));
+			}
+			button.addEventListener('contextmenu', (event) => event.preventDefault());
+			// Enter or Space on a focused pad button fires a click with no pointer behind it.
+			button.addEventListener('click', (event) => event.detail === 0 && tap(control));
+		}
+
+		toggle.addEventListener('click', () => setPaused(!pausedByUser));
+		// Turning reduced motion on pauses; turning it off leaves the visitor's own choice alone.
+		reducedMotion.addEventListener('change', () => reducedMotion.matches && setPaused(true));
+		new IntersectionObserver(([entry]) => {
+			onScreen = entry.isIntersecting;
+			root.classList.toggle('is-offscreen', !onScreen);
+			if (onScreen) resume();
+		}).observe(canvas);
+		document.addEventListener('visibilitychange', resume);
+		document.addEventListener('pf:turbo', () => {
+			game.turbo = true;
+			if (!frame) draw(performance.now() / 1000);
+		});
+
+		setPaused(pausedByUser);
+		draw(0);
+		document.fonts?.ready.then(() => frame || draw(0));
+	}
+</script>

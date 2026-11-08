@@ -1,0 +1,145 @@
+---
+/**
+ * Prototype C (`/proto/playful`): playful and interactive. An arcade cabinet of a page: a playable
+ * kart scene in the hero, HUD-style "stage" headers over each collection and a Konami-code
+ * easter egg (turbo mode). Content comes in as props so the page owns the collection queries.
+ */
+import type { CollectionEntry } from 'astro:content';
+import CollectionGrid from '../../components/CollectionGrid.astro';
+import Contact from '../../components/Contact.astro';
+import Hero from '../../components/Hero.astro';
+import KartHero from '../../components/proto/playful/KartHero.astro';
+import { artTile } from '../../components/proto/playful/art';
+import { softenTodos } from '../../components/proto/playful/content';
+import { KONAMI_LABELS } from '../../components/proto/playful/konami';
+import { repoStats } from '../../lib/github-stats';
+import { withBase } from '../../lib/url';
+import '../../styles/proto/playful.css';
+
+type Project = CollectionEntry<'projects'>;
+
+interface Props {
+	games: CollectionEntry<'games'>[];
+	featured: Project[];
+	mods: Project[];
+	plugins: Project[];
+}
+
+const props = Astro.props;
+const games = props.games.map(softenTodos);
+const featured = props.featured.map(softenTodos);
+const mods = props.mods.map(softenTodos);
+const plugins = props.plugins.map(softenTodos);
+
+const starsOf = (project: Project) => repoStats(project.data).stars ?? 0;
+const totalStars = (projects: Project[]) => projects.reduce((sum, project) => sum + starsOf(project), 0);
+/** The best-starred project, as the hero game's high score to beat. */
+const hiScore = Math.max(0, ...[...featured, ...mods, ...plugins].map(starsOf));
+const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
+/** A HUD readout; `star` ones get a ★ icon (drawn in CSS, as the pixel font has no star glyph). */
+type Readout = { text: string; star?: boolean };
+const starReadout = (projects: Project[]): Readout => ({ text: plural(totalStars(projects), 'star', 'stars'), star: true });
+
+const platforms = new Set(games.flatMap((game) => game.data.platforms));
+
+const sections = [
+	{ id: 'games', title: 'Released games', items: games, media: artTile, hud: [{ text: `${plural(games.length, 'title', 'titles')} shipped` }, { text: plural(platforms.size, 'platform', 'platforms') }] },
+	{ id: 'featured', title: 'Featured projects', items: featured, media: artTile, hud: [{ text: plural(featured.length, 'project', 'projects') }, starReadout(featured)] },
+	{ id: 'zeepkist-mods', title: 'Zeepkist mods', items: mods, hud: [{ text: plural(mods.length, 'mod', 'mods') }, starReadout(mods)] },
+	{ id: 'unity-plugins', title: 'Unity plugins', items: plugins, hud: [{ text: plural(plugins.length, 'plugin', 'plugins') }, starReadout(plugins)] },
+];
+
+const contactLinks = [
+	{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
+	{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
+	{ label: 'Back to start', href: '#top' },
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Christiaan Bloemendaal: game and tools programmer. Released games, Zeepkist mods and open-source Unity plugins." />
+		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<link rel="icon" href={withBase('favicon.ico')} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" />
+		<title>Christiaan Bloemendaal · Playful prototype</title>
+	</head>
+	<body class="pf" id="top">
+		<a class="pf-skip" href="#games">Skip to content</a>
+		<header class="pf-topbar">
+			<a class="pf-topbar__brand" href="#top">CB<span aria-hidden="true">_</span></a>
+			<nav aria-label="Sections">
+				<ul class="pf-topbar__nav">
+					{sections.map((section, index) => (
+						<li><a href={`#${section.id}`}><span aria-hidden="true">{index + 1}·</span>{section.title}</a></li>
+					))}
+					<li><a href="#contact"><span aria-hidden="true">{sections.length + 1}·</span>Contact</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main>
+			<Hero
+				title="Christiaan Bloemendaal"
+				tagline="Game & tools programmer"
+				actions={[
+					{ label: 'See the games', href: '#games' },
+					{ label: 'Browse the code', href: '#featured' },
+				]}
+			>
+				<p class="pf-hero__eyebrow" aria-hidden="true">Player 1 · Ready</p>
+				<p class="hero__intro">
+					I build games and the systems behind them: shipped titles on Xbox, Switch and mobile, a records backend
+					for Zeepkist, and Unity plugins with hundreds of GitHub stars.
+				</p>
+				<KartHero slot="media" hiScore={hiScore} />
+			</Hero>
+
+			{sections.map((section, index) => (
+				<CollectionGrid id={section.id} title={section.title} items={section.items} itemMedia={section.media}>
+					<p class="pf-hud" data-stage={`Stage ${index + 1}`}>
+						{section.hud.map((readout: Readout) => (
+							<span class:list={['pf-hud__readout', { 'pf-hud__readout--stars': readout.star }]}>{readout.text}</span>
+						))}
+					</p>
+				</CollectionGrid>
+			))}
+
+			<Contact links={contactLinks} title="Continue?">
+				<p class="pf-contact__copy">
+					Thanks for playing. Want to team up on a game, a tool or a mod? Find me on GitHub.
+				</p>
+			</Contact>
+		</main>
+
+		<footer class="pf-footer">
+			<p>Psst… try the <span class="pf-footer__code">{KONAMI_LABELS.map((key) => <kbd>{key}</kbd>)}</span> code.</p>
+		</footer>
+
+		<div class="pf-toast" role="status" aria-live="polite" data-pf-announcer></div>
+
+		<script>
+			import { konamiTracker } from '../../components/proto/playful/konami';
+
+			const announcer = document.querySelector<HTMLElement>('[data-pf-announcer]')!;
+			const track = konamiTracker();
+			let toastTimer = 0;
+
+			document.addEventListener('keydown', (event) => {
+				if (!track(event.key)) return;
+				document.body.classList.add('is-turbo');
+				document.dispatchEvent(new CustomEvent('pf:turbo'));
+				announcer.textContent = 'Cheat unlocked: turbo mode! Every star now counts double.';
+				announcer.classList.add('is-visible');
+				clearTimeout(toastTimer);
+				toastTimer = window.setTimeout(() => announcer.classList.remove('is-visible'), 4000);
+			});
+		</script>
+	</body>
+</html>

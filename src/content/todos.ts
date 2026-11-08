@@ -14,7 +14,7 @@ export interface Todo {
 }
 
 /** `TODO` as a whole word, so `TODO:` and `TODO(name)` count but `TODOS` and `MASTODON` don't. */
-const hasTodo = (line: string) => /\bTODO\b/.test(line);
+export const hasTodo = (line: string) => /\bTODO\b/.test(line);
 
 /** An entry's source split into lines, without a leading byte-order mark. */
 export const sourceLines = (source: string) => source.replace(/^\uFEFF/, '').split(/\r?\n/);
