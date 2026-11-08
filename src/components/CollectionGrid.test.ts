@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CollectionGrid from './CollectionGrid.astro';
-import { type AstroContainer, createContainer, gameEntry, projectEntry } from './test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry } from './test-fixtures';
 
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
 vi.mock('../lib/github-stats', async (importOriginal) => {
@@ -103,5 +103,32 @@ describe('CollectionGrid', () => {
 			slots: { default: '<p>Mods for Zeepkist.</p>' },
 		});
 		expect(withIntro).toMatch(/<\/h2>.*<p>Mods for Zeepkist.<\/p>/s);
+	});
+
+	it('passes the content itemExtra gives each entry to its card, after the blurb', async () => {
+		const html = await render({
+			id: 'mods',
+			title: 'Mods',
+			items: [projectEntry({ title: 'RTM', blurb: 'RTM blurb.' }, 'rtm'), projectEntry({ title: 'WASD', blurb: 'WASD blurb.' }, 'wasd')],
+			itemExtra: (entry: { id: string }) => (entry.id === 'rtm' ? '<p class="forks">3 forks</p>' : undefined),
+		});
+		expect(html).toMatch(/RTM blurb.<\/p>\s*<p class="forks">3 forks<\/p>/);
+		expect(html.match(/class="forks"/g)).toHaveLength(1);
+	});
+
+	it('puts the media itemMedia gives an entry in place of its cover, keeping the cover of the rest', async () => {
+		const html = await render({
+			id: 'games',
+			title: 'Games',
+			items: [
+				gameEntry({ title: 'Good Job!', year: 2020, cover: fixtureImage }, 'good-job'),
+				gameEntry({ title: 'FRU', year: 2016, cover: fixtureImage }, 'fru'),
+			],
+			itemMedia: (entry: { id: string }) => (entry.id === 'good-job' ? '<iframe src="https://www.youtube.com/embed/abc"></iframe>' : undefined),
+		});
+		const [goodJob, fru] = html.split('<article').slice(1);
+		expect(goodJob).toMatch(/^[^>]*>\s*<div class="game-card__media"[^>]*>\s*<iframe src="https:\/\/www.youtube.com\/embed\/abc"><\/iframe>/);
+		expect(goodJob).not.toContain('<img');
+		expect(fru).toContain('<img');
 	});
 });

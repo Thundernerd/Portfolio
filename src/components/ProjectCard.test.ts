@@ -70,6 +70,23 @@ describe('ProjectCard', () => {
 		expect(html).toMatch(/<img[^>]*\salt(=""|[\s>])/);
 	});
 
+	it('renders slotted media in place of the image', async () => {
+		const html = await container.renderToString(ProjectCard, {
+			props: { project: projectEntry({ image: fixtureImage }) },
+			slots: { media: '<video src="https://example.com/demo.mp4"></video>' },
+		});
+		expect(html).not.toContain('<img');
+		expect(html).toMatch(/<article[^>]*>\s*<div class="project-card__media"[^>]*>\s*<video src="https:\/\/example.com\/demo.mp4"><\/video>/);
+	});
+
+	it('renders slotted extra content, such as more repo stats, right after the blurb', async () => {
+		const html = await container.renderToString(ProjectCard, {
+			props: { project: projectEntry({ tags: ['Unity'] }) },
+			slots: { extra: '<p class="forks">12 forks</p>' },
+		});
+		expect(html).toMatch(/Unity inspector.<\/p>\s*<p class="forks">12 forks<\/p>\s*<ul class="project-card__tags"/);
+	});
+
 	it('labels a project archived only when its repo is archived', async () => {
 		expect(await render({ project: projectEntry() })).not.toContain('Archived');
 		const html = await render({ project: projectEntry({ archived: true }) });
@@ -87,5 +104,16 @@ describe('ProjectCard', () => {
 		const html = await render({ project: projectEntry({ archived: true }) });
 		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
 		expect(html).not.toContain('project-card__stars');
+	});
+
+	it('keeps the archived label and fetched star badge when both slots are filled', async () => {
+		const html = await container.renderToString(ProjectCard, {
+			props: { project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2, archived: true, image: fixtureImage }) },
+			slots: { media: '<video src="https://example.com/demo.mp4"></video>', extra: '<p class="forks">12 forks</p>' },
+		});
+		expect(html).not.toContain('<img');
+		expect(html).toMatch(/<div class="project-card__media"[^>]*>\s*<video/);
+		expect(html).toMatch(/<\/h3>\s*<p[^>]*>Archived<\/p>\s*<p class="project-card__blurb"[^>]*>Serialize interface references in the Unity inspector.<\/p>\s*<p class="forks">12 forks<\/p>/);
+		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
 	});
 });
