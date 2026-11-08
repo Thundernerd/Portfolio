@@ -1,24 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { z } from 'astro/zod';
-import type { SchemaContext } from 'astro:content';
-import { parse } from 'yaml';
-import { projectSchema } from './schemas';
 
 // getCollection() has no data store under Vitest, so read the entries' frontmatter directly.
+// `npm run build` already validates every entry against projectSchema; this test only checks
+// that the expected plugins are present, so two top-level scalars are all it needs.
 const sources = import.meta.glob<string>('./projects/**/*.{md,mdx}', {
 	query: '?raw',
 	import: 'default',
 	eager: true,
 });
-const context = { image: () => z.string() } as unknown as SchemaContext;
 
-const projects = Object.entries(sources).map(([file, source]) => {
+const frontmatterField = (source: string, field: string) => {
 	const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
-	// An entry without frontmatter parses to null; treat it as empty so it is skipped, not a crash.
-	return { file, data: (parse(frontmatter) ?? {}) as Record<string, unknown> };
-});
+	return frontmatter.match(new RegExp(`^${field}:\\s*(.+?)\\s*$`, 'm'))?.[1];
+};
 
-const unityPlugins = projects.filter(({ data }) => data.kind === 'unity-plugin');
+const unityPluginRepos = Object.values(sources)
+	.filter((source) => frontmatterField(source, 'kind') === 'unity-plugin')
+	.map((source) => frontmatterField(source, 'repo'));
 
 describe('Unity plugins collection', () => {
 	it.each([
@@ -45,13 +43,6 @@ describe('Unity plugins collection', () => {
 		'Thundernerd/Unity3D-PackageManagerModules',
 		'Thundernerd/Unity3D-ResourceAttribute',
 	])('has an entry for %s', (repo) => {
-		expect(unityPlugins.map(({ data }) => data.repo)).toContain(repo);
-	});
-
-	it('has entries that all match the projects schema', () => {
-		for (const { file, data } of unityPlugins) {
-			const result = projectSchema(context).safeParse(data);
-			expect(result.success, `${file}: ${result.error?.message}`).toBe(true);
-		}
+		expect(unityPluginRepos).toContain(repo);
 	});
 });
