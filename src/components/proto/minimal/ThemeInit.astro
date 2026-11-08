@@ -1,0 +1,16 @@
+---
+/**
+ * Applies the remembered theme before first paint, so a visitor who picked one never sees the other
+ * flash. Goes in the `<head>`; without a stored pick the CSS follows `prefers-color-scheme`.
+ */
+import { THEME_STORAGE_KEY } from './theme';
+---
+
+<script is:inline define:vars={{ key: THEME_STORAGE_KEY }}>
+	try {
+		const theme = localStorage.getItem(key);
+		if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+	} catch {
+		// Storage is unavailable: follow the system preference.
+	}
+</script>

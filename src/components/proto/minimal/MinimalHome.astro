@@ -1,0 +1,104 @@
+---
+/**
+ * The home page content of Prototype B (`/proto/minimal`): the hero, then the released games,
+ * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
+ * section components. Project cards get an inline stats line (language, stars) in their `extra`
+ * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
+ * quiet placeholder.
+ */
+import type { CollectionEntry } from 'astro:content';
+import CollectionGrid from '../../CollectionGrid.astro';
+import Contact from '../../Contact.astro';
+import Hero from '../../Hero.astro';
+import { monogramHtml } from './monogram';
+import { presentableGame, presentableProject } from './placeholders';
+import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
+import { plural } from './text';
+
+type Game = CollectionEntry<'games'>;
+type Project = CollectionEntry<'projects'>;
+
+interface Props {
+	games: Game[];
+	projects: Project[];
+}
+
+const games = Astro.props.games.map(presentableGame);
+const projects = Astro.props.projects.map(presentableProject);
+
+const gameMedia = (entry: Game | Project) => (entry.collection === 'games' ? monogramHtml(entry) : undefined);
+const projectStats = (entry: Game | Project) => (entry.collection === 'projects' ? repoStatsHtml(entry) : undefined);
+const ofKind = (kind: Project['data']['kind']) => projects.filter((project) => project.data.kind === kind);
+
+// `tool` projects have no section in the agreed order, so they are left out of the page and the facts.
+const shown = projects.filter((project) => project.data.kind !== 'tool');
+const languages = languageBreakdown(shown);
+const facts = [
+	plural(games.length, 'released game', 'released games'),
+	plural(shown.length, 'open-source project', 'open-source projects'),
+	plural(totalStars(shown), 'GitHub star', 'GitHub stars'),
+];
+---
+
+<Hero
+	title="Christiaan"
+	tagline="Game developer & programmer."
+	actions={[
+		{ label: 'Released games', href: '#games' },
+		{ label: 'Open source', href: '#featured' },
+		{ label: 'Get in touch', href: '#contact' },
+	]}
+>
+	<p class="mn-hero__intro">
+		I ship games on console and mobile, and build the tools around them: Unity plugins, a modding SDK and a
+		records backend for the Zeepkist community.
+	</p>
+	<ul class="mn-facts">
+		{facts.map((fact) => <li>{fact}</li>)}
+	</ul>
+	{
+		languages.length > 0 && (
+			<figure slot="media" class="mn-langs">
+				<figcaption class="mn-langs__caption">Projects by language</figcaption>
+				<ul class="mn-langs__list">
+					{languages.map(({ language, colour, count, share }) => (
+						<li class="mn-langs__row" style={`--share: ${share}; --lang-colour: ${colour}`}>
+							<span class="mn-langs__name">{language}</span>
+							<span class="mn-langs__bar" aria-hidden="true" />
+							<data class="mn-langs__count" value={count}>{count}</data>
+						</li>
+					))}
+				</ul>
+			</figure>
+		)
+	}
+</Hero>
+
+<CollectionGrid id="games" title="Released games" items={games} itemMedia={gameMedia}>
+	<p>Commercial games I worked on, from co-founding a studio to building multiplayer systems.</p>
+</CollectionGrid>
+
+<CollectionGrid id="featured" title="Featured projects" items={ofKind('featured')} itemExtra={projectStats}>
+	<p>Bigger personal projects, mostly around the Zeepkist modding scene.</p>
+</CollectionGrid>
+
+<CollectionGrid id="zeepkist-mods" title="Zeepkist mods" items={ofKind('zeepkist-mod')} itemExtra={projectStats}>
+	<p>BepInEx mods for the soapbox racer Zeepkist, most of them built on ZeepSDK.</p>
+</CollectionGrid>
+
+<CollectionGrid id="unity-plugins" title="Unity plugins" items={ofKind('unity-plugin')} itemExtra={projectStats}>
+	<p>Open-source editor and runtime tools for Unity, sorted by GitHub stars.</p>
+</CollectionGrid>
+
+<Contact
+	title="About & contact"
+	links={[
+		{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
+		{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
+	]}
+>
+	<p class="mn-about">
+		I'm Christiaan, a game developer and programmer. Besides shipping games I build the parts players rarely
+		see: editor tooling, multiplayer systems, backends and the SDKs other modders build on.
+	</p>
+</Contact>
