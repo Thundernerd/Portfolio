@@ -75,4 +75,17 @@ describe('ProjectCard', () => {
 		const html = await render({ project: projectEntry({ archived: true }) });
 		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
 	});
+
+	it('shows both the archived label and the fetched star count on an archived project', async () => {
+		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2, archived: true }) });
+		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
+		expect(html).toContain('Serialize interface references in the Unity inspector.');
+	});
+
+	it('shows the archived label but no star badge when an archived project has no star count', async () => {
+		const html = await render({ project: projectEntry({ archived: true }) });
+		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+		expect(html).not.toContain('project-card__stars');
+	});
 });
