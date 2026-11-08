@@ -26,7 +26,7 @@ export const projectSchema = ({ image }: SchemaContext) =>
 	z.object({
 		title: z.string(),
 		// GitHub `owner/name`; the owner varies (Thundernerd, donderjoekel).
-		repo: z.string().regex(/^[\w.-]+\/[\w.-]+$/, 'Expected a GitHub repo as owner/name'),
+		repo: z.string().regex(/^[A-Za-z0-9-]+\/(?!\.\.?$)[\w.-]+$/, 'Expected a GitHub repo as owner/name'),
 		kind: z.enum(projectKinds),
 		tags: z.array(z.string()).default([]),
 		image: image().optional(),

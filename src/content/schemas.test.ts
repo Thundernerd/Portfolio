@@ -67,6 +67,7 @@ describe('projects schema', () => {
 	it.each([
 		['a repo without an owner', { repo: 'ZeepSDK' }],
 		['a repo given as a URL', { repo: 'https://github.com/donderjoekel/ZeepSDK' }],
+		['a repo given as a relative path', { repo: '../..' }],
 		['an unknown kind', { kind: 'game' }],
 		['negative stars', { stars: -1 }],
 		['fractional stars', { stars: 1.5 }],
