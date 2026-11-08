@@ -3,6 +3,8 @@
  * Page-opening hero: the site title (the page's `<h1>`), a tagline, optional intro copy (default
  * slot), call-to-action links and an optional `media` slot (key art, video, canvas).
  *
+ * A plain `<section>`, so the layout keeps control of the page's banner `<header>`.
+ *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--hero-gap`, `--hero-actions-gap`.
  */
@@ -19,7 +21,7 @@ interface Props {
 const { title, tagline, actions = [] } = Astro.props;
 ---
 
-<header class="hero">
+<section class="hero">
 	<div class="hero__content">
 		<h1 class="hero__title">{title}</h1>
 		{tagline && <p class="hero__tagline">{tagline}</p>}
@@ -43,7 +45,7 @@ const { title, tagline, actions = [] } = Astro.props;
 			</div>
 		)
 	}
-</header>
+</section>
 
 <style>
 	@layer components {

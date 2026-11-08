@@ -2,7 +2,8 @@
 /**
  * Card for one entry of the `games` collection: cover, title, role, studio, year, platforms, blurb,
  * and links to the trailer and store pages. The title links to `href` (a site path, e.g. a game
- * page) when given.
+ * page) when given. Each link is described by the title, so "Trailer" stays meaningful out of
+ * context; the title's id is `game-<entry id>-title`.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--card-gap`, `--card-tags-gap`.
@@ -18,17 +19,29 @@ interface Props {
 
 const { game, href } = Astro.props;
 const { title, platforms, role, studio, year, cover, trailer, storeLinks, blurb } = game.data;
+const titleId = `game-${game.id}-title`;
 const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...storeLinks];
 ---
 
 <article class="game-card">
 	{cover && <Image class="game-card__cover" src={cover} alt="" />}
-	<h3 class="game-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
-	<p class="game-card__meta">
-		<span class="game-card__role">{role}</span>
-		<span class="game-card__studio">{studio}</span>
-		<time class="game-card__year" datetime={String(year)}>{year}</time>
-	</p>
+	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
+	<dl class="game-card__meta">
+		<div class="game-card__fact">
+			<dt>Role</dt>
+			<dd class="game-card__role">{role}</dd>
+		</div>
+		<div class="game-card__fact">
+			<dt>Studio</dt>
+			<dd class="game-card__studio">{studio}</dd>
+		</div>
+		<div class="game-card__fact">
+			<dt>Year</dt>
+			<dd class="game-card__year">
+				<time datetime={String(year)}>{year}</time>
+			</dd>
+		</div>
+	</dl>
 	<ul class="game-card__platforms">
 		{platforms.map((platform) => <li class="game-card__platform">{platform}</li>)}
 	</ul>
@@ -38,7 +51,7 @@ const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...stor
 			<ul class="game-card__links">
 				{links.map((link) => (
 					<li>
-						<a class="game-card__link" href={link.url}>{link.label}</a>
+						<a class="game-card__link" href={link.url} aria-describedby={titleId}>{link.label}</a>
 					</li>
 				))}
 			</ul>

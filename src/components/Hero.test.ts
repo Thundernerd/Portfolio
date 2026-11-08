@@ -16,6 +16,12 @@ describe('Hero', () => {
 		expect(html).toContain('Game &amp; tools programmer');
 	});
 
+	it('renders a section rather than a banner landmark, leaving the site header to the layout', async () => {
+		const html = await container.renderToString(Hero, { props: { title: 'Name' } });
+		expect(html).toMatch(/^<section[^>]*class="hero"/);
+		expect(html).not.toContain('<header');
+	});
+
 	it('renders actions as links, base-prefixing site paths', async () => {
 		const html = await container.renderToString(Hero, {
 			props: {

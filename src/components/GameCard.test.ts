@@ -14,9 +14,9 @@ describe('GameCard', () => {
 		const html = await render({ game: gameEntry() });
 		expect(html).toMatch(/<article[^>]*>/);
 		expect(html).toMatch(/<h3[^>]*>\s*Good Job!\s*<\/h3>/);
-		expect(html).toContain('Programmer');
-		expect(html).toContain('Paladin Studios');
-		expect(html).toMatch(/<time[^>]*datetime="2020"[^>]*>2020<\/time>/);
+		expect(html).toMatch(/<dt[^>]*>Role<\/dt>\s*<dd[^>]*>Programmer<\/dd>/);
+		expect(html).toMatch(/<dt[^>]*>Studio<\/dt>\s*<dd[^>]*>Paladin Studios<\/dd>/);
+		expect(html).toMatch(/<dt[^>]*>Year<\/dt>\s*<dd[^>]*>\s*<time[^>]*datetime="2020"[^>]*>2020<\/time>\s*<\/dd>/);
 		expect(html).toContain('A puzzle game about being the boss’s kid.');
 	});
 
@@ -40,6 +40,17 @@ describe('GameCard', () => {
 		});
 		expect(html).toMatch(/<a[^>]*href="https:\/\/www.youtube.com\/watch\?v=abc"[^>]*>Trailer<\/a>/);
 		expect(html).toMatch(/<a[^>]*href="https:\/\/www.nintendo.com\/good-job"[^>]*>Nintendo eShop<\/a>/);
+	});
+
+	it('ties each link to the game title so "Trailer" makes sense out of context', async () => {
+		const html = await render({
+			game: gameEntry({
+				trailer: 'https://www.youtube.com/watch?v=abc',
+				storeLinks: [{ label: 'Nintendo eShop', url: 'https://www.nintendo.com/good-job' }],
+			}),
+		});
+		expect(html).toMatch(/<h3[^>]*id="game-good-job-title"/);
+		expect(html.match(/<a[^>]*aria-describedby="game-good-job-title"/g)).toHaveLength(2);
 	});
 
 	it('renders the cover only when present', async () => {

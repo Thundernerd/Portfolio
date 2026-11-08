@@ -1,8 +1,7 @@
 ---
 /**
  * Card for one entry of the `projects` collection: image, title, blurb, tags, star count and a link
- * to the GitHub repo. The title links to `href` (a site path, e.g. a project page) when given, and
- * to the repo otherwise.
+ * to the GitHub repo. The title links to `href` (a site path, e.g. a project page) when given.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--card-gap`, `--card-tags-gap`.
@@ -19,15 +18,12 @@ interface Props {
 const { project, href } = Astro.props;
 const { title, repo, blurb, tags, image, stars } = project.data;
 const repoUrl = `https://github.com/${repo}`;
-const titleHref = href === undefined ? repoUrl : resolveHref(href);
 const starCount = stars?.toLocaleString('en-US');
 ---
 
 <article class="project-card" data-kind={project.data.kind}>
 	{image && <Image class="project-card__image" src={image} alt="" />}
-	<h3 class="project-card__title">
-		<a href={titleHref}>{title}</a>
-	</h3>
+	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
 	<p class="project-card__blurb">{blurb}</p>
 	{
 		tags.length > 0 && (
@@ -42,12 +38,9 @@ const starCount = stars?.toLocaleString('en-US');
 		<a class="project-card__repo" href={repoUrl}>{repo}</a>
 		{
 			stars !== undefined && (
-				<span
-					class="project-card__stars"
-					data-stars={stars}
-					aria-label={`${starCount} GitHub ${stars === 1 ? 'star' : 'stars'}`}
-				>
-					{starCount}
+				<span class="project-card__stars">
+					<data class="project-card__star-count" value={stars}>{starCount}</data>
+					<span class="project-card__star-label">{stars === 1 ? 'star' : 'stars'}</span>
 				</span>
 			)
 		}

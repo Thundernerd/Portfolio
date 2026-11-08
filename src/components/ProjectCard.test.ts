@@ -18,6 +18,12 @@ describe('ProjectCard', () => {
 		expect(html).toContain('href="https://github.com/Thundernerd/Unity3D-SerializableInterface"');
 	});
 
+	it('links to the repo once, leaving the title unlinked, when given no href', async () => {
+		const html = await render({ project: projectEntry() });
+		expect(html.match(/href="https:\/\/github.com\/Thundernerd\/Unity3D-SerializableInterface"/g)).toHaveLength(1);
+		expect(html).toMatch(/<h3[^>]*>\s*SerializableInterface\s*<\/h3>/);
+	});
+
 	it('links the title to a base-prefixed page when given an href', async () => {
 		const html = await render({ project: projectEntry(), href: 'projects/serializable-interface/' });
 		expect(html).toMatch(/<h3[^>]*>\s*<a[^>]*href="\/Portfolio\/projects\/serializable-interface\/"/);
@@ -32,12 +38,11 @@ describe('ProjectCard', () => {
 	it('shows the star count only when known', async () => {
 		expect(await render({ project: projectEntry() })).not.toContain('stars');
 		const html = await render({ project: projectEntry({ stars: 1234 }) });
-		expect(html).toMatch(/aria-label="1,234 GitHub stars"[^>]*>1,234</);
-		expect(html).toContain('data-stars="1234"');
+		expect(html).toMatch(/<data[^>]*value="1234"[^>]*>1,234<\/data>\s*<span[^>]*>stars<\/span>/);
 	});
 
 	it('uses singular wording for one star', async () => {
-		expect(await render({ project: projectEntry({ stars: 1 }) })).toContain('aria-label="1 GitHub star"');
+		expect(await render({ project: projectEntry({ stars: 1 }) })).toMatch(/>1<\/data>\s*<span[^>]*>star<\/span>/);
 	});
 
 	it('renders the image only when present, as decoration beside the heading', async () => {
