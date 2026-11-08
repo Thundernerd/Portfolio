@@ -19,7 +19,7 @@
 	--muted: #a3abba; /* 7.9:1 on --card */
 	--faint: #7d8597; /* 4.9:1 on --card, for small labels only */
 	--accent: #ff6b3d; /* 7.0:1 on --bg */
-	--accent-ink: #1a0a04; /* text on --accent, 8.6:1 */
+	--accent-ink: #1a0a04; /* text on --accent, 6.8:1 */
 	--cool: #4cc9f0;
 	--glow: color-mix(in oklab, var(--accent) 45%, transparent);
 
@@ -773,7 +773,14 @@ a {
 }
 
 .dark-trailer:focus-visible {
-	outline-offset: -4px;
+	outline: 3px solid #fff;
+	outline-offset: -5px;
+}
+
+/* A second ring on the play button keeps focus obvious on bright posters too. */
+.dark-trailer:focus-visible .dark-trailer__play {
+	outline: 3px solid #fff;
+	outline-offset: 4px;
 }
 
 .dark-trailer__frame {

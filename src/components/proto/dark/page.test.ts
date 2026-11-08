@@ -16,11 +16,14 @@ const projects = Object.entries(import.meta.glob('../../../content/projects/*.md
 		({ id: idOf(path), collection: 'projects', data: projectSchema(context).parse(file.frontmatter) }) as CollectionEntry<'projects'>,
 );
 
+const ofKind = (kind: string) => projects.filter((project) => project.data.kind === kind);
 const decode = (html: string) => html.replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
 
 describe('/proto/dark home', () => {
 	let container: AstroContainer;
 	let html: string;
+	const sectionOf = (id: string) => html.match(new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+
 	beforeEach(async () => {
 		container = await createContainer();
 		html = await container.renderToString(DarkHome, { props: { games, projects } });
@@ -34,17 +37,16 @@ describe('/proto/dark home', () => {
 
 	it.each([
 		['games', games.map((g) => g.data.title)],
-		['featured', projects.filter((p) => p.data.kind === 'featured').map((p) => p.data.title)],
-		['zeepkist-mods', projects.filter((p) => p.data.kind === 'zeepkist-mod').map((p) => p.data.title)],
-		['unity-plugins', projects.filter((p) => p.data.kind === 'unity-plugin').map((p) => p.data.title)],
+		['featured', ofKind('featured').map((p) => p.data.title)],
+		['zeepkist-mods', ofKind('zeepkist-mod').map((p) => p.data.title)],
+		['unity-plugins', ofKind('unity-plugin').map((p) => p.data.title)],
 	])('lists every %s entry in its section', (id, expected) => {
-		const section = html.match(new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+		const section = sectionOf(id);
 		const titles = [...section.matchAll(/<h3[^>]*>(?:\s*<a[^>]*>)?([^<]+)/g)].map((m) => decode(m[1]).trim());
 		expect(expected.length).toBeGreaterThan(0);
 		expect(titles.sort()).toEqual(expected.sort());
 	});
 
-	const sectionOf = (id: string) => html.match(new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
 	const cardsIn = (section: string) => section.split(/<article/).slice(1);
 
 	it.each(['games', 'featured'])('gives every %s card large media, never a missing image', (id) => {
@@ -66,7 +68,7 @@ describe('/proto/dark home', () => {
 		const hero = html.match(/<section class="hero"[\s\S]*?<\/section>/)?.[0] ?? '';
 		const stat = (label: string) => hero.match(new RegExp(`<dt[^>]*>${label}</dt>\\s*<dd[^>]*>(\\d+)</dd>`))?.[1];
 		expect(stat('Released games')).toBe(String(games.length));
-		expect(stat('Zeepkist mods')).toBe(String(projects.filter((p) => p.data.kind === 'zeepkist-mod').length));
-		expect(stat('Unity plugins')).toBe(String(projects.filter((p) => p.data.kind === 'unity-plugin').length));
+		expect(stat('Zeepkist mods')).toBe(String(ofKind('zeepkist-mod').length));
+		expect(stat('Unity plugins')).toBe(String(ofKind('unity-plugin').length));
 	});
 });

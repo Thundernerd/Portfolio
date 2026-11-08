@@ -1,12 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
+import type { Entry } from './content';
 
 /**
  * Media for the `/proto/dark` cards, as trusted HTML for their `media` slot (see `CollectionGrid`'s
  * `itemMedia`): a click-to-play poster for a YouTube trailer, or a generated initials tile when an
  * entry has no art yet. `undefined` leaves the card's own cover in place.
  */
-
-type Entry = CollectionEntry<'games'> | CollectionEntry<'projects'>;
 
 const YOUTUBE_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtube-nocookie.com']);
 const VIDEO_ID = /^[\w-]{11}$/;
