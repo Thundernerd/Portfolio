@@ -14,7 +14,8 @@ const context = { image: () => z.string() } as unknown as SchemaContext;
 
 const projects = Object.entries(sources).map(([file, source]) => {
 	const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
-	return { file, data: parse(frontmatter) as Record<string, unknown> };
+	// An entry without frontmatter parses to null; treat it as empty so it is skipped, not a crash.
+	return { file, data: (parse(frontmatter) ?? {}) as Record<string, unknown> };
 });
 
 const unityPlugins = projects.filter(({ data }) => data.kind === 'unity-plugin');
