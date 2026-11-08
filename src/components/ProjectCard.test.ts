@@ -48,11 +48,16 @@ describe('ProjectCard', () => {
 		expect(html).toMatch(/<data[^>]*value="1234"[^>]*>1,234<\/data>\s*<span[^>]*>stars<\/span>/);
 	});
 
-	it('prefers the stars and description fetched from GitHub over the frontmatter', async () => {
+	it('prefers the star count fetched from GitHub over the frontmatter', async () => {
 		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched', stars: 2 }) });
 		expect(html).toMatch(/<data[^>]*value="4321"[^>]*>4,321<\/data>/);
-		expect(html).toContain('Description from GitHub.');
-		expect(html).not.toContain('Serialize interface references in the Unity inspector.');
+		expect(html).not.toMatch(/value="2"/);
+	});
+
+	it('keeps the hand-written blurb even when GitHub has a description', async () => {
+		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched' }) });
+		expect(html).toContain('Serialize interface references in the Unity inspector.');
+		expect(html).not.toContain('Description from GitHub.');
 	});
 
 	it('uses singular wording for one star', async () => {
