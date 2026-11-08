@@ -28,7 +28,8 @@ count and description of every `repo` in `src/content/` from the GitHub API into
 `src/data/github-stats.json` (gitignored). Read them in pages with `repoStats()` from
 `src/lib/github-stats.ts`. No token is needed; set `GITHUB_TOKEN` to raise the rate limit. A repo that
 can't be fetched (offline, rate-limited, not found) falls back to the entry's frontmatter `stars` and
-`blurb`, and so does every repo under `npm run dev`, which doesn't run the fetcher.
+`blurb`, and so does every repo under `npm run dev`, which doesn't run the fetcher. Project cards
+take only the star count from `repoStats()` and always show the hand-written `blurb`.
 
 ## Deploy
 
