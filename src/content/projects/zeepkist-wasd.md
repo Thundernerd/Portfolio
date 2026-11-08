@@ -2,9 +2,9 @@
 title: WASD
 repo: Thundernerd/Zeepkist-WASD
 kind: zeepkist-mod
-tags: [C#, BepInEx]
-# TODO(Christiaan): the repo only says "A WASD mod for Zeepkist" (archived, no README).
-# Describe what the mod changes.
-blurb: A WASD mod for Zeepkist.
+tags: [C#, BepInEx, Harmony]
+blurb: >-
+  Adds configurable keyboard bindings for arms up, braking, steering and quick reset when one
+  player is playing.
 stars: 0
 ---
