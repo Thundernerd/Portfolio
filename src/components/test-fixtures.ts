@@ -35,6 +35,7 @@ export function projectEntry(
 			kind: 'unity-plugin',
 			tags: [],
 			blurb: 'Serialize interface references in the Unity inspector.',
+			archived: false,
 			...data,
 		},
 	};
