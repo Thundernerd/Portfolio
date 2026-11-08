@@ -2,7 +2,7 @@
 title: Zeepkist GameLibs
 repo: Thundernerd/Zeepkist.GameLibs
 kind: zeepkist-mod
-tags: [NuGet, Modding]
+tags: [Batchfile, NuGet]
 blurb: >-
   Stripped and publicized game libraries for Zeepkist, packaged as a NuGet package that mods
   compile against.
