@@ -7,19 +7,22 @@ import type { CollectionEntry } from 'astro:content';
 import CollectionGrid from '../../CollectionGrid.astro';
 import Contact from '../../Contact.astro';
 import Hero from '../../Hero.astro';
+import { withoutTodos } from './content';
+import { cardMedia } from './media';
 
 interface Props {
 	games: CollectionEntry<'games'>[];
 	projects: CollectionEntry<'projects'>[];
 }
 
-const { games, projects } = Astro.props;
+const games = Astro.props.games.map(withoutTodos);
+const projects = Astro.props.projects.map(withoutTodos);
 const ofKind = (kind: CollectionEntry<'projects'>['data']['kind']) => projects.filter((project) => project.data.kind === kind);
 ---
 
 <Hero title="Christiaan" tagline="Game developer & programmer" />
-<CollectionGrid id="games" title="Released games" items={games} />
-<CollectionGrid id="featured" title="Featured projects" items={ofKind('featured')} />
+<CollectionGrid id="games" title="Released games" items={games} itemMedia={cardMedia} />
+<CollectionGrid id="featured" title="Featured projects" items={ofKind('featured')} itemMedia={cardMedia} />
 <CollectionGrid id="zeepkist-mods" title="Zeepkist mods" items={ofKind('zeepkist-mod')} />
 <CollectionGrid id="unity-plugins" title="Unity plugins" items={ofKind('unity-plugin')} />
 <Contact id="contact" title="About & contact" links={[{ label: 'GitHub', href: 'https://github.com/Thundernerd' }]} />

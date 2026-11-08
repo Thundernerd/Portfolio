@@ -43,4 +43,22 @@ describe('/proto/dark home', () => {
 		expect(expected.length).toBeGreaterThan(0);
 		expect(titles.sort()).toEqual(expected.sort());
 	});
+
+	const sectionOf = (id: string) => html.match(new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`))?.[0] ?? '';
+	const cardsIn = (section: string) => section.split(/<article/).slice(1);
+
+	it.each(['games', 'featured'])('gives every %s card large media, never a missing image', (id) => {
+		const cards = cardsIn(sectionOf(id));
+		expect(cards.length).toBeGreaterThan(0);
+		for (const card of cards) expect(card).toMatch(/__media"[^>]*>\s*<(div class="dark-tile"|button[^>]*class="dark-trailer")/);
+	});
+
+	it.each(['zeepkist-mods', 'unity-plugins'])('keeps the %s cards compact, without media', (id) => {
+		expect(sectionOf(id)).not.toContain('__media');
+	});
+
+	it('leaves unconfirmed TODO facts out instead of showing the placeholders', () => {
+		expect(games.some((game) => /TODO/.test(game.data.blurb + game.data.studio))).toBe(true);
+		expect(html).not.toMatch(/TODO/);
+	});
 });
