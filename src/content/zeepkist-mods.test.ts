@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { z } from 'astro/zod';
-import type { SchemaContext } from 'astro:content';
 import { projectSchema } from './schemas';
-
-// Astro's image() helper resolves files at build time; outside Astro, stand in a plain path.
-const context = { image: () => z.string() } as unknown as SchemaContext;
+import { testSchemaContext as context } from './test-context';
 
 // Same files as the `projects` collection's glob loader in src/content.config.ts.
 const files = import.meta.glob<{ frontmatter: Record<string, unknown> }>('./projects/**/*.{md,mdx}', {
