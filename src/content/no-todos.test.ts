@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { findTodos, formatTodo } from './todos';
 
-// Launch guard: no content entry may still hold a TODO placeholder. Content is still being filled
-// in, so it only runs when CHECK_TODOS is set (`CHECK_TODOS=1 npm test`); before launch, drop the
-// `skipIf` so it runs on every `npm test` and in CI. See "Content TODOs" in README.md.
-// Raw file text, not parsed frontmatter, so TODOs in YAML comments count too. The glob covers the
-// games and projects collections (src/content.config.ts).
+// Launch guard: opt-in until launch, see "Content TODOs" in README.md. Reads the raw files so TODOs
+// in YAML comments count too; the glob mirrors the collections in src/content.config.ts.
 const entries = import.meta.glob<string>('./{games,projects}/**/*.{md,mdx}', {
 	query: '?raw',
 	import: 'default',
