@@ -33,6 +33,8 @@ describe('games schema', () => {
 		['a fractional year', { year: 2016.5 }],
 		['a trailer that is not a URL', { trailer: 'youtube abc123' }],
 		['a store link that is not a URL', { storeLinks: [{ label: 'Store', url: 'store page' }] }],
+		['a non-http trailer URL', { trailer: 'javascript:alert(1)' }],
+		['a non-http store link', { storeLinks: [{ label: 'Store', url: 'mailto:a@b.c' }] }],
 	])('rejects a game with %s', (_, override) => {
 		expect(gameSchema(context).safeParse({ ...validGame, ...override }).success).toBe(false);
 	});

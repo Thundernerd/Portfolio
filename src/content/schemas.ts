@@ -1,6 +1,9 @@
 import { z } from 'astro/zod';
 import type { SchemaContext } from 'astro:content';
 
+/** An absolute http(s) link; other schemes (mailto:, javascript:) can't be embedded or linked safely. */
+const webUrl = () => z.url({ protocol: /^https?$/ });
+
 /** Frontmatter of a released game in `src/content/games/`. The MD/MDX body holds "what I did". */
 export const gameSchema = ({ image }: SchemaContext) =>
 	z.object({
@@ -11,8 +14,8 @@ export const gameSchema = ({ image }: SchemaContext) =>
 		year: z.number().int(),
 		// Media and links are optional so entries can land before the assets exist.
 		cover: image().optional(),
-		trailer: z.url().optional(),
-		storeLinks: z.array(z.object({ label: z.string(), url: z.url() })).default([]),
+		trailer: webUrl().optional(),
+		storeLinks: z.array(z.object({ label: z.string(), url: webUrl() })).default([]),
 		blurb: z.string(),
 	});
 
