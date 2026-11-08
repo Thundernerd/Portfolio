@@ -61,4 +61,12 @@ describe('/proto/dark home', () => {
 		expect(games.some((game) => /TODO/.test(game.data.blurb + game.data.studio))).toBe(true);
 		expect(html).not.toMatch(/TODO/);
 	});
+
+	it('sums up the collections in the hero', () => {
+		const hero = html.match(/<section class="hero"[\s\S]*?<\/section>/)?.[0] ?? '';
+		const stat = (label: string) => hero.match(new RegExp(`<dt[^>]*>${label}</dt>\\s*<dd[^>]*>(\\d+)</dd>`))?.[1];
+		expect(stat('Released games')).toBe(String(games.length));
+		expect(stat('Zeepkist mods')).toBe(String(projects.filter((p) => p.data.kind === 'zeepkist-mod').length));
+		expect(stat('Unity plugins')).toBe(String(projects.filter((p) => p.data.kind === 'unity-plugin').length));
+	});
 });

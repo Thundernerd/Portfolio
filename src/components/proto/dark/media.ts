@@ -48,14 +48,17 @@ function initials(title: string): string {
 	return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
-/** A stable hue (0–359) for an id (FNV-1a), so each tile keeps its colour between builds. */
+/** Tile hues that glow well on the dark theme: ember, rose, magenta, violet, indigo, azure, cyan, teal. */
+const HUES = [14, 345, 315, 270, 240, 210, 190, 170];
+
+/** A stable hue for an id (FNV-1a into `HUES`), so each tile keeps its colour between builds. */
 function hueOf(id: string): number {
 	let hash = 0x811c9dc5;
 	for (const char of id) {
 		hash ^= char.codePointAt(0)!;
 		hash = Math.imul(hash, 0x01000193) >>> 0;
 	}
-	return hash % 360;
+	return HUES[hash % HUES.length];
 }
 
 function tile(entry: Entry): string {
@@ -66,7 +69,7 @@ function trailerPoster(entry: CollectionEntry<'games'>, id: string): string {
 	const poster = entry.data.cover?.src ?? `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 	const label = escapeHtml(`Play the ${entry.data.title} trailer`);
 	return (
-		`<button type="button" class="dark-trailer" data-youtube-id="${id}" aria-label="${label}">` +
+		`<button type="button" class="dark-trailer" data-youtube-id="${id}" data-trailer-title="${escapeHtml(`${entry.data.title} trailer`)}" aria-label="${label}">` +
 		`<img class="dark-trailer__poster" src="${escapeHtml(poster)}" alt="" loading="lazy" decoding="async" />` +
 		`<span class="dark-trailer__play" aria-hidden="true"></span>` +
 		`</button>`

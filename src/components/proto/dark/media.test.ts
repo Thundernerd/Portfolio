@@ -32,6 +32,7 @@ describe('cardMedia', () => {
 		const html = cardMedia(gameEntry({ title: 'Good Job!', trailer: 'https://youtu.be/dQw4w9WgXcQ' }))!;
 		expect(html).toMatch(/<button[^>]*type="button"[^>]*data-youtube-id="dQw4w9WgXcQ"/);
 		expect(html).toContain('aria-label="Play the Good Job! trailer"');
+		expect(html).toContain('data-trailer-title="Good Job! trailer"');
 		expect(html).toContain('src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"');
 		expect(html).toContain('loading="lazy"');
 		expect(html).not.toContain('<iframe');
