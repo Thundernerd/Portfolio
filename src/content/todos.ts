@@ -1,6 +1,6 @@
 /** A `TODO` placeholder left in a content entry's source. */
 export interface Todo {
-	/** The entry's path, as the glob that read it reports it. */
+	/** The entry's path relative to `src/content/` (`./games/fru.md`), as `rawEntries()` keys it. */
 	file: string;
 	/** 1-based line number in the file. */
 	line: number;
@@ -16,16 +16,23 @@ export interface Todo {
 /** `TODO` as a whole word, so `TODO:` and `TODO(name)` count but `TODOS` and `MASTODON` don't. */
 export const hasTodo = (line: string) => /\bTODO\b/.test(line);
 
+/** An entry's source split into lines, without a leading byte-order mark. */
+export const sourceLines = (source: string) => source.replace(/^\uFEFF/, '').split(/\r?\n/);
+
+const isFence = (line: string) => line.trimEnd() === '---';
+
+/** Index of the line closing an entry's `---` frontmatter, or -1 when it has no (closed) frontmatter. */
+export const closingFence = (lines: string[]) =>
+	isFence(lines[0]) ? lines.findIndex((line, index) => index > 0 && isFence(line)) : -1;
+
 /**
  * Finds every `TODO` placeholder in the raw source of content entries, keyed by file path
- * (the shape `import.meta.glob(..., { query: '?raw', import: 'default', eager: true })` returns).
+ * (the shape `rawEntries()` in `test-entries.ts` returns).
  */
 export function findTodos(sources: Record<string, string>): Todo[] {
 	return Object.entries(sources).flatMap(([file, source]) => {
-		const lines = source.replace(/^\uFEFF/, '').split(/\r?\n/);
-		const isFence = (line: string) => line.trimEnd() === '---';
-		// Index of the closing `---` fence, or -1 when the file has no (closed) frontmatter.
-		const frontmatterEnd = isFence(lines[0]) ? lines.findIndex((line, index) => index > 0 && isFence(line)) : -1;
+		const lines = sourceLines(source);
+		const frontmatterEnd = closingFence(lines);
 		// The top-level key the current frontmatter line belongs to: indented lines (block scalars,
 		// list items, nested maps) continue the key above them.
 		let key: string | undefined;

@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { projectSchema } from './schemas';
-import { testSchemaContext as context } from './test-context';
+import { loadProjects } from './test-entries';
 
-// Same files as the `projects` collection's glob loader in src/content.config.ts.
-const files = import.meta.glob<{ frontmatter: Record<string, unknown> }>('./projects/**/*.{md,mdx}', {
-	eager: true,
-});
-
-const projects = Object.values(files).map((mod) => projectSchema(context).parse(mod.frontmatter));
+const projects = loadProjects();
 
 describe('Zeepkist mods collection', () => {
 	it('lists the expected mods, each once', () => {
