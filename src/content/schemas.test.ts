@@ -53,12 +53,16 @@ const validProject = {
 
 describe('projects schema', () => {
 	it('accepts a complete project entry', () => {
-		expect(projectSchema(context).parse(validProject)).toEqual(validProject);
+		expect(projectSchema(context).parse(validProject)).toEqual({ ...validProject, archived: false });
 	});
 
 	it('accepts a project without image, tags or stars, defaulting to no tags', () => {
 		const { image, tags, stars, ...minimal } = validProject;
-		expect(projectSchema(context).parse(minimal)).toEqual({ ...minimal, tags: [] });
+		expect(projectSchema(context).parse(minimal)).toEqual({ ...minimal, tags: [], archived: false });
+	});
+
+	it('keeps a project marked archived (projects default to not archived, as above)', () => {
+		expect(projectSchema(context).parse({ ...validProject, archived: true }).archived).toBe(true);
 	});
 
 	it.each(['featured', 'zeepkist-mod', 'unity-plugin', 'tool'])('accepts kind %s', (kind) => {

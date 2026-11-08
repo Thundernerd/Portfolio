@@ -69,4 +69,10 @@ describe('ProjectCard', () => {
 		const html = await render({ project: projectEntry({ image: fixtureImage }) });
 		expect(html).toMatch(/<img[^>]*\salt(=""|[\s>])/);
 	});
+
+	it('labels a project archived only when its repo is archived', async () => {
+		expect(await render({ project: projectEntry() })).not.toContain('Archived');
+		const html = await render({ project: projectEntry({ archived: true }) });
+		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+	});
 });

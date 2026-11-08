@@ -31,6 +31,15 @@ can't be fetched (offline, rate-limited, not found) falls back to the entry's fr
 `blurb`, and so does every repo under `npm run dev`, which doesn't run the fetcher. Project cards
 take only the star count from `repoStats()` and always show the hand-written `blurb`.
 
+## Content TODOs
+
+Facts in `src/content/games/` and `src/content/projects/` that still need confirming are marked
+`TODO`, in a frontmatter value (`studio: 'TODO: studio'`), a YAML comment or the body. The launch
+guard in `src/content/no-todos.test.ts` fails on any of them and lists each file, line and field. It
+is skipped by default so CI and preview deploys keep passing while content is being filled in; run it
+on demand with `CHECK_TODOS=1 npm test`. Before launch, once that passes, remove the
+`skipIf(!process.env.CHECK_TODOS)` so the guard runs on every `npm test` and in CI.
+
 ## Deploy
 
 `.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to `main` and on pull requests

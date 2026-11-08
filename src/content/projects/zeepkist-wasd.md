@@ -7,4 +7,5 @@ blurb: >-
   Adds configurable keyboard bindings for arms up, braking, steering and quick reset when one
   player is playing.
 stars: 0
+archived: true
 ---

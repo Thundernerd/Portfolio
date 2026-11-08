@@ -4,6 +4,7 @@
  * to the GitHub repo. The star count comes from `repoStats()`: GitHub's count when the prebuild
  * fetcher reached it, the entry's `stars` otherwise. The blurb is always the hand-written one. The
  * title links to `href` (a site path, e.g. a project page) when given.
+ * An entry marked `archived` gets an "Archived" label (`.project-card__archived`) after the title.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--card-gap`, `--card-tags-gap`.
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const { project, href } = Astro.props;
-const { title, blurb, repo, tags, image } = project.data;
+const { title, blurb, repo, tags, image, archived } = project.data;
 // The star count as fetched from GitHub at build time, falling back to the frontmatter.
 const { stars } = repoStats(project.data);
 const repoUrl = `https://github.com/${repo}`;
@@ -29,6 +30,7 @@ const starCount = stars?.toLocaleString('en-US');
 <article class="project-card" data-kind={project.data.kind}>
 	{image && <Image class="project-card__image" src={image} alt="" />}
 	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
+	{archived && <p class="project-card__archived">Archived</p>}
 	<p class="project-card__blurb">{blurb}</p>
 	{
 		tags.length > 0 && (
