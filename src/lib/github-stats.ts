@@ -1,6 +1,8 @@
-/** Star count of a GitHub repo, as written by `scripts/fetch-github.mjs`. */
+/** Star count and archived flag of a GitHub repo, as written by `scripts/fetch-github.mjs`. */
 export interface RepoStats {
 	stars: number;
+	/** Absent when GitHub's response didn't say. */
+	archived?: boolean;
 }
 
 /** The project frontmatter fields the GitHub stats can stand in for. */
