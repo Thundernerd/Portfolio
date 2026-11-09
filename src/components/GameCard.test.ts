@@ -20,6 +20,13 @@ describe('GameCard', () => {
 		expect(html).toContain('A puzzle game about being the boss’s kid.');
 	});
 
+	it('classes every fact label so layouts can style it without element selectors', async () => {
+		const html = await render({ game: gameEntry() });
+		expect(html).toMatch(/<dt[^>]*class="game-card__label"[^>]*>Role<\/dt>/);
+		expect(html).toMatch(/<dt[^>]*class="game-card__label"[^>]*>Studio<\/dt>/);
+		expect(html).toMatch(/<dt[^>]*class="game-card__label"[^>]*>Year<\/dt>/);
+	});
+
 	it('leaves out the year when it is not known', async () => {
 		const html = await render({ game: gameEntry({ year: undefined }) });
 		expect(html).toMatch(/<dt[^>]*>Studio<\/dt>/);
@@ -35,6 +42,7 @@ describe('GameCard', () => {
 	it('links the title to a base-prefixed page when given an href', async () => {
 		const html = await render({ game: gameEntry(), href: 'games/good-job/' });
 		expect(html).toMatch(/<h3[^>]*>\s*<a[^>]*href="\/Portfolio\/games\/good-job\/"[^>]*>Good Job!<\/a>/);
+		expect(html).toMatch(/<a[^>]*class="game-card__title-link"[^>]*>Good Job!<\/a>/);
 	});
 
 	it('links to the trailer and each store page when present', async () => {

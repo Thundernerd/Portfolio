@@ -1,9 +1,11 @@
 ---
 /**
  * Card for one entry of the `games` collection: cover, title, role, studio, year (when known),
- * platforms, blurb, and links to the trailer and store pages. The title links to `href` (a site path, e.g. a game
- * page) when given. Each link is described by the title, so "Trailer" stays meaningful out of
- * context; the title's id is `game-<entry id>-title`.
+ * platforms, blurb, and links to the trailer and store pages. The title links to `href` (a site
+ * path, e.g. a game page) when given, as `.game-card__title-link`. Each fact is a
+ * `.game-card__fact` pairing a `.game-card__label` (`<dt>`) with its value. Each link is described
+ * by the title, so "Trailer" stays meaningful out of context; the title's id is
+ * `game-<entry id>-title`.
  *
  * Slots: `media` (wrapped in `.game-card__media`) replaces the cover when filled (e.g. with a
  * trailer embed); `extra` renders right after the blurb.
@@ -39,20 +41,20 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 			cover && <Image class="game-card__cover" src={cover} alt="" />
 		)
 	}
-	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
+	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a class="game-card__title-link" href={resolveHref(href)}>{title}</a>}</h3>
 	<dl class="game-card__meta">
 		<div class="game-card__fact">
-			<dt>Role</dt>
+			<dt class="game-card__label">Role</dt>
 			<dd class="game-card__role">{role}</dd>
 		</div>
 		<div class="game-card__fact">
-			<dt>Studio</dt>
+			<dt class="game-card__label">Studio</dt>
 			<dd class="game-card__studio">{studio}</dd>
 		</div>
 		{
 			year !== undefined && (
 				<div class="game-card__fact">
-					<dt>Year</dt>
+					<dt class="game-card__label">Year</dt>
 					<dd class="game-card__year">
 						<time datetime={String(year)}>{year}</time>
 					</dd>

@@ -16,6 +16,15 @@ Run from the repo root (Node `>=22.23.4`):
 | `npm run build`   | Build the production site to `./dist/`                  |
 | `npm run preview` | Preview the production build locally                    |
 
+## Testing
+
+Tests run in Node by default. A test for a client-side script (anything that touches `document` or
+`window`) opts into a [happy-dom](https://github.com/capricorn86/happy-dom) DOM by starting its file
+with `// @vitest-environment happy-dom`; see `src/components/proto/dark/trailer.test.ts`. Put the
+script's logic in an exported function the page's `<script>` calls, render the markup it acts on into
+`document.body`, and assert on the resulting DOM. happy-dom doesn't load iframe pages, so a test that
+creates an iframe logs a harmless `Iframe page loading is disabled` error.
+
 ## Base path
 
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
@@ -24,12 +33,14 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 ## GitHub stats
 
 `npm run build` first runs `scripts/fetch-github.mjs` (the `prebuild` step), which fetches the star
-count and primary language of every `repo` in `src/content/` from the GitHub API into
-`src/data/github-stats.json` (gitignored). Read it in pages with `repoStats()` from
+count, primary language and archived flag of every `repo` in `src/content/` from the GitHub API
+into `src/data/github-stats.json` (gitignored). Read them in pages with `repoStats()` from
 `src/lib/github-stats.ts`. No token is needed; set `GITHUB_TOKEN` to raise the rate limit. A repo
 that can't be fetched (offline, rate-limited, not found) falls back to the entry's frontmatter
-`stars`, and so does every repo under `npm run dev`, which doesn't run the fetcher. The language
-falls back to the first of the entry's `tags` that is a programming language (`TAG_LANGUAGES` in
+`stars` and `archived`, and so does every repo under `npm run dev`, which doesn't run the fetcher. So
+a repo archived on GitHub gets its "Archived" label on the next build without a frontmatter change;
+keep `archived` in the frontmatter up to date anyway, as the fallback. The language falls back to
+the first of the entry's `tags` that is a programming language (`TAG_LANGUAGES` in
 `src/lib/github-stats.ts`) when the repo wasn't fetched or GitHub reports none. Project cards always
 show the hand-written `blurb`.
 
@@ -58,6 +69,7 @@ list resets) inside `@layer components`, so any unlayered layout CSS wins over i
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
 component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
+Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example
 with a trailer embed), wrapped in `.game-card__media` / `.project-card__media`, and `extra` renders

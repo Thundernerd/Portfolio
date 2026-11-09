@@ -47,6 +47,30 @@ describe('fetch-github run()', () => {
 		expect(await readOut()).toEqual({ 'donderjoekel/ZeepSDK': { stars: 42, language: 'C#' } });
 	});
 
+	it.each([
+		['archived', true],
+		['not archived', false],
+	])('records whether GitHub says the repo is %s', async (_, archived) => {
+		await project('a.md', 'repo: Thundernerd/Repo');
+		const fetch = async () => json(200, { stargazers_count: 5, archived });
+
+		await run({ contentDir, outFile, fetch, env: {}, log: silent });
+
+		expect(await readOut()).toEqual({ 'Thundernerd/Repo': { stars: 5, language: null, archived } });
+	});
+
+	it.each([
+		['missing', {}],
+		['not a boolean', { archived: 'yes' }],
+	])('leaves the archived flag unknown when it is %s from the response', async (_, extra) => {
+		await project('a.md', 'repo: Thundernerd/Repo');
+		const fetch = async () => json(200, { stargazers_count: 5, ...extra });
+
+		await run({ contentDir, outFile, fetch, env: {}, log: silent });
+
+		expect(await readOut()).toStrictEqual({ 'Thundernerd/Repo': { stars: 5, language: null } });
+	});
+
 	it('leaves out a repo whose request fails, keeping the others and warning', async () => {
 		await project('a.md', 'repo: Thundernerd/Offline');
 		await project('b.md', 'repo: Thundernerd/Online');
