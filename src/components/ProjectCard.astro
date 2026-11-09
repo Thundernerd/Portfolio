@@ -4,7 +4,8 @@
  * to the GitHub repo. The star count comes from `repoStats()`: GitHub's count when the prebuild
  * fetcher reached it, the entry's `stars` otherwise. The title links to `href` (a site path, e.g. a
  * project page) when given.
- * An entry marked `archived` gets an "Archived" label (`.project-card__archived`) after the title.
+ * An archived repo gets an "Archived" label (`.project-card__archived`) after the title; like the
+ * star count, the flag comes from `repoStats()`: GitHub's when fetched, the entry's `archived` otherwise.
  *
  * Slots: `media` (wrapped in `.project-card__media`) replaces the image when filled; `extra`
  * renders right after the blurb (e.g. more repo stats).
@@ -23,9 +24,8 @@ interface Props {
 }
 
 const { project, href } = Astro.props;
-const { title, blurb, repo, tags, image, archived } = project.data;
-// The star count as fetched from GitHub at build time, falling back to the frontmatter.
-const { stars } = repoStats(project.data);
+const { title, blurb, repo, tags, image } = project.data;
+const { stars, archived } = repoStats(project.data);
 const repoUrl = `https://github.com/${repo}`;
 const starCount = stars?.toLocaleString('en-US');
 // Filled `media` slot content replaces the image. A slot that renders to nothing counts as unfilled, since
