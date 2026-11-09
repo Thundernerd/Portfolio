@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type AstroContainer, createContainer } from '../../components/test-fixtures';
-import Minimal from './Minimal.astro';
+import { type AstroContainer, createContainer } from '../components/test-fixtures';
+import Base from './Base.astro';
 
-describe('Minimal layout', () => {
+describe('Base layout', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
 		container = await createContainer();
 	});
 
-	const render = () => container.renderToString(Minimal, { props: { title: 'Prototype B' }, slots: { default: '<p>content</p>' } });
+	const render = () => container.renderToString(Base, { props: { title: 'Christiaan' }, slots: { default: '<p>content</p>' } });
 
 	it('links the navigation to every home-page section', async () => {
 		const html = await render();
@@ -24,10 +24,15 @@ describe('Minimal layout', () => {
 
 	it('builds its site links and assets under the base path', async () => {
 		const html = await render();
-		expect(html).toMatch(/<a class="mn-brand"[^>]*href="\/Portfolio\/proto\/minimal\/"/);
+		expect(html).toMatch(/<a class="mn-brand"[^>]*href="\/Portfolio\/"/);
 		expect(html).toContain('href="/Portfolio/favicon.svg"');
 		// Only links: under Vitest the container points script `src`s at source files, which the build bundles.
 		expect(html).not.toMatch(/href="\/(?!Portfolio\/)/);
+	});
+
+	it('presents itself as the site, not as a prototype', async () => {
+		const html = await render();
+		expect(html).not.toMatch(/prototype/i);
 	});
 
 	it('renders the theme toggle hidden and unpressed until its script takes over', async () => {
@@ -38,7 +43,7 @@ describe('Minimal layout', () => {
 	it('applies a remembered theme in the head, before the page paints', async () => {
 		const html = await render();
 		const head = /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? '';
-		expect(head).toContain('proto-minimal-theme');
+		expect(head).toContain('portfolio-theme');
 		expect(head).toContain('document.documentElement.dataset.theme');
 	});
 });

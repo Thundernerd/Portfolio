@@ -1,11 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
-import { repoStats } from '../../../lib/github-stats';
+import { repoStats } from '../../lib/github-stats';
 import { escapeHtml, formatCount, noun } from './text';
 
 type Project = CollectionEntry<'projects'>;
 
 /**
- * The colour GitHub uses for each language this prototype expects to show: every language in
+ * The colour GitHub uses for each language the home page expects to show: every language in
  * `TAG_LANGUAGES` (`src/lib/github-stats.ts`), plus ones GitHub reports for the current repos. Any
  * other language gets `OTHER_LANGUAGE_COLOUR`.
  */

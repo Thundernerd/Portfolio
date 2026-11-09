@@ -1,13 +1,16 @@
 /**
- * Theme logic of the minimal prototype's light/dark toggle. The page follows `prefers-color-scheme`
+ * Theme logic of the site's light/dark toggle. The page follows `prefers-color-scheme`
  * until the visitor picks a theme; the pick is remembered in `localStorage`. Every storage access is
  * guarded, since storage can be missing or throw (private mode, blocked site data).
  */
 
 export type Theme = 'light' | 'dark';
 
-/** The `localStorage` key holding the visitor's pick. */
-export const THEME_STORAGE_KEY = 'proto-minimal-theme';
+/**
+ * The `localStorage` key holding the visitor's pick. Namespaced, since every GitHub Pages project
+ * site of the account shares the `thundernerd.github.io` origin and so its storage.
+ */
+export const THEME_STORAGE_KEY = 'portfolio-theme';
 
 /** The part of `Storage` the toggle uses. */
 export type ThemeStorage = Pick<Storage, 'getItem' | 'setItem'>;

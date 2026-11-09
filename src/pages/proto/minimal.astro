@@ -4,8 +4,8 @@
  * with the other prototypes before the style is picked (#12).
  */
 import { getCollection } from 'astro:content';
-import MinimalHome from '../../components/proto/minimal/MinimalHome.astro';
-import Minimal from '../../layouts/proto/Minimal.astro';
+import MinimalHome from '../../components/home/Home.astro';
+import Minimal from '../../layouts/Base.astro';
 
 const games = await getCollection('games');
 const projects = await getCollection('projects');

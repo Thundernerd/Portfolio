@@ -14,13 +14,13 @@ const blockedStorage = {
 
 describe('readStoredTheme', () => {
 	it('returns the remembered choice', () => {
-		expect(readStoredTheme(memoryStorage({ 'proto-minimal-theme': 'dark' }))).toBe('dark');
-		expect(readStoredTheme(memoryStorage({ 'proto-minimal-theme': 'light' }))).toBe('light');
+		expect(readStoredTheme(memoryStorage({ 'portfolio-theme': 'dark' }))).toBe('dark');
+		expect(readStoredTheme(memoryStorage({ 'portfolio-theme': 'light' }))).toBe('light');
 	});
 
 	it('has no choice when nothing or something unknown is stored', () => {
 		expect(readStoredTheme(memoryStorage())).toBeNull();
-		expect(readStoredTheme(memoryStorage({ 'proto-minimal-theme': 'sepia' }))).toBeNull();
+		expect(readStoredTheme(memoryStorage({ 'portfolio-theme': 'sepia' }))).toBeNull();
 	});
 
 	it('has no choice when storage is unavailable or throws', () => {
@@ -42,7 +42,7 @@ describe('createThemeController', () => {
 	});
 
 	it('starts from the remembered pick over the system preference', () => {
-		const storage = memoryStorage({ 'proto-minimal-theme': 'light' });
+		const storage = memoryStorage({ 'portfolio-theme': 'light' });
 		expect(setup(storage, true).controller.theme).toBe('light');
 	});
 
@@ -52,9 +52,9 @@ describe('createThemeController', () => {
 		expect(controller.toggle()).toBe('light');
 		expect(controller.theme).toBe('light');
 		expect(applied).toEqual(['light']);
-		expect(storage.map.get('proto-minimal-theme')).toBe('light');
+		expect(storage.map.get('portfolio-theme')).toBe('light');
 		expect(controller.toggle()).toBe('dark');
-		expect(storage.map.get('proto-minimal-theme')).toBe('dark');
+		expect(storage.map.get('portfolio-theme')).toBe('dark');
 	});
 
 	it('still toggles when storage throws, without remembering', () => {
@@ -74,7 +74,7 @@ describe('createThemeController', () => {
 	});
 
 	it('ignores system changes when a pick was remembered from an earlier visit', () => {
-		const { controller } = setup(memoryStorage({ 'proto-minimal-theme': 'light' }), false);
+		const { controller } = setup(memoryStorage({ 'portfolio-theme': 'light' }), false);
 		controller.systemChanged(true);
 		expect(controller.theme).toBe('light');
 	});

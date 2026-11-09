@@ -1,12 +1,13 @@
 ---
 /**
- * Layout of Prototype B, "minimal developer" (`/proto/minimal`): typography first, monospace
- * accents, little imagery and a light/dark toggle that follows `prefers-color-scheme` by default.
+ * The site's layout, in the minimal style chosen in #12: typography first, monospace accents,
+ * little imagery and a light/dark toggle that follows `prefers-color-scheme` by default. Owns the
+ * document, the header with the section navigation, and the footer; pages fill the `<main>`.
  */
-import ThemeInit from '../../components/proto/minimal/ThemeInit.astro';
-import ThemeToggle from '../../components/proto/minimal/ThemeToggle.astro';
-import { withBase } from '../../lib/url';
-import '../../styles/proto/minimal.css';
+import ThemeInit from '../components/theme/ThemeInit.astro';
+import ThemeToggle from '../components/theme/ThemeToggle.astro';
+import { withBase } from '../lib/url';
+import '../styles/global.css';
 
 interface Props {
 	title: string;
@@ -39,7 +40,7 @@ const nav = [
 		<a class="mn-skip" href="#main">Skip to content</a>
 		<header class="mn-header">
 			<div class="mn-header__inner">
-				<a class="mn-brand" href={withBase('proto/minimal/')}>
+				<a class="mn-brand" href={withBase('')}>
 					<span class="mn-brand__prompt" aria-hidden="true">~/</span>christiaan
 				</a>
 				<nav class="mn-nav" aria-label="Sections">
@@ -54,7 +55,6 @@ const nav = [
 			<slot />
 		</main>
 		<footer class="mn-footer">
-			<p>Prototype B · minimal developer</p>
 			<p>Built with Astro · <a href="https://github.com/Thundernerd/Portfolio">source</a></p>
 		</footer>
 	</body>

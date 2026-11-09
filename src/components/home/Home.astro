@@ -1,15 +1,15 @@
 ---
 /**
- * The home page content of Prototype B (`/proto/minimal`): the hero, then the released games,
+ * The home page content (`/`): the hero, then the released games,
  * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
  * section components. Project cards get an inline stats line (language, stars) in their `extra`
  * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
  * quiet placeholder.
  */
 import type { CollectionEntry } from 'astro:content';
-import CollectionGrid from '../../CollectionGrid.astro';
-import Contact from '../../Contact.astro';
-import Hero from '../../Hero.astro';
+import CollectionGrid from '../CollectionGrid.astro';
+import Contact from '../Contact.astro';
+import Hero from '../Hero.astro';
 import { monogramHtml } from './monogram';
 import { presentableGame, presentableProject } from './placeholders';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';

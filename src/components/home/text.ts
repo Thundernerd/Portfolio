@@ -1,4 +1,4 @@
-/** Small text helpers shared by the minimal prototype's components. */
+/** Small text helpers shared by the home page's components. */
 
 /** Escapes text for HTML built as a string (the cards' `media`/`extra` slots take trusted HTML). */
 export const escapeHtml = (text: string) =>
