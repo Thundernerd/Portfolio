@@ -36,27 +36,36 @@ describe('Home with the real content', () => {
 		expect(titles.sort()).toEqual([...games, ...projects].map((entry) => entry.data.title).sort());
 	});
 
-	it('shows an avatar and links to GitHub and LinkedIn in the contact section, with no email', async () => {
+	/** The rendered contact section and its entries: links (`href`, `download`) and pending plain-text ones. */
+	const contactSection = async () => {
 		const html = await container.renderToString(Home, { props: { games: [], projects: [] } });
 		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		const entries = [...contact.matchAll(/<(a|span)\b([^>]*\bclass="contact__link[^"]*"[^>]*)>([^<]+)</g)].map(([, tag, attrs, label]) => ({
+			label,
+			href: tag === 'a' ? /\bhref="([^"]*)"/.exec(attrs)?.[1] : undefined,
+			download: /\sdownload\b/.test(attrs),
+		}));
+		return { contact, entries };
+	};
+
+	it('shows an avatar and links to GitHub and LinkedIn in the contact section, with no email', async () => {
+		const { contact, entries } = await contactSection();
 		expect(contact).toMatch(/<img[^>]*class="contact__avatar"/);
-		const links = [...contact.matchAll(/<a class="contact__link"[^>]*href="([^"]+)"[^>]*>([^<]+)</g)].map((m) => ({ href: m[1], label: m[2] }));
-		expect(links).toContainEqual({ href: 'https://github.com/Thundernerd', label: 'GitHub · Thundernerd' });
-		expect(links).toContainEqual({ href: 'https://www.linkedin.com/in/chrusb/', label: 'LinkedIn' });
+		expect(entries).toContainEqual({ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd', download: false });
+		expect(entries).toContainEqual({ label: 'LinkedIn', href: 'https://www.linkedin.com/in/chrusb/', download: false });
 		// No email address on the page, to keep it away from scrapers.
-		const entries = [...contact.matchAll(/class="contact__link[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1]);
-		expect(entries.filter((entry) => /^Email\b/.test(entry))).toEqual([]);
+		expect(entries.filter((entry) => /^Email\b/.test(entry.label))).toEqual([]);
 		expect(contact).not.toContain('mailto:');
 	});
 
 	it('links the CV as a download of a PDF under public/', async () => {
-		const html = await container.renderToString(Home, { props: { games: [], projects: [] } });
-		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
-		expect(contact).not.toContain('contact__link--pending');
-		const cv = /<a class="contact__link" href="([^"]+)"([^>]*)>CV\b/.exec(contact);
-		expect(cv?.[1]).toMatch(/^\/Portfolio\/[^/]+\.pdf$/);
-		expect(cv?.[2]).toMatch(/\bdownload\b/);
-		const file = new URL(`../../../public/${cv?.[1].replace(/^\/Portfolio\//, '')}`, import.meta.url);
+		const { entries } = await contactSection();
+		expect(entries.filter((entry) => entry.href === undefined)).toEqual([]);
+		const cv = entries.find((entry) => /^CV\b/.test(entry.label));
+		expect(cv?.download).toBe(true);
+		const sitePath = /^\/Portfolio\/([^/]+\.pdf)$/.exec(cv?.href ?? '')?.[1];
+		expect(sitePath, cv?.href).toBeDefined();
+		const file = new URL(`../../../public/${sitePath}`, import.meta.url);
 		expect(existsSync(file), file.pathname).toBe(true);
 	});
 });
