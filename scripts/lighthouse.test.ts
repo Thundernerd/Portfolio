@@ -38,10 +38,17 @@ afterEach(async () => {
 });
 
 describe('startPreview()', () => {
-	it('rejects with a message naming the port when a server already holds it', async () => {
-		const port = await holdPort('127.0.0.1');
-		await expect(startPreview({ host: '127.0.0.1', port, outDir })).rejects.toThrow(`Port ${port} is already in use`);
-	}, 30_000);
+	// The preview binds 127.0.0.1; a server on every address (0.0.0.0) answers there too.
+	it.each(['127.0.0.1', '0.0.0.0'])(
+		'rejects with a message naming the port when a server on %s holds it',
+		async (host) => {
+			const port = await holdPort(host);
+			await expect(startPreview({ host: '127.0.0.1', port, outDir })).rejects.toThrow(
+				`Port ${port} is already in use`,
+			);
+		},
+		30_000,
+	);
 
 	it('serves the build on the port, and releases it when stopped', async () => {
 		const port = await holdPort('127.0.0.1');
