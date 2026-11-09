@@ -102,6 +102,7 @@ describe('/projects/[slug]', () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.avif', width: 2400, height: 1200, format: 'avif' } as const;
 			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured', image }, 'zeepsdk'));
 			expect(variant(html)).toEqual({ format: 'png', width: '1200' });
+			expect(meta(html, 'og:image:type')).toBe('image/png');
 			expect(meta(html, 'og:image:width')).toBe('1200');
 			expect(meta(html, 'og:image:height')).toBe('600');
 			expect(meta(html, 'og:image:alt')).toBe('Screenshot of ZeepSDK');
@@ -111,12 +112,14 @@ describe('/projects/[slug]', () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.jpg', width: 1920, height: 1080, format: 'jpg' } as const;
 			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
 			expect(variant(html)).toEqual({ format: 'jpg', width: '1200' });
+			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
 			expect(meta(html, 'og:image:height')).toBe('675');
 		});
 
 		it('previews the site card when it has none', async () => {
 			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'));
 			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/og.png');
+			expect(meta(html, 'og:image:type')).toBe('image/png');
 		});
 	});
 

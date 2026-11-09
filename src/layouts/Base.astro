@@ -29,13 +29,18 @@ const { title, description, image } = Astro.props;
 const canonical = new URL(Astro.url.pathname, import.meta.env.SITE).href;
 const ogImage = previewImage(image);
 
-/** The absolute URL, size (when known) and alt text of the page's link-preview image. */
-function previewImage(image: Props['image']): { url: string; width?: number; height?: number; alt: string } {
-	if (!image) return { url: absoluteUrl('og.png'), width: 1200, height: 630, alt: '~/christiaan: game developer and programmer' };
+/** The absolute URL, media type and size (when known) and alt text of the page's link-preview image. */
+function previewImage(image: Props['image']): { url: string; type?: string; width?: number; height?: number; alt: string } {
+	if (!image) return { url: absoluteUrl('og.png'), type: 'image/png', width: 1200, height: 630, alt: '~/christiaan: game developer and programmer' };
 	const { src, alt } = image;
 	if (typeof src === 'string') return { url: new URL(resolveHref(src), import.meta.env.SITE).href, alt };
 	// An `astro:assets` image's `src` is already under the base path, so it is resolved against `site`.
-	return { url: new URL(src.src, import.meta.env.SITE).href, width: src.width, height: src.height, alt };
+	return { url: new URL(src.src, import.meta.env.SITE).href, type: mediaType(src.format), width: src.width, height: src.height, alt };
+}
+
+/** The media type of an `astro:assets` image format, such as `image/jpeg` for `jpg`. */
+function mediaType(format: ImageMetadata['format']): string {
+	return `image/${{ jpg: 'jpeg', svg: 'svg+xml' }[format as string] ?? format}`;
 }
 // The home page's sections, linked through the site root so the nav works from any page. Reads the
 // projects itself so every page's nav lists the same sections as the home page (see `isShown()`).
@@ -56,6 +61,7 @@ const nav = homeSections.filter((section) => isShown(section, projects)).map((se
 		{description && <meta property="og:description" content={description} />}
 		<meta property="og:url" content={canonical} />
 		<meta property="og:image" content={ogImage.url} />
+		{ogImage.type && <meta property="og:image:type" content={ogImage.type} />}
 		{ogImage.width !== undefined && <meta property="og:image:width" content={String(ogImage.width)} />}
 		{ogImage.height !== undefined && <meta property="og:image:height" content={String(ogImage.height)} />}
 		<meta property="og:image:alt" content={ogImage.alt} />

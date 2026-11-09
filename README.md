@@ -33,7 +33,8 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 
 ## SEO and link previews
 
-`Base.astro` gives every page a canonical link, Open Graph and `twitter:card` tags, the favicons and
+`Base.astro` gives every page a canonical link, Open Graph (with the preview image's type and size
+when known) and `twitter:card` tags, the favicons and
 a link to the sitemap. Pages pass their `title` and `description`, and may pass an `image`
 (`{ src, alt }`: an `astro:assets` image, a site path or an absolute URL) to preview in place of the site card; a
 featured project page passes a PNG (a JPEG for a JPEG source) of its `image`, at most 1200px wide,
