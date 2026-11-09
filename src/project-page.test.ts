@@ -123,6 +123,13 @@ describe('/projects/[slug]', () => {
 			expect(meta(html, 'og:image:height')).toBe('675');
 		});
 
+		it('previews a GIF image as a PNG', async () => {
+			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.gif', width: 800, height: 600, format: 'gif' } as const;
+			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+			expect(variant(html)).toEqual({ format: 'png', width: '800' });
+			expect(meta(html, 'og:image:type')).toBe('image/png');
+		});
+
 		it('previews the site card when it has none', async () => {
 			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'));
 			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/og.png');

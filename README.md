@@ -38,10 +38,10 @@ when known) and `twitter:card` tags, the favicons and a link to the sitemap. Pag
 and `description`, and may pass an `image` (`{ src, alt }`: an `astro:assets` image, a site path or
 an absolute URL) to preview in place of the site card; a featured project page passes a JPEG (a
 PNG for a PNG or GIF source) of its `image`, at most 1200px wide, when the entry has one, since
-crawlers render AVIF and WebP unevenly. A lossy AVIF or WebP cover becomes a JPEG rather than a PNG,
-which could outweigh crawlers' size caps (X: 5MB), so a transparent one previews without its
-transparency. A project `image` can't be an SVG, which no crawler renders and the
-build won't rasterize (`image.dangerouslyProcessSVG` stays off): export a PNG. The canonical URL is
+crawlers render AVIF and WebP unevenly. A lossy AVIF or WebP cover becomes a JPEG because, as a
+PNG, it could outweigh crawlers' size caps (X: 5MB); a transparent one therefore previews without
+its transparency. A project `image` can't be an SVG, which no crawler renders and the build won't
+rasterize (`image.dangerouslyProcessSVG` stays off): export a PNG. The canonical URL is
 the page's own path on `site`; other absolute URLs, such as the preview image's, come from
 `absoluteUrl()` in `src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
 `sitemap-index.xml` on build. `trailingSlash: 'always'` keeps each page at one URL, `/Portfolio/`,
