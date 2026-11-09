@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ProjectCard from './ProjectCard.astro';
-import { type AstroContainer, createContainer, fixtureImage, projectEntry } from './test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, imgTag, largeImage, projectEntry, sizesOf, srcsetWidths } from './test-fixtures';
 
 // Stands in for the stats file the prebuild fetcher writes; only the `fixture-owner/fetched*` repos were fetched.
 vi.mock('../lib/github-stats', async (importOriginal) => {
@@ -66,6 +66,19 @@ describe('ProjectCard', () => {
 		expect(await render({ project: projectEntry() })).not.toContain('<img');
 		const html = await render({ project: projectEntry({ image: fixtureImage }) });
 		expect(html).toMatch(/<img[^>]*\salt(=""|[\s>])/);
+	});
+
+	it('serves the image in sizes to fit the card, not at its source size', async () => {
+		const img = imgTag(await render({ project: projectEntry({ image: largeImage }) }));
+		expect(srcsetWidths(img)).toEqual([480, 960]);
+		expect(sizesOf(img)).toBeTruthy();
+		expect(img).toMatch(/\sloading="lazy"/);
+	});
+
+	it("sizes the image for its kind's grid: the featured grid's cards are wider than the others'", async () => {
+		const sizes = async (kind: 'featured' | 'unity-plugin') => sizesOf(imgTag(await render({ project: projectEntry({ kind, image: largeImage }) })));
+		expect(await sizes('featured')).toMatch(/\(min-width: 72rem\) 33rem/);
+		expect(await sizes('unity-plugin')).toMatch(/\(min-width: 72rem\) 21rem/);
 	});
 
 	it('renders slotted media in place of the image', async () => {
