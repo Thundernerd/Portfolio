@@ -1,14 +1,17 @@
-// Lighthouse CI (`npm run lighthouse`): audits the built site in dist/ and fails when any category
-// scores below 90, or any accessibility audit fails, on the pages below. Run `npm run build` first.
-// `astro preview` serves dist/ under the `/Portfolio/` base path, so its links and assets resolve as
-// they do on GitHub Pages.
-// `/Portfolio` is `base` in astro.config.mjs: keep the two in sync. lhci audits whatever answers on
-// this port, so it avoids `astro preview`'s default 4321, which `npm run dev` also uses. The
-// `prelighthouse` step (scripts/assert-port-free.mjs) reads it from `port` below and fails the run
-// when something already listens there.
+// Lighthouse CI: audits the built site in dist/ and fails when any category scores below 90, or any
+// accessibility audit fails, on the pages below. Run `npm run build` first.
+// `npm run lighthouse` (scripts/lighthouse.mjs) serves dist/ with `astro preview` on `host` and
+// `port` below, under the `/Portfolio/` base path so its links and assets resolve as they do on
+// GitHub Pages, and fails unless that preview holds the port; then it runs `lhci autorun` against
+// it. lhci doesn't start a server itself: it only warns when one doesn't come up and audits whatever
+// answers on the port.
+// `/Portfolio` is `base` in astro.config.mjs: keep the two in sync. The port avoids
+// `astro preview`'s default 4321, which `npm run dev` also uses. The preview binds, and lhci audits,
+// one address (not `localhost`, which may resolve to `::1` or `127.0.0.1`), so a server on another
+// loopback address can't answer in its place.
+const host = '127.0.0.1';
 const port = 4400;
-const host = `localhost:${port}`;
-const origin = `http://${host}/Portfolio`;
+const origin = `http://${host}:${port}/Portfolio`;
 
 const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
 const categoryMinimums = Object.fromEntries(
@@ -30,15 +33,11 @@ const accessibilityAudits = Object.fromEntries(
 );
 
 module.exports = {
-	// Not lhci config (lhci only reads `ci`): the port the `prelighthouse` step checks.
+	// Not lhci config (lhci only reads `ci`): where scripts/lighthouse.mjs serves dist/.
+	host,
 	port,
 	ci: {
 		collect: {
-			// `--ignore-lock` keeps the server in the foreground, so lhci stops it when it's done: when
-			// `astro preview` detects an AI agent it otherwise moves itself to the background and outlives
-			// the run.
-			startServerCommand: `npm run preview -- --ignore-lock --port ${port}`,
-			startServerReadyPattern: host,
 			url: [
 				`${origin}/`,
 				// A game page (src/content/games/) and a featured project page (src/content/projects/).
