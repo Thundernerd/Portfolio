@@ -2,6 +2,7 @@ import { experimental_AstroContainer } from 'astro/container';
 import type { CollectionEntry } from 'astro:content';
 import { afterEach, vi } from 'vitest';
 import type * as GithubStats from '../lib/github-stats';
+import type * as HomeSections from './home/sections';
 
 /**
  * Test helpers for component tests: fixtures shaped like parsed content entries, so the tests don't
@@ -21,7 +22,36 @@ export async function createContainer(): Promise<AstroContainer> {
 
 afterEach(() => {
 	vi.unstubAllEnvs();
+	sectionsOverride.list = undefined;
 });
+
+/**
+ * The list of home sections a test swaps in, read by a module mocked with `withSectionsOverride()`;
+ * `undefined` (the default, restored after each test) keeps the real list.
+ */
+export const sectionsOverride: { list: readonly HomeSections.HomeSection[] | undefined } = { list: undefined };
+
+/**
+ * Builds a mocked `src/components/home/sections` module whose `homeSections` is
+ * `sectionsOverride.list` when a test sets it. Like `withFetchedStats()`, load it inside the factory:
+ *
+ * ```ts
+ * vi.mock('./sections', async (importOriginal) =>
+ * 	(await import('../test-fixtures')).withSectionsOverride(await importOriginal()),
+ * );
+ * ```
+ */
+export function withSectionsOverride(actual: typeof HomeSections): typeof HomeSections {
+	return {
+		...actual,
+		get homeSections() {
+			return (sectionsOverride.list ?? actual.homeSections) as typeof actual.homeSections;
+		},
+	};
+}
+
+/** The ids of the `<section>`s in rendered HTML, in page order. */
+export const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
 
 export const fixtureImage = { src: '/fixtures/cover.png', width: 640, height: 360, format: 'png' } as const;
 

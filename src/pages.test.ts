@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type AstroContainer, createContainer } from './components/test-fixtures';
+import { type AstroContainer, createContainer, sectionIds } from './components/test-fixtures';
 import Index from './pages/index.astro';
 
 describe('pages', () => {
@@ -18,8 +18,7 @@ describe('pages', () => {
 			const html = await container.renderToString(Index);
 			expect(html).toMatch(/<html[^>]*class="mn"/);
 			expect(html).toMatch(/<a class="mn-brand"[^>]*href="\/Portfolio\/"/);
-			const sections = [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
-			expect(sections).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'contact']);
+			expect(sectionIds(html)).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'contact']);
 		});
 	});
 });

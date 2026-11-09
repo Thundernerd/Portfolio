@@ -4,7 +4,8 @@
  * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
  * section components. Project cards get an inline stats line (language, stars) in their `extra`
  * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
- * quiet placeholder.
+ * quiet placeholder. The sections' ids, headings and order come from `homeSections` (`./sections`),
+ * which the header nav reads too; the content of each one is keyed by its id below.
  */
 import type { CollectionEntry } from 'astro:content';
 import CollectionGrid from '../CollectionGrid.astro';
@@ -12,6 +13,7 @@ import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
 import { monogramHtml } from './monogram';
 import { presentableGame, presentableProject } from './placeholders';
+import { anchor, type HomeSectionId, homeSections } from './sections';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
 import { plural } from './text';
 
@@ -30,6 +32,37 @@ const gameMedia = (entry: Game | Project) => (entry.collection === 'games' ? mon
 const projectStats = (entry: Game | Project) => (entry.collection === 'projects' ? repoStatsHtml(entry) : undefined);
 const ofKind = (kind: Project['data']['kind']) => projects.filter((project) => project.data.kind === kind);
 
+interface GridContent {
+	items: Game[] | Project[];
+	itemMedia?: (entry: Game | Project) => string | undefined;
+	itemExtra?: (entry: Game | Project) => string | undefined;
+	intro: string;
+}
+
+// The content of every section but `contact`, which is the `Contact` component below.
+const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
+	games: {
+		items: games,
+		itemMedia: gameMedia,
+		intro: 'Commercial games I worked on, from co-founding a studio to building multiplayer systems.',
+	},
+	featured: {
+		items: ofKind('featured'),
+		itemExtra: projectStats,
+		intro: 'Bigger personal projects, mostly around the Zeepkist modding scene.',
+	},
+	'zeepkist-mods': {
+		items: ofKind('zeepkist-mod'),
+		itemExtra: projectStats,
+		intro: 'BepInEx mods for the soapbox racer Zeepkist, most of them built on ZeepSDK.',
+	},
+	'unity-plugins': {
+		items: ofKind('unity-plugin'),
+		itemExtra: projectStats,
+		intro: 'Open-source editor and runtime tools for Unity, sorted by GitHub stars.',
+	},
+};
+
 // `tool` projects have no section in the agreed order, so they are left out of the page and the facts.
 const shown = projects.filter((project) => project.data.kind !== 'tool');
 const languages = languageBreakdown(shown);
@@ -44,9 +77,9 @@ const facts = [
 	title="Christiaan"
 	tagline="Game developer & programmer."
 	actions={[
-		{ label: 'Released games', href: '#games' },
-		{ label: 'Open source', href: '#featured' },
-		{ label: 'Get in touch', href: '#contact' },
+		{ label: 'Released games', href: anchor('games') },
+		{ label: 'Open source', href: anchor('featured') },
+		{ label: 'Get in touch', href: anchor('contact') },
 	]}
 >
 	<p class="mn-hero__intro">
@@ -74,31 +107,30 @@ const facts = [
 	}
 </Hero>
 
-<CollectionGrid id="games" title="Released games" items={games} itemMedia={gameMedia}>
-	<p>Commercial games I worked on, from co-founding a studio to building multiplayer systems.</p>
-</CollectionGrid>
-
-<CollectionGrid id="featured" title="Featured projects" items={ofKind('featured')} itemExtra={projectStats}>
-	<p>Bigger personal projects, mostly around the Zeepkist modding scene.</p>
-</CollectionGrid>
-
-<CollectionGrid id="zeepkist-mods" title="Zeepkist mods" items={ofKind('zeepkist-mod')} itemExtra={projectStats}>
-	<p>BepInEx mods for the soapbox racer Zeepkist, most of them built on ZeepSDK.</p>
-</CollectionGrid>
-
-<CollectionGrid id="unity-plugins" title="Unity plugins" items={ofKind('unity-plugin')} itemExtra={projectStats}>
-	<p>Open-source editor and runtime tools for Unity, sorted by GitHub stars.</p>
-</CollectionGrid>
-
-<Contact
-	title="About & contact"
-	links={[
-		{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
-		{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
-	]}
->
-	<p class="mn-about">
-		I'm Christiaan, a game developer and programmer. Besides shipping games I build the parts players rarely
-		see: editor tooling, multiplayer systems, backends and the SDKs other modders build on.
-	</p>
-</Contact>
+{
+	homeSections.map((section) => {
+		if (section.id === 'contact') {
+			return (
+				<Contact
+					id={section.id}
+					title={section.title}
+					links={[
+						{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
+						{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
+					]}
+				>
+					<p class="mn-about">
+						I'm Christiaan, a game developer and programmer. Besides shipping games I build the parts players
+						rarely see: editor tooling, multiplayer systems, backends and the SDKs other modders build on.
+					</p>
+				</Contact>
+			);
+		}
+		const { intro, ...grid } = grids[section.id];
+		return (
+			<CollectionGrid id={section.id} title={section.title} {...grid}>
+				<p>{intro}</p>
+			</CollectionGrid>
+		);
+	})
+}

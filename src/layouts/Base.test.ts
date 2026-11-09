@@ -1,6 +1,10 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { type AstroContainer, createContainer } from '../components/test-fixtures';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { type AstroContainer, createContainer, sectionsOverride } from '../components/test-fixtures';
 import Base from './Base.astro';
+
+vi.mock('../components/home/sections', async (importOriginal) =>
+	(await import('../components/test-fixtures')).withSectionsOverride(await importOriginal()),
+);
 
 describe('Base layout', () => {
 	let container: AstroContainer;
@@ -20,6 +24,13 @@ describe('Base layout', () => {
 			'/Portfolio/#unity-plugins',
 			'/Portfolio/#contact',
 		]);
+	});
+
+	it('puts a section added to the home sections list in the navigation', async () => {
+		const { homeSections } = await vi.importActual<typeof import('../components/home/sections')>('../components/home/sections');
+		sectionsOverride.list = [...homeSections, { id: 'talks', navLabel: 'talks', title: 'Talks' }];
+		const nav = /<nav[^>]*>([\s\S]*?)<\/nav>/.exec(await render())?.[1] ?? '';
+		expect(nav).toMatch(/<a href="\/Portfolio\/#contact">contact<\/a><\/li>\s*<li><a href="\/Portfolio\/#talks">talks<\/a>/);
 	});
 
 	it('builds its site links and assets under the base path', async () => {

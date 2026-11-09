@@ -1,6 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry } from '../test-fixtures';
+import {
+	type AstroContainer,
+	createContainer,
+	fixtureImage,
+	gameEntry,
+	projectEntry,
+	sectionIds,
+	sectionsOverride,
+} from '../test-fixtures';
 import Home from './Home.astro';
+
+vi.mock('./sections', async (importOriginal) => (await import('../test-fixtures')).withSectionsOverride(await importOriginal()));
 
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
 vi.mock('../../lib/github-stats', async (importOriginal) => {
@@ -17,13 +27,26 @@ describe('Home', () => {
 	const render = (props: Record<string, unknown>) => container.renderToString(Home, { props });
 	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
 	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-	const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
 
 	it('renders the hero, then every section in the agreed order', async () => {
 		const html = await render({ games: [], projects: [] });
 		expect(html).toMatch(/<h1[^>]*>/);
 		expect(html.indexOf('<h1')).toBeLessThan(html.search(/<section[^>]*id="games"/));
 		expect(sectionIds(html)).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'contact']);
+	});
+
+	it('takes the order and headings of its sections from the home sections list', async () => {
+		sectionsOverride.list = [
+			{ id: 'contact', navLabel: 'contact', title: 'Say hi' },
+			{ id: 'unity-plugins', navLabel: 'plugins', title: 'Unity plugins' },
+			{ id: 'zeepkist-mods', navLabel: 'mods', title: 'Zeepkist mods' },
+			{ id: 'featured', navLabel: 'projects', title: 'Featured projects' },
+			{ id: 'games', navLabel: 'games', title: 'Games' },
+		];
+		const html = await render({ games: [], projects: [] });
+		expect(sectionIds(html)).toEqual(['contact', 'unity-plugins', 'zeepkist-mods', 'featured', 'games']);
+		const headings = [...html.matchAll(/<h2[^>]*>([^<]+)<\/h2>/g)].map((m) => m[1].trim());
+		expect(headings).toEqual(['Say hi', 'Unity plugins', 'Zeepkist mods', 'Featured projects', 'Games']);
 	});
 
 	/** The card titles inside the section with this id. */
