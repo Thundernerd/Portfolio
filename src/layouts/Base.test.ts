@@ -35,7 +35,7 @@ describe('Base layout', () => {
 
 	it('builds its site links and assets under the base path', async () => {
 		const html = await render();
-		expect(html).toMatch(/<a class="mn-brand"[^>]*href="\/Portfolio\/"/);
+		expect(html).toMatch(/<a class="site-brand"[^>]*href="\/Portfolio\/"/);
 		expect(html).toContain('href="/Portfolio/favicon.svg"');
 		// Only links: under Vitest the container points script `src`s at source files, which the build bundles.
 		expect(html).not.toMatch(/href="\/(?!Portfolio\/)/);

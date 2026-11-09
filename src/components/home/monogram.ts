@@ -28,5 +28,5 @@ function hueOf(text: string): number {
 export function monogramHtml(game: CollectionEntry<'games'>): string | undefined {
 	if (game.data.cover) return undefined;
 	const letters = initials(game.data.title).toUpperCase();
-	return `<span class="mn-monogram" style="--tile-hue: ${hueOf(game.id)}" aria-hidden="true">${escapeHtml(letters)}</span>`;
+	return `<span class="site-monogram" style="--tile-hue: ${hueOf(game.id)}" aria-hidden="true">${escapeHtml(letters)}</span>`;
 }

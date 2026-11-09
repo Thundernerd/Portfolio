@@ -82,23 +82,23 @@ const facts = [
 		{ label: 'Get in touch', href: anchor('contact') },
 	]}
 >
-	<p class="mn-hero__intro">
+	<p class="site-hero__intro">
 		I ship games on console and mobile, and build the tools around them: Unity plugins, a modding SDK and a
 		records backend for the Zeepkist community.
 	</p>
-	<ul class="mn-facts">
+	<ul class="site-facts">
 		{facts.map((fact) => <li>{fact}</li>)}
 	</ul>
 	{
 		languages.length > 0 && (
-			<figure slot="media" class="mn-langs">
-				<figcaption class="mn-langs__caption">Projects by language</figcaption>
-				<ul class="mn-langs__list">
+			<figure slot="media" class="site-langs">
+				<figcaption class="site-langs__caption">Projects by language</figcaption>
+				<ul class="site-langs__list">
 					{languages.map(({ language, colour, count, share }) => (
-						<li class="mn-langs__row" style={`--share: ${share}; --lang-colour: ${colour}`}>
-							<span class="mn-langs__name">{language}</span>
-							<span class="mn-langs__bar" aria-hidden="true" />
-							<data class="mn-langs__count" value={count}>{count}</data>
+						<li class="site-langs__row" style={`--share: ${share}; --lang-colour: ${colour}`}>
+							<span class="site-langs__name">{language}</span>
+							<span class="site-langs__bar" aria-hidden="true" />
+							<data class="site-langs__count" value={count}>{count}</data>
 						</li>
 					))}
 				</ul>
@@ -119,7 +119,7 @@ const facts = [
 						{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
 					]}
 				>
-					<p class="mn-about">
+					<p class="site-about">
 						I'm Christiaan, a game developer and programmer. Besides shipping games I build the parts players
 						rarely see: editor tooling, multiplayer systems, backends and the SDKs other modders build on.
 					</p>

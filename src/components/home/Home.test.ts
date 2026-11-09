@@ -72,7 +72,7 @@ describe('Home', () => {
 
 	/** The text of each project card's inline stats line, in page order. */
 	const statsLines = (html: string) =>
-		[...html.matchAll(/<ul class="mn-stats"[^>]*>([\s\S]*?)<\/ul>/g)].map((m) => textOf(m[1]));
+		[...html.matchAll(/<ul class="site-stats"[^>]*>([\s\S]*?)<\/ul>/g)].map((m) => textOf(m[1]));
 
 	it('shows the language and star count inline after each project blurb', async () => {
 		const html = await render({
@@ -82,7 +82,7 @@ describe('Home', () => {
 				projectEntry({ title: 'ModkistMKII', kind: 'featured', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
 			],
 		});
-		expect(html).toMatch(/Unity inspector.<\/p>\s*<ul class="mn-stats"/);
+		expect(html).toMatch(/Unity inspector.<\/p>\s*<ul class="site-stats"/);
 		expect(statsLines(html)).toEqual(['Rust 1 star', 'C# 1,300 stars']);
 	});
 
@@ -99,14 +99,14 @@ describe('Home', () => {
 			games: [],
 			projects: [projectEntry({ title: 'Docs', tags: ['NuGet'] }, 'docs')],
 		});
-		expect(html).not.toContain('mn-stats');
+		expect(html).not.toContain('site-stats');
 		const withStars = await render({ games: [], projects: [projectEntry({ tags: ['NuGet'], stars: 0 })] });
 		expect(statsLines(withStars)).toEqual(['0 stars']);
 	});
 
 	/** The monogram shown in place of each game's missing cover, in page order. */
 	const monograms = (html: string) =>
-		[...html.matchAll(/<div class="game-card__media"[^>]*>\s*<span class="mn-monogram"[^>]*aria-hidden="true"[^>]*>([^<]*)<\/span>/g)].map(
+		[...html.matchAll(/<div class="game-card__media"[^>]*>\s*<span class="site-monogram"[^>]*aria-hidden="true"[^>]*>([^<]*)<\/span>/g)].map(
 			(m) => m[1],
 		);
 
@@ -125,7 +125,7 @@ describe('Home', () => {
 	it('keeps the cover of a game that has one', async () => {
 		const html = await render({ games: [gameEntry({ cover: fixtureImage })], projects: [] });
 		expect(html).toContain('<img');
-		expect(html).not.toContain('mn-monogram');
+		expect(html).not.toContain('site-monogram');
 	});
 
 	it('shows a quiet placeholder instead of TODO text that is not filled in yet', async () => {
@@ -148,7 +148,7 @@ describe('Home', () => {
 				projectEntry({ stars: undefined }, 'c'),
 			],
 		});
-		const facts = /<ul class="mn-facts"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? '';
+		const facts = /<ul class="site-facts"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? '';
 		const items = [...facts.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => textOf(m[1]));
 		expect(items).toEqual(['2 released games', '3 open-source projects', '1,234 GitHub stars']);
 	});
