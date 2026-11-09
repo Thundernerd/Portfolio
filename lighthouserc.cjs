@@ -2,8 +2,10 @@
 // scores below 90, or any accessibility audit fails, on the pages below. Run `npm run build` first.
 // `astro preview` serves dist/ under the `/Portfolio/` base path, so its links and assets resolve as
 // they do on GitHub Pages.
-// `astro preview`'s default host; `/Portfolio` is `base` in astro.config.mjs: keep the two in sync.
-const host = 'localhost:4321';
+// `/Portfolio` is `base` in astro.config.mjs: keep the two in sync. lhci audits whatever answers on
+// this port, so it avoids `astro preview`'s default 4321, which `npm run dev` also uses.
+const port = 4400;
+const host = `localhost:${port}`;
 const origin = `http://${host}/Portfolio`;
 
 const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
@@ -28,7 +30,10 @@ const accessibilityAudits = Object.fromEntries(
 module.exports = {
 	ci: {
 		collect: {
-			startServerCommand: 'npm run preview',
+			// `--ignore-lock` keeps the server in the foreground, so lhci stops it when it's done: when
+			// `astro preview` detects an AI agent it otherwise moves itself to the background and outlives
+			// the run.
+			startServerCommand: `npm run preview -- --ignore-lock --port ${port}`,
 			startServerReadyPattern: host,
 			url: [
 				`${origin}/`,
