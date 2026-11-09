@@ -3,7 +3,9 @@
 // `astro preview` serves dist/ under the `/Portfolio/` base path, so its links and assets resolve as
 // they do on GitHub Pages.
 // `/Portfolio` is `base` in astro.config.mjs: keep the two in sync. lhci audits whatever answers on
-// this port, so it avoids `astro preview`'s default 4321, which `npm run dev` also uses.
+// this port, so it avoids `astro preview`'s default 4321, which `npm run dev` also uses. The
+// `prelighthouse` step (scripts/assert-port-free.mjs) reads it from `port` below and fails the run
+// when something already listens there.
 const port = 4400;
 const host = `localhost:${port}`;
 const origin = `http://${host}/Portfolio`;
@@ -28,6 +30,8 @@ const accessibilityAudits = Object.fromEntries(
 );
 
 module.exports = {
+	// Not lhci config (lhci only reads `ci`): the port the `prelighthouse` step checks.
+	port,
 	ci: {
 		collect: {
 			// `--ignore-lock` keeps the server in the foreground, so lhci stops it when it's done: when
