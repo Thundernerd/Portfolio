@@ -16,6 +16,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { resolveHref } from '../lib/url';
+import GameFacts from './GameFacts.astro';
 
 interface Props {
 	game: CollectionEntry<'games'>;
@@ -43,24 +44,7 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 	}
 	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a class="game-card__title-link" href={resolveHref(href)}>{title}</a>}</h3>
 	<dl class="game-card__meta">
-		<div class="game-card__fact">
-			<dt class="game-card__label">Role</dt>
-			<dd class="game-card__role">{role}</dd>
-		</div>
-		<div class="game-card__fact">
-			<dt class="game-card__label">Studio</dt>
-			<dd class="game-card__studio">{studio}</dd>
-		</div>
-		{
-			year !== undefined && (
-				<div class="game-card__fact">
-					<dt class="game-card__label">Year</dt>
-					<dd class="game-card__year">
-						<time datetime={String(year)}>{year}</time>
-					</dd>
-				</div>
-			)
-		}
+		<GameFacts block="game-card" role={role} studio={studio} year={year} />
 	</dl>
 	<ul class="game-card__platforms">
 		{platforms.map((platform) => <li class="game-card__platform">{platform}</li>)}
