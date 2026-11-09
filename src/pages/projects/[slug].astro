@@ -13,7 +13,7 @@ import { presentableProject } from '../../components/home/placeholders';
 import { anchor } from '../../components/home/sections';
 import { plural } from '../../components/home/text';
 import Base from '../../layouts/Base.astro';
-import { repoStats } from '../../lib/github-stats';
+import { repoStats, repoUrl } from '../../lib/github-stats';
 import { hasPage } from '../../lib/project-pages';
 import { withBase } from '../../lib/url';
 
@@ -29,7 +29,6 @@ interface Props {
 const { project } = Astro.props;
 const { title, blurb, repo, tags, image } = presentableProject(project).data;
 const { language, stars, archived } = repoStats(project.data);
-const repoUrl = `https://github.com/${repo}`;
 const { Content } = await render(project);
 ---
 
@@ -71,7 +70,7 @@ const { Content } = await render(project);
 				}
 				<div class="site-project__fact">
 					<dt>Source</dt>
-					<dd><a class="site-project__repo" href={repoUrl}>{repo}</a></dd>
+					<dd><a class="site-project__repo" href={repoUrl(repo)}>{repo}</a></dd>
 				</div>
 			</dl>
 		</header>
