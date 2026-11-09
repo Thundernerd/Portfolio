@@ -7,7 +7,7 @@
 import { anchor, homeSections } from '../components/home/sections';
 import ThemeInit from '../components/theme/ThemeInit.astro';
 import ThemeToggle from '../components/theme/ThemeToggle.astro';
-import { withBase } from '../lib/url';
+import { absoluteUrl, withBase } from '../lib/url';
 import '../styles/global.css';
 
 interface Props {
@@ -16,6 +16,10 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+// Search engines and link previews need absolute URLs: the page's own and the shared preview image.
+// `Astro.url.pathname` already starts with the base path, so it is resolved against `site` directly.
+const canonical = new URL(Astro.url.pathname, import.meta.env.SITE).href;
+const ogImage = { url: absoluteUrl('og.png'), width: 1200, height: 630, alt: '~/christiaan: game developer and programmer' };
 // The home page's sections, linked through the site root so the nav works from any page.
 const nav = homeSections.map((section) => ({ label: section.navLabel, href: withBase(anchor(section.id)) }));
 ---
@@ -26,8 +30,22 @@ const nav = homeSections.map((section) => ({ label: section.navLabel, href: with
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="light dark" />
 		{description && <meta name="description" content={description} />}
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="christiaan" />
+		<meta property="og:title" content={title} />
+		{description && <meta property="og:description" content={description} />}
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage.url} />
+		<meta property="og:image:width" content={String(ogImage.width)} />
+		<meta property="og:image:height" content={String(ogImage.height)} />
+		<meta property="og:image:alt" content={ogImage.alt} />
+		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
-		<link rel="icon" href={withBase('favicon.ico')} />
+		<!-- `sizes` on the .ico (which holds 16, 32 and 48px) makes browsers that support SVG pick the SVG. -->
+		<link rel="icon" href={withBase('favicon.ico')} sizes="32x32" />
+		<link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
+		<link rel="sitemap" href={withBase('sitemap-index.xml')} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<ThemeInit />

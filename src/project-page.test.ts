@@ -59,6 +59,18 @@ describe('/projects/[slug]', () => {
 		expect(html.indexOf('<h1')).toBeLessThan(html.indexOf('software development kit'));
 	});
 
+	it('describes itself for link previews with its own title, blurb and URL', async () => {
+		const project = projectEntry({ title: 'ZeepSDK', kind: 'featured', blurb: 'A modding SDK for Zeepkist.' }, 'zeepsdk');
+		const html = await container.renderToString(ProjectPage, {
+			props: { project },
+			request: new Request('https://thundernerd.github.io/Portfolio/projects/zeepsdk/'),
+		});
+		expect(html).toContain('<link rel="canonical" href="https://thundernerd.github.io/Portfolio/projects/zeepsdk/"');
+		expect(html).toContain('<meta property="og:title" content="ZeepSDK · Christiaan"');
+		expect(html).toContain('<meta property="og:description" content="A modding SDK for Zeepkist."');
+		expect(html).toContain('<meta property="og:url" content="https://thundernerd.github.io/Portfolio/projects/zeepsdk/"');
+	});
+
 	/** The text of each `<dt>`/`<dd>` pair in the page's facts list. */
 	const factsOf = (html: string) =>
 		Object.fromEntries([...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/g)].map((m) => [textOf(m[1]), textOf(m[2])]));

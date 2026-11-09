@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type AstroContainer, createContainer, sectionsOverride } from '../components/test-fixtures';
 import Base from './Base.astro';
@@ -13,6 +14,7 @@ describe('Base layout', () => {
 	});
 
 	const render = () => container.renderToString(Base, { props: { title: 'Christiaan' }, slots: { default: '<p>content</p>' } });
+	const headOf = (html: string) => /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? '';
 
 	it('links the navigation to every section of the home page, from any page', async () => {
 		const html = await render();
@@ -41,6 +43,67 @@ describe('Base layout', () => {
 		expect(html).not.toMatch(/href="\/(?!Portfolio\/)/);
 	});
 
+	describe('head metadata for search engines and link previews', () => {
+		// The deployed home page, with a description, as the build renders it.
+		const renderHomeWithDescription = () =>
+			container.renderToString(Base, {
+				props: { title: 'Christiaan', description: 'Games and Unity plugins.' },
+				request: new Request('https://thundernerd.github.io/Portfolio/'),
+			});
+		const head = async () => headOf(await renderHomeWithDescription());
+		const meta = (html: string, key: string) =>
+			new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`).exec(html)?.[1];
+
+		it('names the page\'s canonical URL on the deployed site', async () => {
+			expect(await head()).toContain('<link rel="canonical" href="https://thundernerd.github.io/Portfolio/"');
+		});
+
+		it('describes the page for Open Graph link previews', async () => {
+			const html = await head();
+			expect(meta(html, 'og:type')).toBe('website');
+			expect(meta(html, 'og:title')).toBe('Christiaan');
+			expect(meta(html, 'og:description')).toBe('Games and Unity plugins.');
+			expect(meta(html, 'og:url')).toBe('https://thundernerd.github.io/Portfolio/');
+			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/og.png');
+			expect(meta(html, 'og:image:width')).toBe('1200');
+			expect(meta(html, 'og:image:height')).toBe('630');
+			expect(meta(html, 'og:image:alt')).toBeTruthy();
+		});
+
+		it('ships the preview image it points at, at the size it declares', () => {
+			// A PNG's width and height are the first two fields of its IHDR chunk, right after the signature.
+			const png = readFileSync(new URL('../../public/og.png', import.meta.url));
+			expect(png.subarray(1, 4).toString('ascii')).toBe('PNG');
+			expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+		});
+
+		it('points crawlers at the sitemap', async () => {
+			expect(await head()).toContain('<link rel="sitemap" href="/Portfolio/sitemap-index.xml"');
+		});
+
+		it('asks for a large image card on X/Twitter', async () => {
+			expect(meta(await head(), 'twitter:card')).toBe('summary_large_image');
+		});
+
+		it('leaves the description tags out when the page has none', async () => {
+			const html = await render();
+			expect(html).not.toMatch(/name="description"|og:description/);
+		});
+	});
+
+	it('links the site\'s icons for browser tabs and home screens', async () => {
+		const head = headOf(await render());
+		expect(head).toMatch(/<link rel="icon" type="image\/svg\+xml" href="\/Portfolio\/favicon.svg"/);
+		expect(head).toMatch(/<link rel="icon" href="\/Portfolio\/favicon.ico" sizes="32x32"/);
+		expect(head).toMatch(/<link rel="apple-touch-icon" href="\/Portfolio\/apple-touch-icon.png"/);
+	});
+
+	it('ships the site\'s own icon, not Astro\'s', () => {
+		const svg = readFileSync(new URL('../../public/favicon.svg', import.meta.url), 'utf8');
+		// The scaffold's icon is the Astro logo, a single path starting at this point.
+		expect(svg).not.toContain('M50.4 78.5');
+	});
+
 	it('presents itself as the site, not as a prototype', async () => {
 		const html = await render();
 		expect(html).not.toMatch(/prototype/i);
@@ -53,7 +116,7 @@ describe('Base layout', () => {
 
 	it('applies a remembered theme in the head, before the page paints', async () => {
 		const html = await render();
-		const head = /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? '';
+		const head = headOf(html);
 		expect(head).toContain('portfolio-theme');
 		expect(head).toContain('document.documentElement.dataset.theme');
 	});
