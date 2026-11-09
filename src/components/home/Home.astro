@@ -9,11 +9,10 @@
  * reads too; the content of each one is keyed by its id below.
  */
 import type { CollectionEntry } from 'astro:content';
-import { gamePath } from '../../lib/paths';
+import { gamePath, projectPagePath } from '../../lib/paths';
 import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
-import { projectPagePath } from '../../lib/project-pages';
 import { monogramHtml } from './monogram';
 import { presentableGame, presentableProject } from '../placeholders';
 import { anchor, type HomeSectionId, homeSections } from './sections';

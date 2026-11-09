@@ -1,11 +1,11 @@
 ---
 /**
- * A page per featured project, at `/projects/<entry id>/` (see `src/lib/project-pages.ts`): a link back to the
- * home page's featured section, the project's title, blurb,
- * facts (language, tech tags, star count and a link to the GitHub repo) and the entry's Markdown
- * body as a README-style description, after its image when it has one. A `TODO` blurb shows as a
- * quiet placeholder, as on the home page. The language, star count and archived flag come from
- * `repoStats()`, as on the project cards: GitHub's values when fetched, the frontmatter's otherwise.
+ * A page per featured project, at `/projects/<entry id>/` (see `hasPage()` in `src/lib/paths.ts`):
+ * a link back to the home page's featured section, the project's title, blurb, facts (language, tech
+ * tags, star count and a link to the GitHub repo) and the entry's Markdown body as a README-style
+ * description, after its image when it has one. A `TODO` blurb shows as a quiet placeholder, as on
+ * the home page. The language, star count and archived flag come from `repoStats()`, as on the
+ * project cards: GitHub's values when fetched, the frontmatter's otherwise.
  */
 import { Image } from 'astro:assets';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
@@ -14,7 +14,7 @@ import { anchor } from '../../components/home/sections';
 import { plural } from '../../components/home/text';
 import Base from '../../layouts/Base.astro';
 import { repoStats, repoUrl } from '../../lib/github-stats';
-import { hasPage } from '../../lib/project-pages';
+import { hasPage } from '../../lib/paths';
 import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
