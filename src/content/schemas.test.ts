@@ -65,7 +65,7 @@ describe('projects schema', () => {
 		expect(projectSchema(context).parse({ ...validProject, archived: true }).archived).toBe(true);
 	});
 
-	it.each(['featured', 'zeepkist-mod', 'unity-plugin', 'tool'])('accepts kind %s', (kind) => {
+	it.each(['featured', 'zeepkist-mod', 'unity-plugin'])('accepts kind %s', (kind) => {
 		expect(projectSchema(context).parse({ ...validProject, kind }).kind).toBe(kind);
 	});
 
@@ -74,6 +74,8 @@ describe('projects schema', () => {
 		['a repo given as a URL', { repo: 'https://github.com/donderjoekel/ZeepSDK' }],
 		['a repo given as a relative path', { repo: '../..' }],
 		['an unknown kind', { kind: 'game' }],
+		// The home page has no section for tools (#52), so a `tool` entry must fail the build rather than vanish.
+		['kind tool', { kind: 'tool' }],
 		['negative stars', { stars: -1 }],
 		['fractional stars', { stars: 1.5 }],
 	])('rejects a project with %s', (_, override) => {

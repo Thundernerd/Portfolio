@@ -63,13 +63,11 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 	},
 };
 
-// `tool` projects have no section in the agreed order, so they are left out of the page and the facts.
-const shown = projects.filter((project) => project.data.kind !== 'tool');
-const languages = languageBreakdown(shown);
+const languages = languageBreakdown(projects);
 const facts = [
 	plural(games.length, 'released game', 'released games'),
-	plural(shown.length, 'open-source project', 'open-source projects'),
-	plural(totalStars(shown), 'GitHub star', 'GitHub stars'),
+	plural(projects.length, 'open-source project', 'open-source projects'),
+	plural(totalStars(projects), 'GitHub star', 'GitHub stars'),
 ];
 ---
 
