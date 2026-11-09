@@ -93,13 +93,14 @@ describe('mountThemeToggle', () => {
 	});
 
 	it('ignores a system theme change once the visitor has picked a theme', () => {
-		const system = fakeSystem(false);
+		const system = fakeSystem(true);
 		mountThemeToggle(button, { storage: memoryStorage(), system });
-		button.click();
+		button.click(); // Picks light.
 
 		system.change(false);
+		system.change(true);
 
-		expect(pressed()).toBe('true');
-		expect(document.documentElement.dataset.theme).toBe('dark');
+		expect(pressed()).toBe('false');
+		expect(document.documentElement.dataset.theme).toBe('light');
 	});
 });
