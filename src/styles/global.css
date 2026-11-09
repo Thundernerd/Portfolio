@@ -837,8 +837,24 @@
 	color: var(--accent);
 }
 
-.site .contact__link:hover {
+.site a.contact__link:hover {
 	text-decoration: underline;
+}
+
+.site .contact__avatar {
+	width: 6rem;
+	height: 6rem;
+	border-radius: 50%;
+	border: 1px solid var(--rule-strong);
+	object-fit: cover;
+}
+
+.site .contact__link--pending {
+	color: var(--muted);
+}
+
+.site .contact__link--pending::after {
+	content: none;
 }
 
 /* ---- Featured project pages ------------------------------------------------------------------ */

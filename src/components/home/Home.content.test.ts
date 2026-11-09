@@ -35,4 +35,14 @@ describe('Home with the real content', () => {
 		expect(shown.length).toBeGreaterThan(0);
 		expect(titles.sort()).toEqual([...games, ...shown].map((entry) => entry.data.title).sort());
 	});
+
+	it('shows an avatar and GitHub, LinkedIn, email and CV entries in the contact section', async () => {
+		const html = await container.renderToString(Home, { props: { games: [], projects: [] } });
+		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		expect(contact).toMatch(/<img[^>]*class="contact__avatar"/);
+		const entries = [...contact.matchAll(/class="contact__link[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1]);
+		for (const contactKind of [/^GitHub\b/, /^LinkedIn\b/, /^Email\b/, /^CV\b/]) {
+			expect(entries.some((entry) => contactKind.test(entry)), String(contactKind)).toBe(true);
+		}
+	});
 });

@@ -53,7 +53,9 @@ in an entry's Markdown body (`<!-- TODO(Christiaan): ... -->`) are dropped when 
 (`src/lib/strip-html-comments.ts`), so notes kept there don't reach the built pages' source. The launch
 guard in `src/content/no-todos.test.ts` fails on any of them and lists each file, line and field. It
 is skipped by default so CI and preview deploys keep passing while content is being filled in; run it
-on demand with `CHECK_TODOS=1 npm test`. Before launch, once that passes, remove the
+on demand with `CHECK_TODOS=1 npm test`. The guard also covers the home page's contact links in
+`src/components/home/profile.ts`: a link whose `href` is a `TODO` shows as "to be confirmed",
+without a link, until it is filled in. Before launch, once that passes, remove the
 `skipIf(!process.env.CHECK_TODOS)` so the guard runs on every `npm test` and in CI.
 
 ## Deploy
@@ -77,7 +79,10 @@ the home page link to. Its content is `src/components/game/GamePage.astro`: the 
 links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube link, linked
 otherwise), the entry's Markdown body under "What I did", its `tech` and a gallery of its
 `screenshots` (each an image next to the entry, with `alt` text). While the body still has a
-`TODO` in it, the page shows "Write-up coming soon." in its place. The
+`TODO` in it, the page shows "Write-up coming soon." in its place. The about & contact section's
+avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn, email, CV) are set in
+`profile` (`src/components/home/profile.ts`); put a CV PDF in `public/` and link it by its site
+path (`cv.pdf`). The
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
 
@@ -98,6 +103,8 @@ list resets) inside `@layer components`, so any unlayered layout CSS wins over i
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
 component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
+`Contact` also takes an optional `avatar` image, marks a link with `download: true` (a CV) with the
+`download` attribute, and shows a link without an `href` as plain text.
 Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example

@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { hasTodo } from '../content/todos';
+import type { ContactEntry, ContactLink } from './types';
 
 /** Whether `value` holds a `TODO`, matched as the content guard in `src/content/todos.ts` does. */
 export const isTodo = hasTodo;
@@ -40,4 +41,9 @@ export function presentableWriteUp(html: string): string | undefined {
 		.replace(/<(p|li|h[1-6])\b[^>]*>[\s\S]*?<\/\1>/g, (block) => (isTodo(block) ? '' : block))
 		.replace(/<(ul|ol)\b[^>]*>\s*<\/\1>/g, '');
 	return filled.replace(/<[^>]*>/g, '').trim() === '' ? undefined : filled;
+}
+
+/** The contact link, or for a `TODO` target, its label marked as still to be confirmed, without a link. */
+export function presentableContactLink(link: ContactLink): ContactEntry {
+	return isTodo(link.href) ? { label: `${link.label} · ${TO_BE_CONFIRMED.toLowerCase()}` } : link;
 }
