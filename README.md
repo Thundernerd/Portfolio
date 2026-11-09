@@ -22,7 +22,9 @@ Tests run in Node by default. A test for a client-side script (anything that tou
 `window`) opts into a [happy-dom](https://github.com/capricorn86/happy-dom) DOM by starting its file
 with `// @vitest-environment happy-dom`; see `src/components/proto/dark/trailer.test.ts`. Put the
 script's logic in an exported function the page's `<script>` calls, render the markup it acts on into
-`document.body`, and assert on the resulting DOM. happy-dom doesn't load iframe pages, so a test that
+`document.body`, and assert on the resulting DOM. The Astro container (`createContainer()`) can't
+render components under happy-dom (it fails with `NoMatchingRenderer`), so write an `.astro`
+component's markup into the test as a string, as `src/components/proto/minimal/toggle.test.ts` does. happy-dom doesn't load iframe pages, so a test that
 creates an iframe logs a harmless `Iframe page loading is disabled` error.
 
 ## Base path

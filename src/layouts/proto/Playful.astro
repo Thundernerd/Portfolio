@@ -125,21 +125,9 @@ const contactLinks = [
 		<div class="pf-toast" role="status" aria-live="polite" data-pf-announcer></div>
 
 		<script>
-			import { konamiTracker } from '../../components/proto/playful/konami';
+			import { mountKonami } from '../../components/proto/playful/turbo';
 
-			const announcer = document.querySelector<HTMLElement>('[data-pf-announcer]')!;
-			const track = konamiTracker();
-			let toastTimer = 0;
-
-			document.addEventListener('keydown', (event) => {
-				if (!track(event.key)) return;
-				document.body.classList.add('is-turbo');
-				document.dispatchEvent(new CustomEvent('pf:turbo'));
-				announcer.textContent = 'Cheat unlocked: turbo mode! Every star now counts double.';
-				announcer.classList.add('is-visible');
-				clearTimeout(toastTimer);
-				toastTimer = window.setTimeout(() => announcer.classList.remove('is-visible'), 4000);
-			});
+			mountKonami(document.querySelector<HTMLElement>('[data-pf-announcer]')!);
 		</script>
 	</body>
 </html>
