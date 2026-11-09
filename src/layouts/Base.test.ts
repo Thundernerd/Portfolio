@@ -75,6 +75,10 @@ describe('Base layout', () => {
 			expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
 		});
 
+		it('points crawlers at the sitemap', async () => {
+			expect(await head()).toContain('<link rel="sitemap" href="/Portfolio/sitemap-index.xml"');
+		});
+
 		it('asks for a large image card on X/Twitter', async () => {
 			expect(meta(await head(), 'twitter:card')).toBe('summary_large_image');
 		});
