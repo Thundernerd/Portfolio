@@ -86,12 +86,9 @@ const links = [
 </Contact>
 
 <script>
-	import { playTrailer } from './trailer';
+	import { onTrailerClick } from './trailer';
 
 	// Swap a trailer poster for the YouTube player only when it is clicked, so the player and its scripts
 	// load on demand (a poster without a cover is a lazy-loaded YouTube thumbnail image).
-	document.addEventListener('click', (event) => {
-		const poster = (event.target as Element | null)?.closest<HTMLButtonElement>('button.dark-trailer[data-youtube-id]');
-		if (poster) playTrailer(poster);
-	});
+	document.addEventListener('click', onTrailerClick);
 </script>
