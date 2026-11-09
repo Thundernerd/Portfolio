@@ -20,12 +20,11 @@ Run from the repo root (Node `>=22.23.4`):
 
 Tests run in Node by default. A test for a client-side script (anything that touches `document` or
 `window`) opts into a [happy-dom](https://github.com/capricorn86/happy-dom) DOM by starting its file
-with `// @vitest-environment happy-dom`; see `src/components/proto/dark/trailer.test.ts`. Put the
+with `// @vitest-environment happy-dom`; see `src/components/theme/toggle.test.ts`. Put the
 script's logic in an exported function the page's `<script>` calls, render the markup it acts on into
 `document.body`, and assert on the resulting DOM. The Astro container (`createContainer()`) can't
 render components under happy-dom (it fails with `NoMatchingRenderer`), so write an `.astro`
-component's markup into the test as a string, as `src/components/proto/minimal/toggle.test.ts` does. happy-dom doesn't load iframe pages, so a test that
-creates an iframe logs a harmless `Iframe page loading is disabled` error.
+component's markup into the test as a string, as that test does.
 
 ## Base path
 
@@ -62,9 +61,18 @@ on demand with `CHECK_TODOS=1 npm test`. Before launch, once that passes, remove
 `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
 (Settings → Pages).
 
+## Layout and style
+
+Pages render inside `src/layouts/Base.astro`, which owns the document, the header (brand, section
+navigation and light/dark toggle) and the footer, and loads the site's stylesheet,
+`src/styles/global.css`. The style is the minimal one chosen in #12: its rules are scoped under the
+`.mn` class on `<html>`, and its own classes share the `mn-` prefix. The home page (`/`) is
+`src/components/home/Home.astro`; the toggle lives in `src/components/theme/` and remembers the
+visitor's pick in `localStorage` under `portfolio-theme`.
+
 ## Section components
 
-`src/components/` holds the shared, unstyled building blocks the pages and style prototypes compose:
+`src/components/` holds the shared, unstyled building blocks the pages compose:
 `Hero`, `GameCard`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
 BEM-style classes (`.hero__title`, `.project-card__stars`, ...) and only structural CSS (layout,
 list resets) inside `@layer components`, so any unlayered layout CSS wins over it regardless of

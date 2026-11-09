@@ -1,4 +1,4 @@
-/** Storage fakes shared by the minimal prototype's theme tests. */
+/** Storage fakes shared by the theme toggle's tests. */
 
 /** A `Storage`-like stand-in backed by a map. */
 export function memoryStorage(initial: Record<string, string> = {}) {

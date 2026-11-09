@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry } from '../../test-fixtures';
-import MinimalHome from './MinimalHome.astro';
+import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry } from '../test-fixtures';
+import Home from './Home.astro';
 
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
-vi.mock('../../../lib/github-stats', async (importOriginal) => {
+vi.mock('../../lib/github-stats', async (importOriginal) => {
 	const fetched = { 'fixture-owner/fetched': { stars: 50, language: 'ShaderLab' } };
-	return (await import('../../test-fixtures')).withFetchedStats(await importOriginal(), fetched);
+	return (await import('../test-fixtures')).withFetchedStats(await importOriginal(), fetched);
 });
 
-describe('MinimalHome', () => {
+describe('Home', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
 		container = await createContainer();
 	});
 
-	const render = (props: Record<string, unknown>) => container.renderToString(MinimalHome, { props });
+	const render = (props: Record<string, unknown>) => container.renderToString(Home, { props });
 	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
 	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 	const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);

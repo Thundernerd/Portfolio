@@ -1,17 +1,15 @@
 ---
-import { withBase } from '../lib/url';
+import { getCollection } from 'astro:content';
+import Home from '../components/home/Home.astro';
+import Base from '../layouts/Base.astro';
+
+const games = await getCollection('games');
+const projects = await getCollection('projects');
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
-		<link rel="icon" href={withBase('favicon.ico')} />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Portfolio</title>
-	</head>
-	<body>
-		<h1>Portfolio</h1>
-	</body>
-</html>
+<Base
+	title="Christiaan · Game developer & programmer"
+	description="Christiaan's portfolio: released games, open-source Unity plugins and Zeepkist mods."
+>
+	<Home games={games} projects={projects} />
+</Base>

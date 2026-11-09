@@ -1,9 +1,9 @@
 /*
- * Prototype B, "minimal developer" (/proto/minimal).
+ * The site's style: the minimal style chosen in #12 (prototype B of #10), loaded by `Base.astro`.
  *
  * Typography first, monospace accents and little imagery. Colours are `light-dark()` pairs driven by
  * `color-scheme`: the page follows `prefers-color-scheme` until the toggle sets `data-theme` on <html>.
- * Everything is scoped under `.mn` (the layout's <html> class), so no other page is affected.
+ * Everything is scoped under `.mn` (the layout's <html> class); its classes share the `mn-` prefix.
  */
 
 .mn {

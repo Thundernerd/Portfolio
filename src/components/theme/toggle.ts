@@ -1,5 +1,5 @@
 /**
- * The DOM wiring of the minimal prototype's light/dark toggle (`ThemeToggle.astro`): connects a
+ * The DOM wiring of the site's light/dark toggle (`ThemeToggle.astro`): connects a
  * `createThemeController` to the toggle button, `<html>`'s `data-theme` and the system theme.
  */
 import { createThemeController, type ThemeStorage } from './theme';
