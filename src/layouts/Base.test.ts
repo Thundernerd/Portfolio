@@ -10,15 +10,15 @@ describe('Base layout', () => {
 
 	const render = () => container.renderToString(Base, { props: { title: 'Christiaan' }, slots: { default: '<p>content</p>' } });
 
-	it('links the navigation to every home-page section', async () => {
+	it('links the navigation to every section of the home page, from any page', async () => {
 		const html = await render();
 		const nav = /<nav[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '';
 		expect([...nav.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual([
-			'#games',
-			'#featured',
-			'#zeepkist-mods',
-			'#unity-plugins',
-			'#contact',
+			'/Portfolio/#games',
+			'/Portfolio/#featured',
+			'/Portfolio/#zeepkist-mods',
+			'/Portfolio/#unity-plugins',
+			'/Portfolio/#contact',
 		]);
 	});
 
