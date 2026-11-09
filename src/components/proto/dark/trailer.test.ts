@@ -36,6 +36,14 @@ describe('onTrailerClick', () => {
 		expect(document.activeElement).toBe(document.querySelector('iframe'));
 	});
 
+	it('lets the player autoplay and go fullscreen', () => {
+		renderPoster().click();
+
+		const frame = document.querySelector('iframe')!;
+		expect(frame.getAttribute('allow')).toBe('autoplay; encrypted-media; picture-in-picture; fullscreen');
+		expect(frame.allowFullscreen).toBe(true);
+	});
+
 	it('plays the trailer when the click lands on the poster image', () => {
 		renderPoster();
 
