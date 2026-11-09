@@ -34,5 +34,6 @@ export const projectSchema = ({ image }: SchemaContext) =>
 		// Fallback star count; a later build-time fetcher may refresh it from GitHub.
 		stars: z.number().int().nonnegative().optional(),
 		// The GitHub repo is archived (read-only); cards label it so visitors know it's unmaintained.
+		// The build prefers GitHub's own flag (see `repoStats()`); this is the fallback when it can't fetch it.
 		archived: z.boolean().default(false),
 	});
