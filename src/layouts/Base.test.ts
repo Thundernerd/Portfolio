@@ -1,15 +1,24 @@
+import type { CollectionEntry } from 'astro:content';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type AstroContainer, createContainer, sectionsOverride } from '../components/test-fixtures';
+import { type AstroContainer, createContainer, projectEntry, sectionsOverride } from '../components/test-fixtures';
 import Base from './Base.astro';
 
 vi.mock('../components/home/sections', async (importOriginal) =>
 	(await import('../components/test-fixtures')).withSectionsOverride(await importOriginal()),
 );
 
+// Astro's content layer is not populated under Vitest; the tests set the projects the layout reads.
+const content = vi.hoisted(() => ({ projects: [] as CollectionEntry<'projects'>[] }));
+vi.mock('astro:content', async (importOriginal) => ({
+	...(await importOriginal<typeof import('astro:content')>()),
+	getCollection: async () => content.projects,
+}));
+
 describe('Base layout', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
+		content.projects = [];
 		container = await createContainer();
 	});
 
@@ -26,6 +35,29 @@ describe('Base layout', () => {
 			'/Portfolio/#unity-plugins',
 			'/Portfolio/#contact',
 		]);
+	});
+
+	/** The hrefs of the header navigation's links. */
+	const navLinks = (html: string) =>
+		[...(/<nav[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '').matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
+
+	it('links the Tools section after Unity plugins once a tool project exists', async () => {
+		content.projects = [projectEntry({ title: 'Code generator', kind: 'tool' }, 'code-generator')];
+		const html = await render();
+		expect(navLinks(html)).toEqual([
+			'/Portfolio/#games',
+			'/Portfolio/#featured',
+			'/Portfolio/#zeepkist-mods',
+			'/Portfolio/#unity-plugins',
+			'/Portfolio/#tools',
+			'/Portfolio/#contact',
+		]);
+		expect(html).toMatch(/<a href="\/Portfolio\/#tools">tools<\/a>/);
+	});
+
+	it('leaves the Tools link out while no tool project exists', async () => {
+		content.projects = [projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm')];
+		expect(navLinks(await render())).not.toContain('/Portfolio/#tools');
 	});
 
 	it('puts a section added to the home sections list in the navigation', async () => {

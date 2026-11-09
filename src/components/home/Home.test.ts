@@ -90,6 +90,36 @@ describe('Home', () => {
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
 	});
 
+	it('adds a Tools section after Unity plugins when a tool project exists, with unlinked cards and their stats', async () => {
+		const html = await render({
+			games: [],
+			projects: [projectEntry({ title: 'Code generator', kind: 'tool', tags: ['C#'], stars: 12 }, 'code-generator')],
+		});
+		expect(sectionIds(html)).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'tools', 'contact']);
+		expect(html).toMatch(/<section[^>]*id="tools"[^>]*>[\s\S]*?<h2[^>]*>\s*Tools\s*<\/h2>/);
+		expect(titlesIn(html, 'tools')).toEqual(['Code generator']);
+		const tools = /<section[^>]*id="tools"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		expect(tools).not.toMatch(/<h3[^>]*>\s*<a/);
+		expect(textOf(/<ul class="site-stats"[^>]*>([\s\S]*?)<\/ul>/.exec(tools)?.[1] ?? '')).toBe('C# 12 stars');
+	});
+
+	it('counts tool projects in the hero facts and language breakdown', async () => {
+		const html = await render({
+			games: [],
+			projects: [
+				projectEntry({ title: 'RTM', kind: 'zeepkist-mod', tags: ['C#'], stars: 3 }, 'rtm'),
+				projectEntry({ title: 'Code generator', kind: 'tool', tags: ['Rust'], stars: 4 }, 'code-generator'),
+			],
+		});
+		const facts = /<ul class="site-facts"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? '';
+		expect([...facts.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => textOf(m[1]))).toEqual([
+			'0 released games',
+			'2 open-source projects',
+			'7 GitHub stars',
+		]);
+		expect([...html.matchAll(/<span class="site-langs__name"[^>]*>([^<]+)/g)].map((m) => m[1]).sort()).toEqual(['C#', 'Rust']);
+	});
+
 	it('shows a project of every kind the schema allows in some section', async () => {
 		const projects = projectKinds.map((kind) => projectEntry({ title: `A ${kind} project`, kind }, kind));
 		const html = await render({ games: [], projects });

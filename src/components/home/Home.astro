@@ -1,7 +1,7 @@
 ---
 /**
  * The home page content (`/`): the hero, then the released games, featured projects, Zeepkist mods,
- * Unity plugins and about/contact sections, built from the shared section components. Game cards link
+ * Unity plugins, tools (only when a tool project exists) and about/contact sections, built from the shared section components. Game cards link
  * to the game's page (`gamePath()`); project cards link to the project's page when it has one
  * (`projectPagePath()`) and get an inline stats line (language, stars) in their `extra` slot; games
  * without key art get a monogram tile in their `media` slot; `TODO` copy and contact links show as a
@@ -17,7 +17,7 @@ import Hero from '../Hero.astro';
 import { monogramHtml } from './monogram';
 import { presentableContactLink, presentableGame, presentableProject } from '../placeholders';
 import { profile } from './profile';
-import { anchor, type HomeSectionId, homeSections } from './sections';
+import { anchor, type HomeSectionId, homeSections, isShown } from './sections';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
 import { plural } from './text';
 
@@ -71,8 +71,16 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 		itemExtra: projectStats,
 		intro: 'Open-source editor and runtime tools for Unity, sorted by GitHub stars.',
 	},
+	tools: {
+		items: ofKind('tool'),
+		itemHref: projectPage,
+		itemExtra: projectStats,
+		intro: 'Standalone tools and utilities, outside Unity and Zeepkist.',
+	},
 };
 
+// The sections on this page: the Tools section only appears once a tool project exists.
+const sections = homeSections.filter((section) => isShown(section, projects));
 const languages = languageBreakdown(projects);
 const facts = [
 	plural(games.length, 'released game', 'released games'),
@@ -116,7 +124,7 @@ const facts = [
 </Hero>
 
 {
-	homeSections.map((section) => {
+	sections.map((section) => {
 		if (section.id === 'contact') {
 			return (
 				<Contact
