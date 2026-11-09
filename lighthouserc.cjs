@@ -2,8 +2,14 @@
 // scores below 90, or any accessibility audit fails, on the pages below. Run `npm run build` first.
 // `astro preview` serves dist/ under the `/Portfolio/` base path, so its links and assets resolve as
 // they do on GitHub Pages.
-// `/Portfolio` is `base` in astro.config.mjs: keep the two in sync.
-const origin = 'http://localhost:4321/Portfolio';
+// `astro preview`'s default host; `/Portfolio` is `base` in astro.config.mjs: keep the two in sync.
+const host = 'localhost:4321';
+const origin = `http://${host}/Portfolio`;
+
+const categories = ['performance', 'accessibility', 'best-practices', 'seo'];
+const categoryMinimums = Object.fromEntries(
+	categories.map((category) => [`categories:${category}`, ['error', { minScore: 0.9 }]]),
+);
 
 // A single accessibility failure, such as one image without `alt`, can leave the category above 90,
 // so every audit that counts towards the accessibility score must also pass on its own. The list
@@ -23,7 +29,7 @@ module.exports = {
 	ci: {
 		collect: {
 			startServerCommand: 'npm run preview',
-			startServerReadyPattern: 'localhost:4321',
+			startServerReadyPattern: host,
 			url: [
 				`${origin}/`,
 				// A game page (src/content/games/) and a featured project page (src/content/projects/).
@@ -35,10 +41,7 @@ module.exports = {
 		},
 		assert: {
 			assertions: {
-				'categories:performance': ['error', { minScore: 0.9 }],
-				'categories:accessibility': ['error', { minScore: 0.9 }],
-				'categories:best-practices': ['error', { minScore: 0.9 }],
-				'categories:seo': ['error', { minScore: 0.9 }],
+				...categoryMinimums,
 				...accessibilityAudits,
 			},
 		},
