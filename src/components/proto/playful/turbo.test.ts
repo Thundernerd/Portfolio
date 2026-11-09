@@ -61,6 +61,18 @@ describe('mountKonami', () => {
 		expect(announcer.classList.contains('is-visible')).toBe(false);
 	});
 
+	it('restarts the 4 seconds when the code is typed again while the toast shows', () => {
+		press(CODE);
+		vi.advanceTimersByTime(3000);
+
+		press(CODE);
+		vi.advanceTimersByTime(3999);
+		expect(announcer.classList.contains('is-visible')).toBe(true);
+
+		vi.advanceTimersByTime(1);
+		expect(announcer.classList.contains('is-visible')).toBe(false);
+	});
+
 	it('does nothing for a wrong sequence', () => {
 		let turbos = 0;
 		const onTurbo = () => turbos++;
