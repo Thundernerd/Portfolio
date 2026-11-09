@@ -9,25 +9,49 @@ import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 
 /**
- * Resolves when nothing listens on `port`, by briefly listening on it on every address, and
- * rejects with a message naming the port otherwise.
+ * Hosts to try listening on: every address, then each loopback address `localhost` may resolve to.
+ * Linux refuses the wildcard while any address holds the port, but macOS and the BSDs allow it next
+ * to a server bound to `127.0.0.1` or `::1`, so those are tried as well.
+ */
+const hosts = [undefined, '127.0.0.1', '::1'];
+
+/** Errors that mean the host doesn't exist on this machine (no IPv6), not that the port is taken. */
+const unavailable = new Set(['EADDRNOTAVAIL', 'EAFNOSUPPORT']);
+
+/**
+ * Briefly listens on `port` on `host` (every address when undefined), resolving once it is released.
+ * @param {number} port
+ * @param {string | undefined} host
+ * @returns {Promise<void>}
+ */
+function tryListen(port, host) {
+	return new Promise((resolve, reject) => {
+		const server = createServer();
+		server.once('error', reject);
+		server.listen(port, host, () => server.close(() => resolve()));
+	});
+}
+
+/**
+ * Resolves when nothing listens on `port`, by briefly listening on it on every address and on each
+ * loopback address, and rejects with a message naming the port otherwise.
  * @param {number} port
  * @returns {Promise<void>}
  */
-export function assertPortFree(port) {
-	return new Promise((resolve, reject) => {
-		const server = createServer();
-		server.once('error', (/** @type {NodeJS.ErrnoException} */ error) => {
-			reject(
-				new Error(
-					`Port ${port} is already in use (${error.code ?? error.message}), so Lighthouse would ` +
-						`audit whatever is listening there instead of dist/. Stop it (for example a stale ` +
-						'`astro preview`) and run `npm run lighthouse` again.',
-				),
+export async function assertPortFree(port) {
+	for (const host of hosts) {
+		try {
+			await tryListen(port, host);
+		} catch (caught) {
+			const error = /** @type {NodeJS.ErrnoException} */ (caught);
+			if (error.code && unavailable.has(error.code)) continue;
+			throw new Error(
+				`Port ${port} is already in use (${error.code ?? error.message}), so Lighthouse would ` +
+					`audit whatever is listening there instead of dist/. Stop it (for example a stale ` +
+					'`astro preview`) and run `npm run lighthouse` again.',
 			);
-		});
-		server.listen(port, () => server.close(() => resolve()));
-	});
+		}
+	}
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

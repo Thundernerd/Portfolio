@@ -4,11 +4,6 @@ import { assertPortFree } from './assert-port-free.mjs';
 
 let server: Server | undefined;
 
-afterEach(async () => {
-	await new Promise((resolve) => (server ? server.close(resolve) : resolve(undefined)));
-	server = undefined;
-});
-
 /** Starts a test server on a free port on `host` and returns that port. */
 async function holdPort(host: string) {
 	server = createServer();
@@ -18,16 +13,27 @@ async function holdPort(host: string) {
 	return address.port;
 }
 
+/** Stops the test server, if one is running. */
+async function releasePort() {
+	await new Promise((resolve) => (server ? server.close(resolve) : resolve(undefined)));
+	server = undefined;
+}
+
+afterEach(releasePort);
+
 describe('assertPortFree()', () => {
-	it('rejects with a message naming the port when a server holds it', async () => {
-		const port = await holdPort('localhost');
-		await expect(assertPortFree(port)).rejects.toThrow(String(port));
-	});
+	// `astro preview` listens on `localhost`, which resolves to one of the loopback addresses.
+	it.each(['localhost', '127.0.0.1', '::1'])(
+		'rejects with a message naming the port when a server on %s holds it',
+		async (host) => {
+			const port = await holdPort(host);
+			await expect(assertPortFree(port)).rejects.toThrow(`Port ${port} is already in use`);
+		},
+	);
 
 	it('resolves when the port is free', async () => {
 		const port = await holdPort('localhost');
-		await new Promise((resolve) => server!.close(resolve));
-		server = undefined;
+		await releasePort();
 		await expect(assertPortFree(port)).resolves.toBeUndefined();
 	});
 });
