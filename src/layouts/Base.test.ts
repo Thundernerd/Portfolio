@@ -1,11 +1,25 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { HomeSection } from '../components/home/sections';
 import { type AstroContainer, createContainer } from '../components/test-fixtures';
 import Base from './Base.astro';
+
+// Lets a test swap in its own list of home sections; the others see the real one.
+const sectionsOverride = vi.hoisted(() => ({ list: undefined as readonly HomeSection[] | undefined }));
+vi.mock('../components/home/sections', async (importOriginal) => {
+	const real = await importOriginal<typeof import('../components/home/sections')>();
+	return {
+		...real,
+		get homeSections() {
+			return sectionsOverride.list ?? real.homeSections;
+		},
+	};
+});
 
 describe('Base layout', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
 		container = await createContainer();
+		sectionsOverride.list = undefined;
 	});
 
 	const render = () => container.renderToString(Base, { props: { title: 'Christiaan' }, slots: { default: '<p>content</p>' } });
@@ -20,6 +34,13 @@ describe('Base layout', () => {
 			'/Portfolio/#unity-plugins',
 			'/Portfolio/#contact',
 		]);
+	});
+
+	it('puts a section added to the home sections list in the navigation', async () => {
+		const { homeSections } = await vi.importActual<typeof import('../components/home/sections')>('../components/home/sections');
+		sectionsOverride.list = [...homeSections, { id: 'talks', nav: 'talks', title: 'Talks' }];
+		const nav = /<nav[^>]*>([\s\S]*?)<\/nav>/.exec(await render())?.[1] ?? '';
+		expect(nav).toMatch(/<a href="\/Portfolio\/#contact">contact<\/a><\/li>\s*<li><a href="\/Portfolio\/#talks">talks<\/a>/);
 	});
 
 	it('builds its site links and assets under the base path', async () => {
