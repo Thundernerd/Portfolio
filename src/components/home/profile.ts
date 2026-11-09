@@ -22,6 +22,6 @@ export const profile: Profile = {
 		{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
 		{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
 		{ label: 'LinkedIn', href: 'https://www.linkedin.com/in/chrusb/' },
-		{ label: 'CV (PDF)', href: 'TODO: put the CV in public/ and give its path, e.g. cv.pdf', download: true },
+		{ label: 'CV (PDF)', href: 'cv.pdf', download: true },
 	],
 };
