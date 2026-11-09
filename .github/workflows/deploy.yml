@@ -34,6 +34,18 @@ jobs:
         with:
           build-cmd: npm run check && npm test && npm run build
 
+      # Audits the built site with the runner's Chrome; the pages and thresholds are in lighthouserc.cjs.
+      - name: Check Lighthouse scores
+        run: npm run lighthouse
+
+      - name: Upload Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports/
+          if-no-files-found: ignore
+
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build

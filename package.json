@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.7",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@lhci/cli": "^0.15.1",
     "@types/node": "^22.20.5",
     "happy-dom": "^21.0.4",
     "typescript": "^6.0.3",

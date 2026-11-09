@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Lighthouse CI results and reports (npx lhci autorun)
+.lighthouseci/
