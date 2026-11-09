@@ -34,6 +34,7 @@ describe('ProjectCard', () => {
 	it('links the title to a base-prefixed page when given an href', async () => {
 		const html = await render({ project: projectEntry(), href: 'projects/serializable-interface/' });
 		expect(html).toMatch(/<h3[^>]*>\s*<a[^>]*href="\/Portfolio\/projects\/serializable-interface\/"/);
+		expect(html).toMatch(/<a[^>]*class="project-card__title-link"[^>]*>SerializableInterface<\/a>/);
 	});
 
 	it('lists tags only when there are some', async () => {

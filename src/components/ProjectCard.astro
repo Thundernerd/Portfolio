@@ -3,7 +3,7 @@
  * Card for one entry of the `projects` collection: image, title, blurb, tags, star count and a link
  * to the GitHub repo. The star count comes from `repoStats()`: GitHub's count when the prebuild
  * fetcher reached it, the entry's `stars` otherwise. The title links to `href` (a site path, e.g. a
- * project page) when given.
+ * project page) when given, as `.project-card__title-link`.
  * An entry marked `archived` gets an "Archived" label (`.project-card__archived`) after the title.
  *
  * Slots: `media` (wrapped in `.project-card__media`) replaces the image when filled; `extra`
@@ -43,7 +43,7 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 			image && <Image class="project-card__image" src={image} alt="" />
 		)
 	}
-	<h3 class="project-card__title">{href === undefined ? title : <a href={resolveHref(href)}>{title}</a>}</h3>
+	<h3 class="project-card__title">{href === undefined ? title : <a class="project-card__title-link" href={resolveHref(href)}>{title}</a>}</h3>
 	{archived && <p class="project-card__archived">Archived</p>}
 	<p class="project-card__blurb">{blurb}</p>
 	<slot name="extra" />
