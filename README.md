@@ -30,7 +30,8 @@ count and primary language of every `repo` in `src/content/` from the GitHub API
 that can't be fetched (offline, rate-limited, not found) falls back to the entry's frontmatter
 `stars`, and so does every repo under `npm run dev`, which doesn't run the fetcher. The language
 falls back to the first of the entry's `tags` that is a programming language (`TAG_LANGUAGES` in
-`src/lib/github-stats.ts`) when the repo wasn't fetched or GitHub reports none. Project cards always show the hand-written `blurb`.
+`src/lib/github-stats.ts`) when the repo wasn't fetched or GitHub reports none. Project cards always
+show the hand-written `blurb`.
 
 ## Content TODOs
 
