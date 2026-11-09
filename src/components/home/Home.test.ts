@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { projectKinds } from '../../content/schemas';
 import {
 	type AstroContainer,
 	createContainer,
@@ -68,6 +69,13 @@ describe('Home', () => {
 		expect(titlesIn(html, 'featured')).toEqual(['ZeepSDK']);
 		expect(titlesIn(html, 'zeepkist-mods')).toEqual(['RTM']);
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
+	});
+
+	it('shows a project of every kind the schema allows in some section', async () => {
+		const projects = projectKinds.map((kind) => projectEntry({ title: `A ${kind} project`, kind }, kind));
+		const html = await render({ games: [], projects });
+		const shown = sectionIds(html).flatMap((id) => titlesIn(html, id));
+		expect(shown.sort()).toEqual(projects.map((project) => project.data.title).sort());
 	});
 
 	/** The text of each project card's inline stats line, in page order. */
