@@ -2,10 +2,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ProjectCard from './ProjectCard.astro';
 import { type AstroContainer, createContainer, fixtureImage, projectEntry } from './test-fixtures';
 
-// Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
+// Stands in for the stats file the prebuild fetcher writes; only the `fixture-owner/fetched*` repos were fetched.
 vi.mock('../lib/github-stats', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('../lib/github-stats')>();
-	const fetched = { 'fixture-owner/fetched': { stars: 4321 } };
+	const fetched = {
+		'fixture-owner/fetched': { stars: 4321 },
+		'fixture-owner/fetched-archived': { stars: 4321, archived: true },
+		'fixture-owner/fetched-unarchived': { stars: 4321, archived: false },
+	};
 	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
 });
 
@@ -86,6 +90,16 @@ describe('ProjectCard', () => {
 		expect(await render({ project: projectEntry() })).not.toContain('Archived');
 		const html = await render({ project: projectEntry({ archived: true }) });
 		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+	});
+
+	it('labels a project archived when GitHub says so, even though its frontmatter does not', async () => {
+		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched-archived', archived: false }) });
+		expect(html).toMatch(/<p[^>]*>Archived<\/p>/);
+	});
+
+	it('drops the archived label when GitHub says the repo is no longer archived', async () => {
+		const html = await render({ project: projectEntry({ repo: 'fixture-owner/fetched-unarchived', archived: true }) });
+		expect(html).not.toContain('Archived');
 	});
 
 	it('shows both the archived label and the fetched star count on an archived project', async () => {
