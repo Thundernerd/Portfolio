@@ -98,14 +98,21 @@ describe('/projects/[slug]', () => {
 			expect(meta(html, 'og:image:alt')).toBe('Screenshot of ZeepSDK');
 		});
 
-		it('previews an AVIF image as a PNG of at most 1200px wide', async () => {
+		it('previews an AVIF image as a JPEG of at most 1200px wide', async () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.avif', width: 2400, height: 1200, format: 'avif' } as const;
 			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured', image }, 'zeepsdk'));
-			expect(variant(html)).toEqual({ format: 'png', width: '1200' });
-			expect(meta(html, 'og:image:type')).toBe('image/png');
+			expect(variant(html)).toEqual({ format: 'jpg', width: '1200' });
+			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
 			expect(meta(html, 'og:image:width')).toBe('1200');
 			expect(meta(html, 'og:image:height')).toBe('600');
 			expect(meta(html, 'og:image:alt')).toBe('Screenshot of ZeepSDK');
+		});
+
+		it('previews a WebP image as a JPEG', async () => {
+			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.webp', width: 800, height: 600, format: 'webp' } as const;
+			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+			expect(variant(html)).toEqual({ format: 'jpg', width: '800' });
+			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
 		});
 
 		it('keeps a JPEG image a JPEG', async () => {
