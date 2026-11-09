@@ -16,8 +16,8 @@ describe('pages', () => {
 
 		it('renders the home sections inside the site layout', async () => {
 			const html = await container.renderToString(Index);
-			expect(html).toMatch(/<html[^>]*class="mn"/);
-			expect(html).toMatch(/<a class="mn-brand"[^>]*href="\/Portfolio\/"/);
+			expect(html).toMatch(/<html[^>]*class="site"/);
+			expect(html).toMatch(/<a class="site-brand"[^>]*href="\/Portfolio\/"/);
 			const sections = [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
 			expect(sections).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'contact']);
 		});
