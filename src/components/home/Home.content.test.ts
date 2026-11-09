@@ -27,13 +27,12 @@ describe('Home with the real content', () => {
 		container = await createContainer();
 	});
 
-	it('renders a card for every game and every project in a home-page section', async () => {
+	it('renders a card for every game and every project', async () => {
 		const html = await container.renderToString(Home, { props: { games, projects } });
 		const titles = [...html.matchAll(/<h3[^>]*>(?:\s*<a[^>]*>)?([^<]+)/g)].map((m) => m[1].trim().replaceAll('&amp;', '&'));
-		const shown = projects.filter((p) => p.data.kind !== 'tool');
 		expect(games.length).toBeGreaterThan(0);
-		expect(shown.length).toBeGreaterThan(0);
-		expect(titles.sort()).toEqual([...games, ...shown].map((entry) => entry.data.title).sort());
+		expect(projects.length).toBeGreaterThan(0);
+		expect(titles.sort()).toEqual([...games, ...projects].map((entry) => entry.data.title).sort());
 	});
 
 	it('shows an avatar and GitHub, LinkedIn, email and CV entries in the contact section', async () => {

@@ -101,6 +101,10 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
 add a section there and give it content in `Home.astro`, where the type checker asks for it.
+In order they are released games, featured projects, Zeepkist mods, Unity plugins, tools and about &
+contact; each project `kind` in `src/content/projects/` has its section. The tools section has
+`onlyWithKind: 'tool'`, so it and its nav link only appear once a project has `kind: tool`
+(`isShown()`).
 Each game has a page at `/games/<entry id>/` (`src/pages/games/[slug].astro`), which the game cards on
 the home page link to. Its content is `src/components/game/GamePage.astro`: the facts and store
 links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube link, linked

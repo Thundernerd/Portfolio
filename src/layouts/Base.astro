@@ -4,7 +4,8 @@
  * little imagery and a light/dark toggle that follows `prefers-color-scheme` by default. Owns the
  * document, the header with the section navigation, and the footer; pages fill the `<main>`.
  */
-import { anchor, homeSections } from '../components/home/sections';
+import { getCollection } from 'astro:content';
+import { anchor, homeSections, isShown } from '../components/home/sections';
 import ThemeInit from '../components/theme/ThemeInit.astro';
 import ThemeToggle from '../components/theme/ThemeToggle.astro';
 import { absoluteUrl, withBase } from '../lib/url';
@@ -20,8 +21,10 @@ const { title, description } = Astro.props;
 // `Astro.url.pathname` already starts with the base path, so it is resolved against `site` directly.
 const canonical = new URL(Astro.url.pathname, import.meta.env.SITE).href;
 const ogImage = { url: absoluteUrl('og.png'), width: 1200, height: 630, alt: '~/christiaan: game developer and programmer' };
-// The home page's sections, linked through the site root so the nav works from any page.
-const nav = homeSections.map((section) => ({ label: section.navLabel, href: withBase(anchor(section.id)) }));
+// The home page's sections, linked through the site root so the nav works from any page. Reads the
+// projects itself so every page's nav lists the same sections as the home page (see `isShown()`).
+const projects = await getCollection('projects');
+const nav = homeSections.filter((section) => isShown(section, projects)).map((section) => ({ label: section.navLabel, href: withBase(anchor(section.id)) }));
 ---
 
 <html lang="en" class="site">

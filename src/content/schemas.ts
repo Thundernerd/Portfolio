@@ -26,7 +26,11 @@ export const gameSchema = ({ image }: SchemaContext) =>
 		screenshots: z.array(z.object({ image: image(), alt: z.string() })).default([]),
 	});
 
-const projectKinds = ['featured', 'zeepkist-mod', 'unity-plugin', 'tool'] as const;
+/**
+ * The kinds of project, one per home-page section that lists projects. A kind with no section would
+ * leave its entries off the page, so add the section with the kind (`Home.test.ts` checks this).
+ */
+export const projectKinds = ['featured', 'zeepkist-mod', 'unity-plugin', 'tool'] as const;
 
 /** Frontmatter of a project in `src/content/projects/`: featured work and the mod/plugin collections. */
 export const projectSchema = ({ image }: SchemaContext) =>
