@@ -327,13 +327,13 @@
 	color: var(--muted);
 }
 
-.mn-hero__intro {
+.site-hero__intro {
 	margin: 0;
 	max-width: 38rem;
 	font-size: 1.0625rem;
 }
 
-.mn-facts {
+.site-facts {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.35rem 0;
@@ -345,7 +345,7 @@
 	color: var(--muted);
 }
 
-.mn-facts li:not(:last-child)::after {
+.site-facts li:not(:last-child)::after {
 	content: '·' / '';
 	margin-inline: 0.7em;
 	color: var(--rule-strong);
@@ -516,7 +516,7 @@
 }
 
 /* Inline repo stats in the card's `extra` slot. */
-.mn-stats {
+.site-stats {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.25rem 1rem;
@@ -528,13 +528,13 @@
 	color: var(--text);
 }
 
-.mn-stats li {
+.site-stats li {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4rem;
 }
 
-.mn-stats__dot {
+.site-stats__dot {
 	width: 0.6rem;
 	height: 0.6rem;
 	border-radius: 50%;
@@ -542,7 +542,7 @@
 	box-shadow: 0 0 0 1px light-dark(rgb(0 0 0 / 0.12), rgb(255 255 255 / 0.18));
 }
 
-.mn-stats__stars::before {
+.site-stats__stars::before {
 	content: '★' / '';
 	color: light-dark(#9a6700, #e3b341);
 }
@@ -597,7 +597,7 @@
 }
 
 /* The monogram tile that stands in for missing key art, tinted per game. */
-.mn-monogram {
+.site-monogram {
 	display: grid;
 	place-items: center;
 	width: 100%;
@@ -678,7 +678,7 @@
 	--contact-links-gap: 0.75rem 1.75rem;
 }
 
-.mn-about {
+.site-about {
 	max-width: 40rem;
 	margin: 0;
 	font-size: 1.0625rem;
@@ -709,7 +709,7 @@
 	}
 }
 
-.mn-langs {
+.site-langs {
 	margin: 0;
 	padding: 1.1rem 1.25rem 1.25rem;
 	border: 1px solid var(--rule);
@@ -719,18 +719,18 @@
 	font-size: 0.8125rem;
 }
 
-.mn-langs__caption {
+.site-langs__caption {
 	margin-bottom: 0.9rem;
 	color: var(--muted);
 	font-size: 0.75rem;
 }
 
-.mn-langs__caption::before {
+.site-langs__caption::before {
 	content: '$ ' / '';
 	color: var(--accent);
 }
 
-.mn-langs__list {
+.site-langs__list {
 	display: grid;
 	gap: 0.55rem;
 	margin: 0;
@@ -738,14 +738,14 @@
 	list-style: none;
 }
 
-.mn-langs__row {
+.site-langs__row {
 	display: grid;
 	grid-template-columns: 5.5rem 1fr 2ch;
 	align-items: center;
 	gap: 0.75rem;
 }
 
-.mn-langs__bar {
+.site-langs__bar {
 	height: 0.45rem;
 	border-radius: 999px;
 	/* A faint ring keeps dark language colours (C#, Lua) visible on the dark theme. */
@@ -753,7 +753,7 @@
 	background: linear-gradient(var(--lang-colour), var(--lang-colour)) 0 0 / calc(var(--share) * 100%) 100% no-repeat, var(--chip);
 }
 
-.mn-langs__count {
+.site-langs__count {
 	text-align: right;
 	color: var(--muted);
 }

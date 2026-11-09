@@ -63,13 +63,13 @@ export function repoStatsHtml(project: Project): string | undefined {
 	const items: string[] = [];
 	if (language) {
 		items.push(
-			`<li class="mn-stats__lang"><span class="mn-stats__dot" style="--lang-colour: ${colourOf(language)}" aria-hidden="true"></span>${escapeHtml(language)}</li>`,
+			`<li class="site-stats__lang"><span class="site-stats__dot" style="--lang-colour: ${colourOf(language)}" aria-hidden="true"></span>${escapeHtml(language)}</li>`,
 		);
 	}
 	if (stars !== undefined) {
 		items.push(
-			`<li class="mn-stats__stars"><data value="${stars}">${formatCount(stars)}</data> ${noun(stars, 'star', 'stars')}</li>`,
+			`<li class="site-stats__stars"><data value="${stars}">${formatCount(stars)}</data> ${noun(stars, 'star', 'stars')}</li>`,
 		);
 	}
-	return items.length > 0 ? `<ul class="mn-stats" aria-label="Repository stats">${items.join('')}</ul>` : undefined;
+	return items.length > 0 ? `<ul class="site-stats" aria-label="Repository stats">${items.join('')}</ul>` : undefined;
 }
