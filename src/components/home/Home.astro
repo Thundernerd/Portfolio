@@ -1,16 +1,18 @@
 ---
 /**
- * The home page content (`/`): the hero, then the released games,
- * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
- * section components. Featured project cards link to their pages; project cards get an inline stats line (language, stars) in their `extra`
- * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
- * quiet placeholder. The sections' ids, headings and order come from `homeSections` (`./sections`),
- * which the header nav reads too; the content of each one is keyed by its id below.
+ * The home page content (`/`): the hero, then the released games, featured projects, Zeepkist mods,
+ * Unity plugins and about/contact sections, built from the shared section components. Project cards
+ * link to the project's page when it has one (`projectPagePath()`) and get an inline stats line
+ * (language, stars) in their `extra` slot; games without key art get a monogram tile in their `media`
+ * slot; `TODO` copy shows as a quiet placeholder. The sections' ids, headings and order come from
+ * `homeSections` (`./sections`), which the header nav reads too; the content of each one is keyed by
+ * its id below.
  */
 import type { CollectionEntry } from 'astro:content';
 import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
+import { projectPagePath } from '../../lib/project-pages';
 import { monogramHtml } from './monogram';
 import { presentableGame, presentableProject } from './placeholders';
 import { anchor, type HomeSectionId, homeSections } from './sections';
@@ -30,8 +32,7 @@ const projects = Astro.props.projects.map(presentableProject);
 
 const gameMedia = (entry: Game | Project) => (entry.collection === 'games' ? monogramHtml(entry) : undefined);
 const projectStats = (entry: Game | Project) => (entry.collection === 'projects' ? repoStatsHtml(entry) : undefined);
-// Featured projects have a page of their own (`src/pages/projects/[slug].astro`).
-const projectPage = (entry: Game | Project) => (entry.collection === 'projects' ? `projects/${entry.id}/` : undefined);
+const projectPage = (entry: Game | Project) => (entry.collection === 'projects' ? projectPagePath(entry) : undefined);
 const ofKind = (kind: Project['data']['kind']) => projects.filter((project) => project.data.kind === kind);
 
 interface GridContent {
@@ -57,11 +58,13 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 	},
 	'zeepkist-mods': {
 		items: ofKind('zeepkist-mod'),
+		itemHref: projectPage,
 		itemExtra: projectStats,
 		intro: 'BepInEx mods for the soapbox racer Zeepkist, most of them built on ZeepSDK.',
 	},
 	'unity-plugins': {
 		items: ofKind('unity-plugin'),
+		itemHref: projectPage,
 		itemExtra: projectStats,
 		intro: 'Open-source editor and runtime tools for Unity, sorted by GitHub stars.',
 	},
