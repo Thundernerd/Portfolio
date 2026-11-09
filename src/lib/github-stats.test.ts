@@ -22,15 +22,18 @@ describe('resolveRepoStats', () => {
 		expect(resolveRepoStats(withoutStars, {})).toStrictEqual({ stars: undefined, archived: false });
 	});
 
-	it('prefers the archived flag fetched from GitHub over the frontmatter', () => {
-		expect(resolveRepoStats(project, { [project.repo]: { stars: 300, archived: true } }).archived).toBe(true);
-		const markedArchived = { ...project, archived: true };
-		expect(resolveRepoStats(markedArchived, { [project.repo]: { stars: 300, archived: false } }).archived).toBe(false);
+	it.each([
+		['archived over a frontmatter that is not', true, false],
+		['not archived over a frontmatter that is', false, true],
+	])('prefers the fetched archived flag: %s', (_, fetchedArchived, frontmatterArchived) => {
+		const fetched = { [project.repo]: { stars: 300, archived: fetchedArchived } };
+		expect(resolveRepoStats({ ...project, archived: frontmatterArchived }, fetched).archived).toBe(fetchedArchived);
 	});
 
-	it('falls back to the frontmatter archived flag when GitHub did not give one', () => {
-		const markedArchived = { ...project, archived: true };
-		expect(resolveRepoStats(markedArchived, {}).archived).toBe(true);
-		expect(resolveRepoStats(markedArchived, { [project.repo]: { stars: 300 } }).archived).toBe(true);
+	it.each([
+		['the repo was not fetched', {}],
+		['GitHub did not give the flag', { [project.repo]: { stars: 300 } }],
+	])('falls back to the frontmatter archived flag when %s', (_, fetched) => {
+		expect(resolveRepoStats({ ...project, archived: true }, fetched).archived).toBe(true);
 	});
 });
