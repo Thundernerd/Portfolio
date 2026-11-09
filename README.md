@@ -95,8 +95,16 @@ without a link, until it is filled in. Before launch, once that passes, remove t
 ## Deploy
 
 `.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to `main` and on pull requests
-(using [`withastro/action`](https://github.com/withastro/action)). Pushes to `main` then publish
-`dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
+(using [`withastro/action`](https://github.com/withastro/action)), then checks the built site with
+[Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci). `lighthouserc.cjs` serves `dist/`
+under `/Portfolio/` with `astro preview` and audits the home page, a game page and a featured project
+page (mobile, light scheme). The job fails when any of them scores below 90 in performance,
+accessibility, best practices or SEO, or fails any accessibility audit on its own (one missing `alt`
+leaves the category above 90). The reports are uploaded as the run's `lighthouse-reports` artifact.
+Run it locally after a build with `npm run build && npx lhci autorun`; it needs Chrome or Chromium
+(point `CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`.
+If you rename the audited game or project, update its URL in `lighthouserc.cjs`. Pushes to `main`
+then publish `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
 (Settings → Pages).
 
 ## Layout and style

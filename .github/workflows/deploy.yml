@@ -34,6 +34,20 @@ jobs:
         with:
           build-cmd: npm run check && npm test && npm run build
 
+      # Audits the built home page, a game page and a featured project page (lighthouserc.cjs) with
+      # the runner's Chrome, and fails the job when a category scores below 90 or an accessibility
+      # audit fails.
+      - name: Check Lighthouse scores
+        run: npx lhci autorun
+
+      - name: Upload Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports/
+          if-no-files-found: ignore
+
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
