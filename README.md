@@ -71,7 +71,13 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `.site` class on `<html>`, and its own classes share the `site-` prefix. The home page (`/`) is
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
-add a section there and give it content in `Home.astro`, where the type checker asks for it. The
+add a section there and give it content in `Home.astro`, where the type checker asks for it.
+Each game has a page at `/games/<entry id>/` (`src/pages/games/[slug].astro`), which the game cards on
+the home page link to. Its content is `src/components/game/GamePage.astro`: the facts and store
+links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube link, linked
+otherwise), the entry's Markdown body under "What I did", its `tech` and a gallery of its
+`screenshots` (each an image next to the entry, with `alt` text). While the body still has a
+`TODO` in it, the page shows "Write-up coming soon." in its place. The
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
 

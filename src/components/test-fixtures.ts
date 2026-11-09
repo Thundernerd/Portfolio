@@ -90,6 +90,8 @@ export function gameEntry(data: Partial<CollectionEntry<'games'>['data']> = {}, 
 			year: 2020,
 			storeLinks: [],
 			blurb: 'A puzzle game about being the boss’s kid.',
+			tech: [],
+			screenshots: [],
 			...data,
 		},
 	};

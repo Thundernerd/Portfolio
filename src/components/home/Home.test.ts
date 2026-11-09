@@ -48,6 +48,11 @@ describe('Home', () => {
 		expect(headings).toEqual(['Say hi', 'Unity plugins', 'Zeepkist mods', 'Featured projects', 'Games']);
 	});
 
+	it("links each game card to the game's page", async () => {
+		const html = await render({ games: [gameEntry({ title: 'FRU' }, 'fru')], projects: [] });
+		expect(html).toMatch(/<a class="game-card__title-link"[^>]*href="\/Portfolio\/games\/fru\/"[^>]*>FRU<\/a>/);
+	});
+
 	/** The card titles inside the section with this id. */
 	const titlesIn = (html: string, id: string) => {
 		const section = new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`).exec(html)?.[0] ?? '';
@@ -69,9 +74,9 @@ describe('Home', () => {
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
 	});
 
-	it('links each featured project card to its page, and no other card', async () => {
+	it('links each featured project card to its page, and no other project card', async () => {
 		const html = await render({
-			games: [gameEntry()],
+			games: [],
 			projects: [
 				projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
 				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),

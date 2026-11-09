@@ -1,20 +1,21 @@
 ---
 /**
  * The home page content (`/`): the hero, then the released games, featured projects, Zeepkist mods,
- * Unity plugins and about/contact sections, built from the shared section components. Project cards
- * link to the project's page when it has one (`projectPagePath()`) and get an inline stats line
- * (language, stars) in their `extra` slot; games without key art get a monogram tile in their `media`
- * slot; `TODO` copy shows as a quiet placeholder. The sections' ids, headings and order come from
- * `homeSections` (`./sections`), which the header nav reads too; the content of each one is keyed by
- * its id below.
+ * Unity plugins and about/contact sections, built from the shared section components. Game cards link
+ * to the game's page (`gamePath()`); project cards link to the project's page when it has one
+ * (`projectPagePath()`) and get an inline stats line (language, stars) in their `extra` slot; games
+ * without key art get a monogram tile in their `media` slot; `TODO` copy shows as a quiet placeholder.
+ * The sections' ids, headings and order come from `homeSections` (`./sections`), which the header nav
+ * reads too; the content of each one is keyed by its id below.
  */
 import type { CollectionEntry } from 'astro:content';
+import { gamePath } from '../../lib/paths';
 import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
 import { projectPagePath } from '../../lib/project-pages';
 import { monogramHtml } from './monogram';
-import { presentableGame, presentableProject } from './placeholders';
+import { presentableGame, presentableProject } from '../placeholders';
 import { anchor, type HomeSectionId, homeSections } from './sections';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
 import { plural } from './text';
@@ -47,6 +48,7 @@ interface GridContent {
 const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 	games: {
 		items: games,
+		itemHref: (entry) => gamePath(entry.id),
 		itemMedia: gameMedia,
 		intro: 'Commercial games I worked on, from co-founding a studio to building multiplayer systems.',
 	},
