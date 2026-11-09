@@ -41,7 +41,8 @@ const nav = homeSections.map((section) => ({ label: section.navLabel, href: with
 		<meta property="og:image:alt" content={ogImage.alt} />
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
-		<link rel="icon" href={withBase('favicon.ico')} />
+		<link rel="icon" href={withBase('favicon.ico')} sizes="32x32" />
+		<link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<ThemeInit />

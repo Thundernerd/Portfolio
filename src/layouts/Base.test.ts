@@ -85,6 +85,19 @@ describe('Base layout', () => {
 		});
 	});
 
+	it('links the site\'s icons for browser tabs and home screens', async () => {
+		const head = /<head>([\s\S]*?)<\/head>/.exec(await render())?.[1] ?? '';
+		expect(head).toMatch(/<link rel="icon" type="image\/svg\+xml" href="\/Portfolio\/favicon.svg"/);
+		expect(head).toMatch(/<link rel="icon" href="\/Portfolio\/favicon.ico" sizes="32x32"/);
+		expect(head).toMatch(/<link rel="apple-touch-icon" href="\/Portfolio\/apple-touch-icon.png"/);
+	});
+
+	it('ships the site\'s own icon, not Astro\'s', () => {
+		const svg = readFileSync(new URL('../../public/favicon.svg', import.meta.url), 'utf8');
+		// The scaffold's icon is the Astro logo, a single path starting at this point.
+		expect(svg).not.toContain('M50.4 78.5');
+	});
+
 	it('presents itself as the site, not as a prototype', async () => {
 		const html = await render();
 		expect(html).not.toMatch(/prototype/i);
