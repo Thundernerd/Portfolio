@@ -13,8 +13,7 @@
     "astro": "astro",
     "check": "astro check",
     "test": "vitest run",
-    "prelighthouse": "node scripts/assert-port-free.mjs",
-    "lighthouse": "lhci autorun"
+    "lighthouse": "node scripts/lighthouse.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.7",
