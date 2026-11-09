@@ -102,6 +102,30 @@ describe('Base layout', () => {
 			expect(meta(html, 'og:image:alt')).toBeTruthy();
 		});
 
+		it("previews the page's own image, at its size and with its alt text, when the page passes one", async () => {
+			// An `astro:assets` image as the build emits it: its `src` is already under the base path.
+			const image = { src: '/Portfolio/_astro/cover.Bx1a2c3d.png', width: 640, height: 360, format: 'png' } as const;
+			const html = headOf(
+				await container.renderToString(Base, {
+					props: { title: 'ZeepSDK', image: { src: image, alt: 'Screenshot of ZeepSDK' } },
+					request: new Request('https://thundernerd.github.io/Portfolio/projects/zeepsdk/'),
+				}),
+			);
+			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/_astro/cover.Bx1a2c3d.png');
+			expect(meta(html, 'og:image:width')).toBe('640');
+			expect(meta(html, 'og:image:height')).toBe('360');
+			expect(meta(html, 'og:image:alt')).toBe('Screenshot of ZeepSDK');
+		});
+
+		it('previews an image given by its site path, without a size it does not know', async () => {
+			const html = headOf(
+				await container.renderToString(Base, { props: { title: 'Talk', image: { src: 'talks/cover.jpg', alt: 'A talk' } } }),
+			);
+			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/talks/cover.jpg');
+			expect(html).not.toMatch(/og:image:(width|height)/);
+			expect(meta(html, 'og:image:alt')).toBe('A talk');
+		});
+
 		it('ships the preview image it points at, at the size it declares', () => {
 			// A PNG's width and height are the first two fields of its IHDR chunk, right after the signature.
 			const png = readFileSync(new URL('../../public/og.png', import.meta.url));
