@@ -9,6 +9,16 @@ function press(keys: string[]): void {
 	for (const key of keys) document.body.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
 }
 
+/** Counts the `pf:turbo` events dispatched on the page while `act` runs. */
+function countTurbos(act: () => void): number {
+	let turbos = 0;
+	const onTurbo = () => turbos++;
+	document.addEventListener('pf:turbo', onTurbo);
+	act();
+	document.removeEventListener('pf:turbo', onTurbo);
+	return turbos;
+}
+
 let announcer: HTMLElement;
 let unmount: () => void;
 
@@ -34,14 +44,7 @@ describe('mountKonami', () => {
 	});
 
 	it('tells the page turbo mode is on with a pf:turbo event', () => {
-		let turbos = 0;
-		const onTurbo = () => turbos++;
-		document.addEventListener('pf:turbo', onTurbo);
-
-		press(CODE);
-		document.removeEventListener('pf:turbo', onTurbo);
-
-		expect(turbos).toBe(1);
+		expect(countTurbos(() => press(CODE))).toBe(1);
 	});
 
 	it('announces turbo mode in the toast', () => {
@@ -74,15 +77,10 @@ describe('mountKonami', () => {
 	});
 
 	it('does nothing for a wrong sequence', () => {
-		let turbos = 0;
-		const onTurbo = () => turbos++;
-		document.addEventListener('pf:turbo', onTurbo);
+		const wrong = ['ArrowUp', 'ArrowDown', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
-		press(['ArrowUp', 'ArrowDown', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']);
-		document.removeEventListener('pf:turbo', onTurbo);
-
+		expect(countTurbos(() => press(wrong))).toBe(0);
 		expect(document.body.classList.contains('is-turbo')).toBe(false);
-		expect(turbos).toBe(0);
 		expect(announcer.textContent).toBe('');
 		expect(announcer.classList.contains('is-visible')).toBe(false);
 	});

@@ -1,15 +1,8 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
+import { memoryStorage } from './test-storage';
+import { THEME_STORAGE_KEY } from './theme';
 import { mountThemeToggle } from './toggle';
-
-/** A `Storage`-like stand-in backed by a map. */
-function memoryStorage(initial: Record<string, string> = {}) {
-	const map = new Map(Object.entries(initial));
-	return {
-		getItem: (key: string) => map.get(key) ?? null,
-		setItem: (key: string, value: string) => void map.set(key, value),
-	};
-}
 
 /** A `prefers-color-scheme: dark` media query stand-in whose system theme the test can change. */
 function fakeSystem(prefersDark: boolean) {
@@ -58,13 +51,13 @@ describe('mountThemeToggle', () => {
 	});
 
 	it('starts pressed when the visitor picked dark earlier, whatever the system prefers', () => {
-		mountThemeToggle(button, { storage: memoryStorage({ 'proto-minimal-theme': 'dark' }), system: fakeSystem(false) });
+		mountThemeToggle(button, { storage: memoryStorage({ [THEME_STORAGE_KEY]: 'dark' }), system: fakeSystem(false) });
 
 		expect(pressed()).toBe('true');
 	});
 
 	it('starts unpressed when the visitor picked light earlier, whatever the system prefers', () => {
-		mountThemeToggle(button, { storage: memoryStorage({ 'proto-minimal-theme': 'light' }), system: fakeSystem(true) });
+		mountThemeToggle(button, { storage: memoryStorage({ [THEME_STORAGE_KEY]: 'light' }), system: fakeSystem(true) });
 
 		expect(pressed()).toBe('false');
 	});

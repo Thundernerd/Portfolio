@@ -1,15 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { memoryStorage } from './test-storage';
 import { type Theme, createThemeController, readStoredTheme } from './theme';
-
-/** A `Storage`-like stand-in backed by a map. */
-function memoryStorage(initial: Record<string, string> = {}) {
-	const map = new Map(Object.entries(initial));
-	return {
-		getItem: (key: string) => map.get(key) ?? null,
-		setItem: (key: string, value: string) => void map.set(key, value),
-		map,
-	};
-}
 
 /** Storage that throws on every access, as in Safari private mode or with site data blocked. */
 const blockedStorage = {
