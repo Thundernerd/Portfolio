@@ -109,7 +109,8 @@ leaves the category above 90). The reports are uploaded as the run's `lighthouse
 If you rename the audited game or project, update its URL in `lighthouserc.cjs`.
 
 Run it locally with `npm run build && npm run lighthouse`. It needs Chrome or Chromium (point
-`CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`.
+`CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`. It serves
+the build on port 4400; stop anything else listening there first, or Lighthouse audits that instead.
 
 ## Layout and style
 
