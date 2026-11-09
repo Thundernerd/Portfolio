@@ -49,6 +49,11 @@ describe('Home', () => {
 		expect(headings).toEqual(['Say hi', 'Unity plugins', 'Zeepkist mods', 'Featured projects', 'Games']);
 	});
 
+	it("links each game card to the game's page", async () => {
+		const html = await render({ games: [gameEntry({ title: 'FRU' }, 'fru')], projects: [] });
+		expect(html).toMatch(/<a class="game-card__title-link"[^>]*href="\/Portfolio\/games\/fru\/"[^>]*>FRU<\/a>/);
+	});
+
 	/** The card titles inside the section with this id. */
 	const titlesIn = (html: string, id: string) => {
 		const section = new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`).exec(html)?.[0] ?? '';

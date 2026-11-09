@@ -3,9 +3,9 @@ import { type AstroContainer, createContainer, sectionIds } from './components/t
 import Index from './pages/index.astro';
 
 describe('pages', () => {
-	it('serves the home page and no prototype routes', () => {
+	it('serves the home page and a page per game, and no prototype routes', () => {
 		// Astro serves every file under `src/pages/` (tests too), so this lists every route the site has.
-		expect(Object.keys(import.meta.glob('./pages/**/*'))).toEqual(['./pages/index.astro']);
+		expect(Object.keys(import.meta.glob('./pages/**/*')).sort()).toEqual(['./pages/games/[slug].astro', './pages/index.astro']);
 	});
 
 	describe('/', () => {

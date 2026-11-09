@@ -5,6 +5,9 @@
  * linked otherwise; "What I did", the entry's rendered Markdown body passed in the default slot; and
  * the tech; and a gallery of the screenshots. `TODO` copy shows as a quiet placeholder, as on the home page; so does the whole write-up
  * while its body (`game.body`) still has a `TODO` in it.
+ *
+ * Structural only, like the shared section components: the site stylesheet styles it through the
+ * classes below or these custom properties: `--game-tags-gap`, `--gallery-min`, `--gallery-gap`.
  */
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
@@ -118,3 +121,40 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 		)
 	}
 </article>
+
+<style>
+	@layer components {
+		.game-page__facts,
+		.game-page__platforms,
+		.game-page__stores,
+		.game-page__tags,
+		.game-page__gallery {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.game-page__platforms,
+		.game-page__stores,
+		.game-page__tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--game-tags-gap, 0.5rem);
+		}
+		.game-page__trailer-embed {
+			display: block;
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			border: 0;
+		}
+		.game-page__gallery {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(min(var(--gallery-min, 20rem), 100%), 1fr));
+			gap: var(--gallery-gap, 1rem);
+		}
+		.game-page__shot-image {
+			display: block;
+			max-width: 100%;
+			height: auto;
+		}
+	}
+</style>
