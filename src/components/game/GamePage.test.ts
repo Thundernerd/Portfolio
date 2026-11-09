@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { type AstroContainer, createContainer, fixtureImage, gameEntry } from '../test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, gameEntry, imgTag, largeImage, sizesOf, srcsetWidths } from '../test-fixtures';
 import GamePage from './GamePage.astro';
 
 describe('GamePage', () => {
@@ -99,5 +99,11 @@ describe('GamePage', () => {
 		const gallery = sectionHeaded(html, 'Screenshots') ?? '';
 		expect([...gallery.matchAll(/<img[^>]*\salt="([^"]*)"/g)].map((m) => m[1])).toEqual(['The office, mid-chaos.', 'A printer on fire.']);
 		expect(sectionHeaded(await render({ game: gameEntry() }), 'Screenshots')).toBeUndefined();
+	});
+
+	it('serves screenshots in sizes to fit a gallery column, at most half the 56rem page', async () => {
+		const img = imgTag(await render({ game: gameEntry({ screenshots: [{ image: largeImage, alt: 'The office.' }] }) }));
+		expect(srcsetWidths(img)).toEqual([480, 960]);
+		expect(sizesOf(img)).toBe('(min-width: 61rem) 28rem, (min-width: 45rem) 50vw, 100vw');
 	});
 });

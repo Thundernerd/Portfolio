@@ -94,9 +94,11 @@ async function previewVariant(image: ImageMetadata): Promise<ImageMetadata> {
 			</dl>
 		</header>
 		{
+			// The image spans the page's 46rem column (`.site-project` in `global.css`) and sits near the top,
+			// where it is likely the largest paint, so it loads eagerly and first (`priority`).
 			image && (
 				<figure class="site-project__media">
-					<Image class="site-project__image" src={image} alt={imageAlt} />
+					<Image class="site-project__image" src={image} alt={imageAlt} widths={[736, 1472]} sizes="(min-width: 52rem) 46rem, 100vw" priority />
 				</figure>
 			)
 		}

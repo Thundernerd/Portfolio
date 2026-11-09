@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import GameCard from './GameCard.astro';
-import { type AstroContainer, createContainer, fixtureImage, gameEntry } from './test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, gameEntry, imgTag, largeImage, sizesOf, srcsetWidths } from './test-fixtures';
 
 describe('GameCard', () => {
 	let container: AstroContainer;
@@ -71,6 +71,13 @@ describe('GameCard', () => {
 	it('renders the cover only when present', async () => {
 		expect(await render({ game: gameEntry() })).not.toContain('<img');
 		expect(await render({ game: gameEntry({ cover: fixtureImage }) })).toMatch(/<img[^>]*\salt(=""|[\s>])/);
+	});
+
+	it('serves the cover in sizes to fit the card, not at its source size', async () => {
+		const img = imgTag(await render({ game: gameEntry({ cover: largeImage }) }));
+		expect(srcsetWidths(img)).toEqual([480, 960]);
+		expect(sizesOf(img)).toBeTruthy();
+		expect(img).toMatch(/\sloading="lazy"/);
 	});
 
 	it('renders slotted media, such as a trailer embed, in place of the cover', async () => {

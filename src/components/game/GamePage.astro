@@ -24,6 +24,9 @@ interface Props {
 	game: CollectionEntry<'games'>;
 }
 
+// A screenshot fills a gallery column (`--gallery-min: 20rem`, 1rem gap): two columns from 45rem,
+// each at most 28rem in the page's 56rem (`.game-page` in `global.css`).
+const shotSizes = '(min-width: 61rem) 28rem, (min-width: 45rem) 50vw, 100vw';
 const { game } = Astro.props;
 const { title, platforms, role, studio, year, blurb, trailer, storeLinks, tech, screenshots } = presentableGame(game).data;
 const writeUp = presentableWriteUp(Astro.slots.has('default') ? await Astro.slots.render('default') : '');
@@ -93,7 +96,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 				<ul class="game-page__gallery">
 					{screenshots.map((shot) => (
 						<li class="game-page__shot">
-							<Image class="game-page__shot-image" src={shot.image} alt={shot.alt} widths={[480, 960]} sizes="(min-width: 48rem) 50vw, 100vw" />
+							<Image class="game-page__shot-image" src={shot.image} alt={shot.alt} widths={[480, 960]} sizes={shotSizes} />
 						</li>
 					))}
 				</ul>

@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createComponent, render as renderTemplate, unescapeHTML } from 'astro/runtime/server/index.js';
-import { type AstroContainer, createContainer, fixtureImage, projectEntry, textOf } from './components/test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, imgTag, largeImage, projectEntry, sizesOf, srcsetWidths, textOf } from './components/test-fixtures';
 import ProjectPage, { getStaticPaths } from './pages/projects/[slug].astro';
 
 // Astro's content layer is not populated under Vitest; the tests set the collection the page reads.
@@ -167,6 +167,15 @@ describe('/projects/[slug]', () => {
 		const without = await renderPage(projectEntry({ kind: 'featured' }));
 		expect(without).not.toContain('<img');
 		expect(without).not.toContain('site-project__media');
+	});
+
+	it("serves the project's image in sizes to fit the page, loaded first since it sits at the top", async () => {
+		const html = await renderPage(projectEntry({ kind: 'featured', image: largeImage }, 'zeepsdk'));
+		const img = imgTag(html, 'class="site-project__image"');
+		expect(srcsetWidths(img)).toEqual([736, 1472]);
+		expect(sizesOf(img)).toBe('(min-width: 52rem) 46rem, 100vw');
+		expect(img).toMatch(/\sloading="eager"/);
+		expect(img).toMatch(/\sfetchpriority="high"/);
 	});
 
 	it('shows a quiet placeholder instead of a TODO blurb', async () => {
