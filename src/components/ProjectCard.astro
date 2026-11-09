@@ -27,9 +27,13 @@ interface Props {
 const { project, href } = Astro.props;
 const { title, blurb, repo, tags, image } = project.data;
 const { stars, archived } = repoStats(project.data);
-// The image fills its card: the full width on a phone, a column of a project grid above that, at most
-// half of the 72rem page (the featured grid's `--grid-min: 22rem` in `global.css` fits two columns).
-const IMAGE_SIZES = '(min-width: 72rem) 35rem, (min-width: 48rem) 50vw, 100vw';
+// The image fills its card: the full width on a phone, a column of its kind's grid above that
+// (`--grid-min` and `--grid-gap` in `global.css`, inside the page's 67rem of content). Featured cards sit in a
+// grid of two 22rem+ columns; the other kinds in up to three 17rem+ columns.
+const imageSizes =
+	project.data.kind === 'featured'
+		? '(min-width: 72rem) 33rem, (min-width: 49rem) 50vw, 100vw'
+		: '(min-width: 72rem) 21rem, (min-width: 60rem) 33vw, (min-width: 40rem) 50vw, 100vw';
 // Filled `media` slot content replaces the image. A slot that renders to nothing counts as unfilled, since
 // `Astro.slots.has` is also true for `set:html={undefined}` (as `CollectionGrid` passes) or a false condition.
 const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media')).trim() !== '';
@@ -42,7 +46,7 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 				<slot name="media" />
 			</div>
 		) : (
-			image && <Image class="project-card__image" src={image} alt="" widths={[480, 960]} sizes={IMAGE_SIZES} />
+			image && <Image class="project-card__image" src={image} alt="" widths={[480, 960]} sizes={imageSizes} />
 		)
 	}
 	<h3 class="project-card__title">{href === undefined ? title : <a class="project-card__title-link" href={resolveHref(href)}>{title}</a>}</h3>
