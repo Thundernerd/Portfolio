@@ -110,7 +110,10 @@ If you rename the audited game or project, update its URL in `lighthouserc.cjs`.
 
 Run it locally with `npm run build && npm run lighthouse`. It needs Chrome or Chromium (point
 `CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`. It serves
-the build on port 4400; stop anything else listening there first, or Lighthouse audits that instead.
+the build on port 4400 (`port` in `lighthouserc.cjs`). Lighthouse CI would audit anything else
+already listening there in place of the build, so the `prelighthouse` step
+(`scripts/assert-port-free.mjs`) fails the run first, naming the port; stop that server (often a
+stale `astro preview`) and run it again.
 
 `package.json` `overrides` lifts `basic-ftp`, which `@lhci/cli` pulls in through `proxy-agent` and
 `get-uri`, to 6.x for a high-severity advisory (GHSA-c475-qrg2-pj4r) that `get-uri`'s `^5` range
