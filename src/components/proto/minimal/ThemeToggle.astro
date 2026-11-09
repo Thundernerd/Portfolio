@@ -12,7 +12,8 @@
 </button>
 
 <script>
-	import { createThemeController, type ThemeStorage } from './theme';
+	import type { ThemeStorage } from './theme';
+	import { mountThemeToggle } from './toggle';
 
 	const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
 	if (button) {
@@ -22,25 +23,6 @@
 		} catch {
 			// Storage is blocked; the toggle still works for this page view.
 		}
-		const root = document.documentElement;
-		const system = window.matchMedia('(prefers-color-scheme: dark)');
-		const controller = createThemeController({
-			storage,
-			prefersDark: system.matches,
-			apply: (theme) => {
-				root.dataset.theme = theme;
-			},
-		});
-		const show = () => button.setAttribute('aria-pressed', String(controller.theme === 'dark'));
-		show();
-		button.hidden = false;
-		button.addEventListener('click', () => {
-			controller.toggle();
-			show();
-		});
-		system.addEventListener('change', (event) => {
-			controller.systemChanged(event.matches);
-			show();
-		});
+		mountThemeToggle(button, { storage, system: window.matchMedia('(prefers-color-scheme: dark)') });
 	}
 </script>
