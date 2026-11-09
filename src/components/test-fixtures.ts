@@ -58,6 +58,18 @@ export const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid
 
 export const fixtureImage = { src: '/fixtures/cover.png', width: 640, height: 360, format: 'png' } as const;
 
+/** A 4K image, larger than any slot on the site, so every candidate width in a `srcset` applies. */
+export const largeImage = { ...fixtureImage, width: 3840, height: 2160 } as const;
+
+/** The first `<img>` in rendered HTML whose attributes match `attribute` (any `<img>` without one). */
+export const imgTag = (html: string, attribute = '') => html.match(new RegExp(`<img[^>]*${attribute}[^>]*>`))?.[0] ?? '';
+
+/** The candidate widths in an `<img>`'s `srcset`, such as `[480, 960]`. */
+export const srcsetWidths = (img: string) => [...(img.match(/\ssrcset="([^"]*)"/)?.[1] ?? '').matchAll(/\s(\d+)w\b/g)].map((m) => Number(m[1]));
+
+/** An `<img>`'s `sizes` attribute, or `undefined` without one. */
+export const sizesOf = (img: string) => img.match(/\ssizes="([^"]*)"/)?.[1];
+
 export function projectEntry(
 	data: Partial<CollectionEntry<'projects'>['data']> = {},
 	id = 'serializable-interface',
