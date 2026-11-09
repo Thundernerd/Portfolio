@@ -86,20 +86,12 @@ const links = [
 </Contact>
 
 <script>
-	import { embedUrl } from './media';
+	import { playTrailer } from './trailer';
 
 	// Swap a trailer poster for the YouTube player only when it is clicked, so the player and its scripts
 	// load on demand (a poster without a cover is a lazy-loaded YouTube thumbnail image).
 	document.addEventListener('click', (event) => {
 		const poster = (event.target as Element | null)?.closest<HTMLButtonElement>('button.dark-trailer[data-youtube-id]');
-		if (!poster?.dataset.youtubeId) return;
-		const frame = document.createElement('iframe');
-		frame.className = 'dark-trailer__frame';
-		frame.src = embedUrl(poster.dataset.youtubeId);
-		frame.title = poster.dataset.trailerTitle ?? 'Trailer';
-		frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-		frame.allowFullscreen = true;
-		poster.replaceWith(frame);
-		frame.focus();
+		if (poster) playTrailer(poster);
 	});
 </script>

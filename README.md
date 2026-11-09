@@ -16,6 +16,15 @@ Run from the repo root (Node `>=22.23.4`):
 | `npm run build`   | Build the production site to `./dist/`                  |
 | `npm run preview` | Preview the production build locally                    |
 
+## Testing
+
+Tests run in Node by default. A test for a client-side script (anything that touches `document` or
+`window`) opts into a [happy-dom](https://github.com/capricorn86/happy-dom) DOM by starting its file
+with `// @vitest-environment happy-dom`; see `src/components/proto/dark/trailer.test.ts`. Put the
+script's logic in an exported function the page's `<script>` calls, render the markup it acts on into
+`document.body`, and assert on the resulting DOM. happy-dom doesn't load iframe pages, so a test that
+creates an iframe logs a harmless `Iframe page loading is disabled` error.
+
 ## Base path
 
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
