@@ -35,13 +35,16 @@ describe('Home with the real content', () => {
 		expect(titles.sort()).toEqual([...games, ...projects].map((entry) => entry.data.title).sort());
 	});
 
-	it('shows an avatar and GitHub, LinkedIn, email and CV entries in the contact section', async () => {
+	it('shows an avatar and links to GitHub and LinkedIn in the contact section, with no email', async () => {
 		const html = await container.renderToString(Home, { props: { games: [], projects: [] } });
 		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
 		expect(contact).toMatch(/<img[^>]*class="contact__avatar"/);
+		const links = [...contact.matchAll(/<a class="contact__link"[^>]*href="([^"]+)"[^>]*>([^<]+)</g)].map((m) => ({ href: m[1], label: m[2] }));
+		expect(links).toContainEqual({ href: 'https://github.com/Thundernerd', label: 'GitHub · Thundernerd' });
+		expect(links).toContainEqual({ href: 'https://www.linkedin.com/in/chrusb/', label: 'LinkedIn' });
+		// No email address on the page, to keep it away from scrapers.
 		const entries = [...contact.matchAll(/class="contact__link[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1]);
-		for (const contactKind of [/^GitHub\b/, /^LinkedIn\b/, /^Email\b/, /^CV\b/]) {
-			expect(entries.some((entry) => contactKind.test(entry)), String(contactKind)).toBe(true);
-		}
+		expect(entries.filter((entry) => /^Email\b/.test(entry))).toEqual([]);
+		expect(contact).not.toContain('mailto:');
 	});
 });
