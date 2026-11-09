@@ -8,6 +8,7 @@ stars: 1
 ---
 
 <!-- TODO(Christiaan): say what "GTR" stands for, add screenshots (`image` in the frontmatter) and any player or record numbers you want shown. -->
+<!-- TODO(Christiaan): confirm the split services still run as Docker containers (the intro and the `Docker` tag say so; the only Compose setup is the retired backend's). -->
 
 Zeepkist GTR is a whole system rather than a single mod. Players race with the in-game mod, which sends
 their records to a set of .NET services that pass them along over a RabbitMQ message bus, and the results
