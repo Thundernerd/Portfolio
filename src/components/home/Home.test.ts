@@ -7,6 +7,7 @@ import {
 	projectEntry,
 	sectionIds,
 	sectionsOverride,
+	textOf,
 } from '../test-fixtures';
 import Home from './Home.astro';
 
@@ -25,8 +26,6 @@ describe('Home', () => {
 	});
 
 	const render = (props: Record<string, unknown>) => container.renderToString(Home, { props });
-	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
-	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 	it('renders the hero, then every section in the agreed order', async () => {
 		const html = await render({ games: [], projects: [] });
@@ -73,6 +72,19 @@ describe('Home', () => {
 		expect(titlesIn(html, 'featured')).toEqual(['ZeepSDK']);
 		expect(titlesIn(html, 'zeepkist-mods')).toEqual(['RTM']);
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
+	});
+
+	it('links each featured project card to its page, and no other project card', async () => {
+		const html = await render({
+			games: [],
+			projects: [
+				projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
+				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
+				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
+			],
+		});
+		const titleLinks = [...html.matchAll(/<h3[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([^<]+)/g)].map((m) => [m[2].trim(), m[1]]);
+		expect(titleLinks).toEqual([['ZeepSDK', '/Portfolio/projects/zeepsdk/']]);
 	});
 
 	/** The text of each project card's inline stats line, in page order. */

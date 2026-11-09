@@ -50,6 +50,9 @@ export function withSectionsOverride(actual: typeof HomeSections): typeof HomeSe
 	};
 }
 
+/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
+export const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
 /** The ids of the `<section>`s in rendered HTML, in page order. */
 export const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
 

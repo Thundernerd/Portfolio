@@ -841,6 +841,161 @@
 	text-decoration: underline;
 }
 
+/* ---- Featured project pages ------------------------------------------------------------------ */
+
+.site-project {
+	display: grid;
+	gap: 2rem;
+	max-width: 46rem;
+	padding-block: clamp(2rem, 6vw, 3.5rem) clamp(3rem, 8vw, 5rem);
+}
+
+.site-project__back {
+	justify-self: start;
+	font-family: var(--font-mono);
+	font-size: 0.8125rem;
+	color: var(--muted);
+	text-decoration: none;
+}
+
+.site-project__back::before {
+	content: '← ' / '';
+	color: var(--accent);
+}
+
+.site-project__header {
+	display: grid;
+	gap: 1rem;
+}
+
+.site-project__title {
+	margin: 0;
+	font-size: clamp(2.25rem, 8vw, 3.5rem);
+	font-weight: 700;
+	line-height: 1.05;
+	letter-spacing: -0.035em;
+}
+
+.site-project__archived {
+	justify-self: start;
+	margin: 0;
+	padding: 0.1rem 0.45rem;
+	border-radius: 4px;
+	background: var(--warn-soft);
+	color: var(--warn);
+	font: 600 0.75rem/1.4 var(--font-mono);
+	text-transform: lowercase;
+	letter-spacing: 0.02em;
+}
+
+.site-project__blurb {
+	margin: 0;
+	font-size: clamp(1.125rem, 2.5vw, 1.3rem);
+	line-height: 1.45;
+	color: var(--muted);
+}
+
+.site-project__facts {
+	display: grid;
+	gap: 0.35rem;
+	margin: 0.5rem 0 0;
+	padding-top: 1rem;
+	border-top: 1px solid var(--rule);
+	font-size: 0.9375rem;
+}
+
+.site-project__fact {
+	display: grid;
+	grid-template-columns: 5.5rem 1fr;
+	gap: 0.75rem;
+	align-items: baseline;
+}
+
+.site-project__fact dt {
+	font: 0.75rem/1.85 var(--font-mono);
+	color: var(--muted);
+	text-transform: lowercase;
+}
+
+.site-project__fact dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.site-project__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.site-project__tag {
+	padding: 0.1rem 0.45rem;
+	border-radius: 4px;
+	background: var(--chip);
+	font: 0.75rem/1.5 var(--font-mono);
+	color: var(--muted);
+}
+
+.site-project__repo {
+	font-family: var(--font-mono);
+	font-size: 0.875rem;
+}
+
+.site-project__media {
+	margin: 0;
+}
+
+.site-project__image {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	border: 1px solid var(--rule);
+	border-radius: 10px;
+}
+
+/* The README-style description: the entry's rendered Markdown. */
+.site-project__body {
+	font-size: 1.0625rem;
+}
+
+.site-project__body > :first-child {
+	margin-top: 0;
+}
+
+.site-project__body h2,
+.site-project__body h3 {
+	margin: 2rem 0 0.5rem;
+	letter-spacing: -0.02em;
+	line-height: 1.25;
+}
+
+.site-project__body p,
+.site-project__body ul,
+.site-project__body ol {
+	margin: 0 0 1rem;
+}
+
+.site-project__body li + li {
+	margin-top: 0.35rem;
+}
+
+.site-project__body code {
+	padding: 0.05rem 0.3rem;
+	border-radius: 4px;
+	background: var(--chip);
+	font-family: var(--font-mono);
+	font-size: 0.875em;
+}
+
+.site-project__body img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 10px;
+}
+
 /* ---- Hero: projects by language -------------------------------------------------------------- */
 
 @media (min-width: 64rem) {
