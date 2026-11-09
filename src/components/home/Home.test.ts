@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry } from '../test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry, sectionIds } from '../test-fixtures';
 import Home from './Home.astro';
 
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
@@ -17,7 +17,6 @@ describe('Home', () => {
 	const render = (props: Record<string, unknown>) => container.renderToString(Home, { props });
 	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
 	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-	const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
 
 	it('renders the hero, then every section in the agreed order', async () => {
 		const html = await render({ games: [], projects: [] });

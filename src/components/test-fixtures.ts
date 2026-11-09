@@ -23,6 +23,9 @@ afterEach(() => {
 	vi.unstubAllEnvs();
 });
 
+/** The ids of the `<section>`s in rendered HTML, in page order. */
+export const sectionIds = (html: string) => [...html.matchAll(/<section[^>]*\sid="([^"]+)"/g)].map((m) => m[1]);
+
 export const fixtureImage = { src: '/fixtures/cover.png', width: 640, height: 360, format: 'png' } as const;
 
 export function projectEntry(
