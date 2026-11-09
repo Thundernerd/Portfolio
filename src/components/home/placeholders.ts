@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import type { ContactEntry, Link } from '../types';
+import type { ContactEntry, ContactLink } from '../types';
 
 /** `TODO` as a whole word, as the content guard in `src/content/todos.ts` matches it. */
 const isTodo = (value: string) => /\bTODO\b/.test(value);
@@ -31,6 +31,6 @@ export function presentableProject(project: CollectionEntry<'projects'>): Collec
 }
 
 /** The contact link, or for a `TODO` target, its label marked as still to be confirmed, without a link. */
-export function presentableContactLink(link: Link): ContactEntry {
+export function presentableContactLink(link: ContactLink): ContactEntry {
 	return isTodo(link.href) ? { label: `${link.label} · ${TO_BE_CONFIRMED.toLowerCase()}` } : link;
 }

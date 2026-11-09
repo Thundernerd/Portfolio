@@ -61,4 +61,12 @@ describe('Contact', () => {
 		expect(html).toMatch(/<li[^>]*>\s*<span class="contact__link contact__link--pending"[^>]*>LinkedIn · to be confirmed<\/span>/);
 		expect(html).not.toMatch(/<a[^>]*>LinkedIn/);
 	});
+
+	it('marks a link to download, such as a CV, with the download attribute', async () => {
+		const html = await container.renderToString(Contact, {
+			props: { links: [{ label: 'CV (PDF)', href: 'cv.pdf', download: true }, links[0]] },
+		});
+		expect(html).toMatch(/<a[^>]*href="\/Portfolio\/cv.pdf"[^>]*download[^>]*>CV \(PDF\)<\/a>/);
+		expect(html).not.toMatch(/<a[^>]*download[^>]*>GitHub<\/a>/);
+	});
 });

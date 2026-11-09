@@ -1,5 +1,5 @@
 import avatar from '../../assets/avatar.jpg';
-import type { Link } from '../types';
+import type { ContactLink } from '../types';
 
 /**
  * The facts the home page's about & contact section shows: the avatar and the contact links, in
@@ -10,7 +10,7 @@ import type { Link } from '../types';
 export interface Profile {
 	avatar: ImageMetadata;
 	avatarAlt: string;
-	links: Link[];
+	links: ContactLink[];
 }
 
 export const profile: Profile = {
@@ -21,6 +21,6 @@ export const profile: Profile = {
 		{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
 		{ label: 'LinkedIn', href: 'TODO: LinkedIn profile URL' },
 		{ label: 'Email', href: 'TODO: mailto: link to a public email address' },
-		{ label: 'CV (PDF)', href: 'TODO: put the CV in public/ and give its path, e.g. cv.pdf' },
+		{ label: 'CV (PDF)', href: 'TODO: put the CV in public/ and give its path, e.g. cv.pdf', download: true },
 	],
 };
