@@ -1,4 +1,5 @@
 import { z } from 'astro/zod';
+import type { ImageMetadata } from 'astro';
 import type { SchemaContext } from 'astro:content';
 
 /** An absolute http(s) link; other schemes (mailto:, javascript:) can't be embedded or linked safely. */
@@ -40,7 +41,14 @@ export const projectSchema = ({ image }: SchemaContext) =>
 		repo: z.string().regex(/^[A-Za-z0-9-]+\/(?!\.\.?$)[\w.-]+$/, 'Expected a GitHub repo as owner/name'),
 		kind: z.enum(projectKinds),
 		tags: z.array(z.string()).default([]),
-		image: image().optional(),
+		// Also the project page's link-preview image, which is converted to PNG/JPEG for crawlers. The
+		// build won't rasterize an SVG (Astro's `image.dangerouslyProcessSVG` stays off), so export a
+		// PNG instead. Under Vitest `image()` is a plain path, so both shapes are checked.
+		image: image()
+			.refine((img: ImageMetadata | string) => (typeof img === 'string' ? !/\.svg$/i.test(img) : img.format !== 'svg'), {
+				message: 'A project image cannot be an SVG: link previews need a raster image, so export it as a PNG',
+			})
+			.optional(),
 		blurb: z.string(),
 		// Fallback star count; a later build-time fetcher may refresh it from GitHub.
 		stars: z.number().int().nonnegative().optional(),

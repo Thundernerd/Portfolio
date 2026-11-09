@@ -1,0 +1,54 @@
+---
+/**
+ * A game's fact rows, for a caller's `<dl>`: Role, Studio, Year (only when known, as a
+ * `<time datetime>`) and, when `platforms` is given, a Platforms row holding a list. Shared by
+ * `GameCard` and `GamePage`, so a fact is added or changed in one place.
+ *
+ * Classes take the caller's BEM `block` (`game-card`, `game-page`): each row is a `.<block>__fact`
+ * pairing a `.<block>__label` (`<dt>`) with a `.<block>__role` / `__studio` / `__year` value, and
+ * the platforms list is `.<block>__platforms` of `.<block>__platform` items. Unstyled; the caller
+ * styles these classes. Its scoped styles don't reach this component's elements, so target them
+ * with `:global()`.
+ */
+interface Props {
+	block: 'game-card' | 'game-page';
+	role: string;
+	studio: string;
+	year?: number;
+	/** Shown as a Platforms row when given; leave it out to list the platforms elsewhere. */
+	platforms?: readonly string[];
+}
+
+const { block, role, studio, year, platforms } = Astro.props;
+---
+
+<div class={`${block}__fact`}>
+	<dt class={`${block}__label`}>Role</dt>
+	<dd class={`${block}__role`}>{role}</dd>
+</div>
+<div class={`${block}__fact`}>
+	<dt class={`${block}__label`}>Studio</dt>
+	<dd class={`${block}__studio`}>{studio}</dd>
+</div>
+{
+	year !== undefined && (
+		<div class={`${block}__fact`}>
+			<dt class={`${block}__label`}>Year</dt>
+			<dd class={`${block}__year`}>
+				<time datetime={String(year)}>{year}</time>
+			</dd>
+		</div>
+	)
+}
+{
+	platforms !== undefined && (
+		<div class={`${block}__fact`}>
+			<dt class={`${block}__label`}>Platforms</dt>
+			<dd>
+				<ul class={`${block}__platforms`}>
+					{platforms.map((platform) => <li class={`${block}__platform`}>{platform}</li>)}
+				</ul>
+			</dd>
+		</div>
+	)
+}

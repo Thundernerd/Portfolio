@@ -16,6 +16,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { repoStats, repoUrl } from '../lib/github-stats';
+import { formatCount, noun } from '../lib/text';
 import { resolveHref } from '../lib/url';
 
 interface Props {
@@ -26,7 +27,6 @@ interface Props {
 const { project, href } = Astro.props;
 const { title, blurb, repo, tags, image } = project.data;
 const { stars, archived } = repoStats(project.data);
-const starCount = stars?.toLocaleString('en-US');
 // Filled `media` slot content replaces the image. A slot that renders to nothing counts as unfilled, since
 // `Astro.slots.has` is also true for `set:html={undefined}` (as `CollectionGrid` passes) or a false condition.
 const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media')).trim() !== '';
@@ -60,8 +60,8 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 		{
 			stars !== undefined && (
 				<span class="project-card__stars">
-					<data class="project-card__star-count" value={stars}>{starCount}</data>
-					<span class="project-card__star-label">{stars === 1 ? 'star' : 'stars'}</span>
+					<data class="project-card__star-count" value={stars}>{formatCount(stars)}</data>
+					<span class="project-card__star-label">{noun(stars, 'star', 'stars')}</span>
 				</span>
 			)
 		}

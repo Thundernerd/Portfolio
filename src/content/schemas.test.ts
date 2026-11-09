@@ -79,6 +79,8 @@ describe('projects schema', () => {
 		['an unknown kind', { kind: 'game' }],
 		['negative stars', { stars: -1 }],
 		['fractional stars', { stars: 1.5 }],
+		// Link previews can't show an SVG, and the build doesn't rasterize one (see `projectSchema`).
+		['an SVG image', { image: './cover.svg' }],
 	])('rejects a project with %s', (_, override) => {
 		expect(projectSchema(context).safeParse({ ...validProject, ...override }).success).toBe(false);
 	});

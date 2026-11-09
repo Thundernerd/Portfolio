@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 import { repoStats } from '../../lib/github-stats';
-import { escapeHtml, formatCount, noun } from './text';
+import { escapeHtml, formatCount, noun } from '../../lib/text';
 
 type Project = CollectionEntry<'projects'>;
 

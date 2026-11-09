@@ -33,10 +33,15 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 
 ## SEO and link previews
 
-`Base.astro` gives every page a canonical link, Open Graph and `twitter:card` tags, the favicons and
-a link to the sitemap. Pages pass their `title` and `description`. The canonical URL is the page's own
-path on `site`; other absolute URLs, such as the preview image's, come from `absoluteUrl()` in
-`src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
+`Base.astro` gives every page a canonical link, Open Graph (with the preview image's type and size
+when known) and `twitter:card` tags, the favicons and a link to the sitemap. Pages pass their `title`
+and `description`, and may pass an `image` (`{ src, alt }`: an `astro:assets` image, a site path or
+an absolute URL) to preview in place of the site card; a featured project page passes a PNG (a JPEG
+for a JPEG source) of its `image`, at most 1200px wide, when the entry has one, since crawlers
+render AVIF and WebP unevenly. A project `image` can't be an SVG, which no crawler renders and the
+build won't rasterize (`image.dangerouslyProcessSVG` stays off): export a PNG. The canonical URL is
+the page's own path on `site`; other absolute URLs, such as the preview image's, come from
+`absoluteUrl()` in `src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
 `sitemap-index.xml` on build. `trailingSlash: 'always'` keeps each page at one URL, `/Portfolio/`,
 in the sitemap and the canonical link.
 
@@ -134,7 +139,7 @@ the markup), so it follows the light and dark themes, and it scrolls sideways on
 ## Section components
 
 `src/components/` holds the shared, unstyled building blocks the pages compose:
-`Hero`, `GameCard`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
+`Hero`, `GameCard`, `GameFacts`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
 BEM-style classes (`.hero__title`, `.project-card__stars`, ...) and only structural CSS (layout,
 list resets) inside `@layer components`, so any unlayered layout CSS wins over it regardless of
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
@@ -142,6 +147,9 @@ component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
 `Contact` also takes an optional `avatar` image, marks a link with `download: true` (a CV) with the
 `download` attribute, and shows a link without an `href` as plain text.
+`GameFacts` renders a game's fact rows (Role, Studio, Year and, when given, Platforms) inside the
+caller's `<dl>`, under the caller's BEM block (`game-card` or `game-page`); `GameCard` and the game
+page both use it, so add or change a fact there.
 Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example

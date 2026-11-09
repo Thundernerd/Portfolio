@@ -71,6 +71,58 @@ describe('/projects/[slug]', () => {
 		expect(html).toContain('<meta property="og:url" content="https://thundernerd.github.io/Portfolio/projects/zeepsdk/"');
 	});
 
+	describe('link-preview image', () => {
+		const renderDeployed = (project: CollectionEntry<'projects'>) =>
+			container.renderToString(ProjectPage, {
+				props: { project },
+				request: new Request(`https://thundernerd.github.io/Portfolio/projects/${project.id}/`),
+			});
+		const meta = (html: string, key: string) => new RegExp(`<meta property="${key}" content="([^"]*)"`).exec(html)?.[1];
+
+		// Under Vitest `getImage()` returns Astro's dev endpoint (`/_image/?href=...&w=...&f=...`) rather than
+		// the built `/Portfolio/_astro/<name>.<hash>.<ext>` file, so these read the variant's format and
+		// width from its query; `npm run build` emits the file itself.
+		const variant = (html: string) => {
+			const url = new URL((meta(html, 'og:image') ?? '').replaceAll('&amp;', '&'));
+			return { format: url.searchParams.get('f'), width: url.searchParams.get('w') };
+		};
+
+		it("previews the project's image when it has one, as a PNG of its own size", async () => {
+			// As the build emits it: an `astro:assets` image's `src` is already under the base path.
+			const image = { ...fixtureImage, src: '/Portfolio/_astro/zeepsdk.Ab12Cd34.png' };
+			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured', image }, 'zeepsdk'));
+			expect(meta(html, 'og:image')).toMatch(/^https:\/\/thundernerd\.github\.io\/Portfolio\//);
+			expect(variant(html)).toEqual({ format: 'png', width: '640' });
+			expect(meta(html, 'og:image:width')).toBe('640');
+			expect(meta(html, 'og:image:height')).toBe('360');
+			expect(meta(html, 'og:image:alt')).toBe('Screenshot of ZeepSDK');
+		});
+
+		it('previews an AVIF image as a PNG of at most 1200px wide', async () => {
+			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.avif', width: 2400, height: 1200, format: 'avif' } as const;
+			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured', image }, 'zeepsdk'));
+			expect(variant(html)).toEqual({ format: 'png', width: '1200' });
+			expect(meta(html, 'og:image:type')).toBe('image/png');
+			expect(meta(html, 'og:image:width')).toBe('1200');
+			expect(meta(html, 'og:image:height')).toBe('600');
+			expect(meta(html, 'og:image:alt')).toBe('Screenshot of ZeepSDK');
+		});
+
+		it('keeps a JPEG image a JPEG', async () => {
+			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.jpg', width: 1920, height: 1080, format: 'jpg' } as const;
+			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+			expect(variant(html)).toEqual({ format: 'jpg', width: '1200' });
+			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
+			expect(meta(html, 'og:image:height')).toBe('675');
+		});
+
+		it('previews the site card when it has none', async () => {
+			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'));
+			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/og.png');
+			expect(meta(html, 'og:image:type')).toBe('image/png');
+		});
+	});
+
 	/** The text of each `<dt>`/`<dd>` pair in the page's facts list. */
 	const factsOf = (html: string) =>
 		Object.fromEntries([...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/g)].map((m) => [textOf(m[1]), textOf(m[2])]));
