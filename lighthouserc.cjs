@@ -3,7 +3,7 @@
 // `astro preview` serves dist/ under the `/Portfolio/` base path, so its links and assets resolve as
 // they do on GitHub Pages.
 // `/Portfolio` is `base` in astro.config.mjs: keep the two in sync. lhci audits whatever answers on
-// this port, so it isn't `astro preview`'s default 4321, which `npm run dev` also uses.
+// this port, so it avoids `astro preview`'s default 4321, which `npm run dev` also uses.
 const port = 4400;
 const host = `localhost:${port}`;
 const origin = `http://${host}/Portfolio`;

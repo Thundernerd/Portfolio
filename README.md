@@ -112,9 +112,12 @@ Run it locally with `npm run build && npm run lighthouse`. It needs Chrome or Ch
 `CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`. It serves
 the build on port 4400; stop anything else listening there first, or Lighthouse audits that instead.
 
-`package.json` `overrides` lifts `basic-ftp`, which `@lhci/cli` pulls in through `proxy-agent` 6,
-to 6.x for a high-severity advisory (GHSA-c475-qrg2-pj4r) that `get-uri` 6's `^5` range can't reach.
-Drop the override once an `@lhci/cli` release depends on `proxy-agent` 8 or later.
+`package.json` `overrides` lifts `basic-ftp`, which `@lhci/cli` pulls in through `proxy-agent` and
+`get-uri`, to 6.x for a high-severity advisory (GHSA-c475-qrg2-pj4r) that `get-uri`'s `^5` range
+can't reach (even in `get-uri` 8). Drop the override once `npm ls basic-ftp` shows 6.x without it.
+`npm ls` reports `proxy-agent@6.5.0` as invalid: Lighthouse's `@puppeteer/browsers` declares an
+optional peer `proxy-agent >=8.0.1`, but `@lhci/cli` requires `^6.5.0`. Puppeteer only loads it to
+download a browser, which Lighthouse CI doesn't do (it runs the installed Chrome), so it's harmless.
 
 ## Layout and style
 
