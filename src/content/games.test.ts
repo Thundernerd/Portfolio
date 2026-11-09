@@ -13,7 +13,7 @@ describe('games content', () => {
 	it.each([
 		['FRU', ['Xbox One'], 'Co-founder & programmer'],
 		['Good Job!', ['Nintendo Switch'], 'Programmer'],
-		['Nailed It! Baking Bash', ['Mobile'], 'Programmer (multiplayer systems)'],
+		['Nailed It! Baking Bash', ['iOS', 'Android'], 'Programmer (multiplayer systems)'],
 	])('records the platforms and role for %s', (title, platforms, role) => {
 		expect(byTitle(title)).toMatchObject({ platforms, role });
 	});
