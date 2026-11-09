@@ -9,21 +9,24 @@ export interface RepoStats {
 export interface RepoProject {
 	repo: string;
 	stars?: number;
+	archived: boolean;
 }
 
 /** What to show for a project: GitHub's values where fetched, its frontmatter otherwise. */
 export interface ResolvedRepoStats {
 	stars: number | undefined;
+	archived: boolean;
 }
 
 /**
- * Resolves a project's star count from the `fetched` stats, falling back to its frontmatter `stars`
- * when the fetcher couldn't reach GitHub for that repo.
+ * Resolves a project's star count and archived flag from the `fetched` stats, falling back to its
+ * frontmatter `stars` and `archived` when the fetcher couldn't get them from GitHub for that repo.
  */
 export function resolveRepoStats(project: RepoProject, fetched: Record<string, RepoStats>): ResolvedRepoStats {
 	const stats = fetched[project.repo];
 	return {
 		stars: stats?.stars ?? project.stars,
+		archived: stats?.archived ?? project.archived,
 	};
 }
 
@@ -35,7 +38,7 @@ const generated = import.meta.glob<Record<string, RepoStats>>('../data/github-st
 });
 const fetchedStats: Record<string, RepoStats> = Object.values(generated)[0] ?? {};
 
-/** A project's star count: as fetched at build time, or from its frontmatter. */
+/** A project's star count and archived flag: as fetched at build time, or from its frontmatter. */
 export function repoStats(project: RepoProject): ResolvedRepoStats {
 	return resolveRepoStats(project, fetchedStats);
 }
