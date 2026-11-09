@@ -3,11 +3,11 @@
  * A page per featured project, at `/projects/<entry id>/` (see `hasPage()` in `src/lib/paths.ts`):
  * a link back to the home page's featured section, the project's title, blurb, facts (language, tech
  * tags, star count and a link to the GitHub repo) and the entry's Markdown body as a README-style
- * description, after its image when it has one; a PNG or JPEG of that image is also its
- * link-preview image. A `TODO` blurb shows as a quiet placeholder, as on the home page. A project
- * with a diagram (`projectDiagram()`) shows it after the description under "Architecture". The
- * language, star count and archived flag come from `repoStats()`, as on the project cards: GitHub's
- * values when fetched, the frontmatter's otherwise.
+ * description, after its image when it has one; a variant of that image (`previewVariant()`) is
+ * also its link-preview image. A `TODO` blurb shows as a quiet placeholder, as on the home page. A
+ * project with a diagram (`projectDiagram()`) shows it after the description under "Architecture".
+ * The language, star count and archived flag come from `repoStats()`, as on the project cards:
+ * GitHub's values when fetched, the frontmatter's otherwise.
  */
 import { getImage, Image } from 'astro:assets';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
@@ -38,12 +38,14 @@ const imageAlt = `Screenshot of ${title}`;
 const preview = image && (await previewVariant(image));
 
 /**
- * A variant of the project's image that every link-preview crawler renders: a PNG (a JPEG stays a
- * JPEG) of at most 1200px wide. Crawlers' support for AVIF and WebP is uneven, so the original file
- * can't be previewed as-is (an SVG, which none of them render, is refused by `projectSchema`).
+ * A variant of the project's image that every link-preview crawler renders, at most 1200px wide.
+ * Crawlers' support for AVIF and WebP is uneven, so the original file can't be previewed as-is (an
+ * SVG, which none of them render, is refused by `projectSchema`). Lossy sources (JPEG, AVIF, WebP)
+ * become a JPEG, since a photo as a PNG can outweigh crawlers' size caps (X: 5MB); PNG and GIF
+ * become a PNG. A transparent AVIF or WebP cover therefore loses its transparency.
  */
 async function previewVariant(image: ImageMetadata): Promise<ImageMetadata> {
-	const format = image.format === 'jpg' || image.format === 'jpeg' ? 'jpg' : 'png';
+	const format = ['jpg', 'jpeg', 'avif', 'webp'].includes(image.format) ? 'jpg' : 'png';
 	const { src, attributes } = await getImage({ src: image, format, width: Math.min(image.width, 1200) });
 	return { src, width: Number(attributes.width), height: Number(attributes.height), format };
 }
