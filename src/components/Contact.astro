@@ -32,7 +32,7 @@ const headingId = `${id}-heading`;
 
 <section class="contact" id={id} aria-labelledby={headingId}>
 	<h2 class="contact__title" id={headingId}>{title}</h2>
-	{avatar && <Image class="contact__avatar" src={avatar} alt={avatarAlt} width={192} />}
+	{avatar && <img class="contact__avatar" src={avatar.src} width={192} />}
 	<slot />
 	<address class="contact__address">
 		<ul class="contact__links">
