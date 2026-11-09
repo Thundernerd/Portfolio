@@ -66,7 +66,7 @@ on demand with `CHECK_TODOS=1 npm test`. Before launch, once that passes, remove
 Pages render inside `src/layouts/Base.astro`, which owns the document, the header (brand, section
 navigation and light/dark toggle) and the footer, and loads the site's stylesheet,
 `src/styles/global.css`. The style is the minimal one chosen in #12: its rules are scoped under the
-`.mn` class on `<html>`, and its own classes share the `mn-` prefix. The home page (`/`) is
+`.site` class on `<html>`, and its own classes share the `site-` prefix. The home page (`/`) is
 `src/components/home/Home.astro`; the toggle lives in `src/components/theme/` and remembers the
 visitor's pick in `localStorage` under `portfolio-theme`.
 

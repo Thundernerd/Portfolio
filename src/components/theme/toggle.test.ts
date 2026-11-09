@@ -22,9 +22,9 @@ let button: HTMLButtonElement;
 
 // The button as `ThemeToggle.astro` renders it (the Astro container can't render under happy-dom).
 const TOGGLE_MARKUP = `
-	<button class="mn-toggle" type="button" aria-pressed="false" data-theme-toggle hidden>
-		<span class="mn-toggle__track" aria-hidden="true"><span class="mn-toggle__thumb"></span></span>
-		<span class="mn-toggle__label">Dark mode</span>
+	<button class="site-toggle" type="button" aria-pressed="false" data-theme-toggle hidden>
+		<span class="site-toggle__track" aria-hidden="true"><span class="site-toggle__thumb"></span></span>
+		<span class="site-toggle__label">Dark mode</span>
 	</button>`;
 
 beforeEach(() => {

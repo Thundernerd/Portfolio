@@ -3,7 +3,7 @@
  *
  * Typography first, monospace accents and little imagery. Colours are `light-dark()` pairs driven by
  * `color-scheme`: the page follows `prefers-color-scheme` until the toggle sets `data-theme` on <html>.
- * Everything is scoped under `.site` (the layout's <html> class); its classes share the `mn-` prefix.
+ * Everything is scoped under `.site` (the layout's <html> class); its classes share the `site-` prefix.
  */
 
 .site {
@@ -203,7 +203,7 @@
 
 /* ---- Theme toggle ---------------------------------------------------------------------------- */
 
-.mn-toggle {
+.site-toggle {
 	grid-area: toggle;
 	display: inline-flex;
 	align-items: center;
@@ -217,16 +217,16 @@
 	cursor: pointer;
 }
 
-.mn-toggle[hidden] {
+.site-toggle[hidden] {
 	display: none;
 }
 
-.mn-toggle:hover {
+.site-toggle:hover {
 	color: var(--text);
 	border-color: var(--rule-strong);
 }
 
-.mn-toggle__track {
+.site-toggle__track {
 	position: relative;
 	width: 1.9rem;
 	height: 1.05rem;
@@ -235,7 +235,7 @@
 	border: 1px solid var(--rule-strong);
 }
 
-.mn-toggle__thumb {
+.site-toggle__thumb {
 	position: absolute;
 	top: 50%;
 	left: 0.15rem;
@@ -246,18 +246,18 @@
 	transform: translateY(-50%);
 }
 
-.mn-toggle[aria-pressed='true'] .mn-toggle__track {
+.site-toggle[aria-pressed='true'] .site-toggle__track {
 	background: var(--accent-soft);
 	border-color: var(--accent);
 }
 
-.mn-toggle[aria-pressed='true'] .mn-toggle__thumb {
+.site-toggle[aria-pressed='true'] .site-toggle__thumb {
 	transform: translate(0.85rem, -50%);
 	background: var(--accent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.mn-toggle__thumb {
+	.site-toggle__thumb {
 		transition:
 			transform 0.2s ease,
 			background-color 0.2s ease;
