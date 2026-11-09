@@ -14,9 +14,12 @@ function stylesheets(): { file: string; css: string }[] {
 	return [{ file: 'styles/global.css', css: globalCss }, ...blocks];
 }
 
-/** Each declaration in `css`, with the at-rule preludes (`@media ...`) it is nested in. */
-function declarations(css: string): { property: string; value: string; atRules: string[] }[] {
-	const found: { property: string; value: string; atRules: string[] }[] = [];
+/** A CSS declaration and the preludes of the at-rules (`@media ...`) it is nested in. */
+type Declaration = { property: string; value: string; atRules: string[] };
+
+/** Each declaration in `css`. */
+function declarations(css: string): Declaration[] {
+	const found: Declaration[] = [];
 	const stack: string[] = [];
 	let text = '';
 	for (const char of css.replace(/\/\*[\s\S]*?\*\//g, '')) {
@@ -39,7 +42,7 @@ describe('reduced motion', () => {
 	it('only moves things for visitors who have not asked for reduced motion', () => {
 		const moving = stylesheets().flatMap(({ file, css }) =>
 			declarations(css)
-				.filter(({ property, value }) => /^(transition|animation)/.test(property) || (property === 'scroll-behavior' && value === 'smooth'))
+				.filter(({ property, value }) => /^(transition|animation)/.test(property) || (property === 'scroll-behavior' && /\bsmooth\b/.test(value)))
 				.filter(({ atRules }) => !atRules.some((prelude) => /prefers-reduced-motion:\s*no-preference/.test(prelude)))
 				.map(({ property }) => `${file}: ${property}`),
 		);
@@ -47,9 +50,11 @@ describe('reduced motion', () => {
 	});
 });
 
+type Theme = 'light' | 'dark';
+
 /** The light and dark values of each `light-dark()` colour token on `.site`, such as `--text`. */
-function themeTokens(): Map<string, { light: string; dark: string }> {
-	const tokens = new Map<string, { light: string; dark: string }>();
+function themeTokens(): Map<string, Record<Theme, string>> {
+	const tokens = new Map<string, Record<Theme, string>>();
 	for (const m of globalCss.matchAll(/(--[\w-]+):\s*light-dark\(\s*(#[0-9a-f]{6})\s*,\s*(#[0-9a-f]{6})\s*\)/gi)) {
 		tokens.set(m[1], { light: m[2], dark: m[3] });
 	}
@@ -66,34 +71,44 @@ function contrast(a: string, b: string): number {
 	return (lighter + 0.05) / (darker + 0.05);
 }
 
+/** The token pairs whose contrast is below `minimum` in either theme, as `foreground on background (theme): ratio`. */
+function failing(pairs: [string, string][], minimum: number): string[] {
+	const tokens = themeTokens();
+	return pairs.flatMap(([fg, bg]) =>
+		(['light', 'dark'] as const).flatMap((theme) => {
+			const [a, b] = [tokens.get(fg)?.[theme], tokens.get(bg)?.[theme]];
+			if (!a || !b) return [`${fg} on ${bg}: missing token`];
+			const ratio = contrast(a, b);
+			return ratio < minimum ? [`${fg} on ${bg} (${theme}): ${ratio.toFixed(2)}`] : [];
+		}),
+	);
+}
+
 describe('colour contrast', () => {
 	it('measures contrast as WCAG does', () => {
 		expect(contrast('#000000', '#ffffff')).toBeCloseTo(21);
 		expect(contrast('#777777', '#ffffff')).toBeCloseTo(4.48, 2);
 	});
 
-	// The pairs whose contrast is below `minimum` in either theme, as `foreground on background (theme): ratio`.
-	function failing(pairs: [string, string][], minimum: number): string[] {
-		const tokens = themeTokens();
-		return pairs.flatMap(([fg, bg]) =>
-			(['light', 'dark'] as const).flatMap((theme) => {
-				const [a, b] = [tokens.get(fg)?.[theme], tokens.get(bg)?.[theme]];
-				if (!a || !b) return [`${fg} on ${bg}: missing token`];
-				const ratio = contrast(a, b);
-				return ratio < minimum ? [`${fg} on ${bg} (${theme}): ${ratio.toFixed(2)}`] : [];
-			}),
-		);
-	}
-
 	const textColours = ['--text', '--muted', '--accent', '--warn'];
 	const surfaces = ['--bg', '--surface', '--chip', '--accent-soft', '--warn-soft'];
 
 	it('keeps every text colour readable on every surface, in both themes (WCAG AA, 4.5:1)', () => {
 		const pairs = textColours.flatMap((fg) => surfaces.map((bg): [string, string] => [fg, bg]));
-		expect(failing([...pairs, ['--accent-ink', '--accent']], 4.5)).toEqual([]);
+		expect(failing(pairs, 4.5)).toEqual([]);
 	});
 
-	it('keeps the focus ring visible against the page, in both themes (WCAG AA, 3:1)', () => {
-		expect(failing([['--accent', '--bg'], ['--accent', '--surface']], 3)).toEqual([]);
+	it('keeps selected text readable, in both themes (WCAG AA, 4.5:1)', () => {
+		// `::selection` sets `--accent-ink` on `--accent`.
+		expect(failing([['--accent-ink', '--accent']], 4.5)).toEqual([]);
+	});
+
+	it("keeps the focus ring and the theme toggle's state visible, in both themes (WCAG AA, 3:1)", () => {
+		// The toggle's thumb shows its state: `--muted` on the `--chip` track when off, `--accent` on
+		// `--accent-soft` when on. Its borders (`--rule`, `--rule-strong`) are fainter than 3:1, which
+		// WCAG allows because its text label already marks out the control.
+		const focusRing: [string, string][] = [['--accent', '--bg'], ['--accent', '--surface']];
+		const toggleThumb: [string, string][] = [['--muted', '--chip'], ['--accent', '--accent-soft']];
+		expect(failing([...focusRing, ...toggleThumb], 3)).toEqual([]);
 	});
 });
