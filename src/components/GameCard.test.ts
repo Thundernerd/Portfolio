@@ -73,6 +73,14 @@ describe('GameCard', () => {
 		expect(await render({ game: gameEntry({ cover: fixtureImage }) })).toMatch(/<img[^>]*\salt(=""|[\s>])/);
 	});
 
+	it('serves the cover in sizes to fit the card, not at its source size', async () => {
+		const cover = { ...fixtureImage, width: 3840, height: 2160 };
+		const img = (await render({ game: gameEntry({ cover }) })).match(/<img[^>]*>/)?.[0] ?? '';
+		expect([...img.matchAll(/\s(\d+)w\b/g)].map((m) => Number(m[1]))).toEqual([480, 960]);
+		expect(img).toMatch(/\ssizes="[^"]+"/);
+		expect(img).toMatch(/\sloading="lazy"/);
+	});
+
 	it('renders slotted media, such as a trailer embed, in place of the cover', async () => {
 		const html = await container.renderToString(GameCard, {
 			props: { game: gameEntry({ cover: fixtureImage }) },

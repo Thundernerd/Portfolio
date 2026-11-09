@@ -26,6 +26,9 @@ interface Props {
 const { game, href } = Astro.props;
 const { title, platforms, role, studio, year, cover, trailer, storeLinks, blurb } = game.data;
 const titleId = `game-${game.id}-title`;
+// The cover fills its card: the full width on a phone, a column of the games grid (`--grid-min:
+// 19rem` in `global.css`) above that, at most a third of the 72rem page.
+const COVER_SIZES = '(min-width: 72rem) 23rem, (min-width: 44rem) 50vw, 100vw';
 const links = [...(trailer ? [{ label: 'Trailer', url: trailer }] : []), ...storeLinks];
 // Filled `media` slot content replaces the cover. A slot that renders to nothing counts as unfilled, since
 // `Astro.slots.has` is also true for `set:html={undefined}` (as `CollectionGrid` passes) or a false condition.
@@ -39,7 +42,7 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 				<slot name="media" />
 			</div>
 		) : (
-			cover && <Image class="game-card__cover" src={cover} alt="" />
+			cover && <Image class="game-card__cover" src={cover} alt="" widths={[480, 960]} sizes={COVER_SIZES} />
 		)
 	}
 	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a class="game-card__title-link" href={resolveHref(href)}>{title}</a>}</h3>
