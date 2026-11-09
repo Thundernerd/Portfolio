@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import Contact from './Contact.astro';
-import { type AstroContainer, createContainer } from './test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage } from './test-fixtures';
 
 describe('Contact', () => {
 	let container: AstroContainer;
@@ -39,5 +39,26 @@ describe('Contact', () => {
 			slots: { default: '<p>Say hi.</p>' },
 		});
 		expect(html).toMatch(/<p>Say hi.<\/p>.*<address/s);
+	});
+
+	it('shows an avatar with its alt text before the heading when given one', async () => {
+		const html = await container.renderToString(Contact, {
+			props: { links, avatar: fixtureImage, avatarAlt: 'Portrait of Christiaan' },
+		});
+		expect(html).toMatch(/<img[^>]*class="contact__avatar"[^>]*>.*<h2/s);
+		expect(html).toMatch(/<img[^>]*alt="Portrait of Christiaan"/);
+	});
+
+	it('renders no avatar without one', async () => {
+		const html = await container.renderToString(Contact, { props: { links } });
+		expect(html).not.toContain('<img');
+	});
+
+	it('shows an entry without a target as plain text, not a link', async () => {
+		const html = await container.renderToString(Contact, {
+			props: { links: [...links, { label: 'LinkedIn · to be confirmed' }] },
+		});
+		expect(html).toMatch(/<li[^>]*>\s*<span class="contact__link contact__link--pending"[^>]*>LinkedIn · to be confirmed<\/span>/);
+		expect(html).not.toMatch(/<a[^>]*>LinkedIn/);
 	});
 });

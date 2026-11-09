@@ -1,27 +1,37 @@
 ---
 /**
- * Contact section: a heading, optional copy (default slot) and the contact links (GitHub, LinkedIn,
- * email, CV...) inside an `<address>`.
+ * Contact section: an optional avatar, a heading, optional copy (default slot) and the contact links
+ * (GitHub, LinkedIn, email, CV...) inside an `<address>`.
  *
  * Structural only. Layouts style it through the classes below or these custom properties:
  * `--contact-gap`, `--contact-links-gap`.
  */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import { resolveHref } from '../lib/url';
-import type { Link } from './types';
+import type { ContactEntry } from './types';
 
 interface Props {
-	/** Site paths go through `withBase()`; absolute URLs (`https:`, `mailto:`) pass through. */
-	links: Link[];
+	/**
+	 * Site paths go through `withBase()`; absolute URLs (`https:`, `mailto:`) pass through. An entry
+	 * without an `href` shows as plain text, `.contact__link--pending`.
+	 */
+	links: ContactEntry[];
 	/** Anchor id of the section; the heading gets `${id}-heading`. */
 	id?: string;
 	title?: string;
+	/** A portrait shown before the heading as `.contact__avatar`. */
+	avatar?: ImageMetadata;
+	/** The avatar's alt text; empty (decorative) by default. */
+	avatarAlt?: string;
 }
 
-const { links, id = 'contact', title = 'Contact' } = Astro.props;
+const { links, id = 'contact', title = 'Contact', avatar, avatarAlt = '' } = Astro.props;
 const headingId = `${id}-heading`;
 ---
 
 <section class="contact" id={id} aria-labelledby={headingId}>
+	{avatar && <Image class="contact__avatar" src={avatar} alt={avatarAlt} />}
 	<h2 class="contact__title" id={headingId}>{title}</h2>
 	<slot />
 	<address class="contact__address">
@@ -29,7 +39,11 @@ const headingId = `${id}-heading`;
 			{
 				links.map((link) => (
 					<li>
-						<a class="contact__link" href={resolveHref(link.href)}>{link.label}</a>
+						{link.href === undefined ? (
+							<span class="contact__link contact__link--pending">{link.label}</span>
+						) : (
+							<a class="contact__link" href={resolveHref(link.href)}>{link.label}</a>
+						)}
 					</li>
 				))
 			}
