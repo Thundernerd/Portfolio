@@ -69,8 +69,9 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `.mn` class on `<html>`, and its own classes share the `mn-` prefix. The home page (`/`) is
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
-add a section there and give it content in `Home.astro`, where the type checker asks for it. The toggle lives in `src/components/theme/` and remembers the
-visitor's pick in `localStorage` under `portfolio-theme`.
+add a section there and give it content in `Home.astro`, where the type checker asks for it. The
+toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
+`portfolio-theme`.
 
 ## Section components
 
