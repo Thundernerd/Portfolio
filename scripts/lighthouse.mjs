@@ -22,8 +22,12 @@ const require = createRequire(import.meta.url);
  */
 const packageFile = (name, file) => join(dirname(require.resolve(`${name}/package.json`)), file);
 
-/** Matches the first URL the preview prints for itself, capturing its port. */
-const servedUrl = /http:\/\/[^\s/"]+:(\d+)\//;
+/**
+ * Matches the URL the preview prints for itself on `host`, capturing its port: the one it serves on,
+ * which is not the requested one when that was taken.
+ * @param {string} host
+ */
+const servedUrl = (host) => new RegExp(`http://${host.replaceAll('.', '\\.')}:(\\d+)/`);
 
 /** Strips terminal colours, which `astro preview` adds when its output is a terminal. */
 const ansiColours = /\x1b\[[0-9;]*m/g;
@@ -67,6 +71,7 @@ export function startPreview({ host, port, outDir, signal }) {
 		await exited;
 	};
 
+	const served = servedUrl(host);
 	return new Promise((resolve, reject) => {
 		let output = '';
 		let settled = false;
@@ -90,7 +95,7 @@ export function startPreview({ host, port, outDir, signal }) {
 		/** @param {Buffer} chunk */
 		const onData = (chunk) => {
 			output += chunk.toString().replace(ansiColours, '');
-			const match = servedUrl.exec(output);
+			const match = served.exec(output);
 			if (!match || settled) return;
 			if (Number(match[1]) !== port) {
 				fail(
