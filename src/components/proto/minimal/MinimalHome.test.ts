@@ -1,6 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type AstroContainer, createContainer, fixtureImage, gameEntry, projectEntry } from '../../test-fixtures';
 import MinimalHome from './MinimalHome.astro';
+
+// Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
+vi.mock('../../../lib/github-stats', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('../../../lib/github-stats')>();
+	const fetched = { 'fixture-owner/fetched': { stars: 50, language: 'ShaderLab' } };
+	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
+});
 
 describe('MinimalHome', () => {
 	let container: AstroContainer;
@@ -55,6 +62,14 @@ describe('MinimalHome', () => {
 		});
 		expect(html).toMatch(/Unity inspector.<\/p>\s*<ul class="mn-stats"/);
 		expect(statsLines(html)).toEqual(['Rust 1 star', 'C# 1,300 stars']);
+	});
+
+	it("shows GitHub's language for a fetched repo instead of the one its tags name", async () => {
+		const html = await render({
+			games: [],
+			projects: [projectEntry({ title: 'Fetched', repo: 'fixture-owner/fetched', tags: ['Unity', 'C#'] }, 'fetched')],
+		});
+		expect(statsLines(html)).toEqual(['ShaderLab 50 stars']);
 	});
 
 	it('leaves out what a project does not have: a language among its tags, or a star count', async () => {

@@ -33,18 +33,18 @@ async function readOut() {
 }
 
 describe('fetch-github run()', () => {
-	it('writes only the star count for a repo referenced in the content', async () => {
+	it('writes only the star count and language for a repo referenced in the content', async () => {
 		await project('zeepsdk.md', 'title: ZeepSDK\nrepo: donderjoekel/ZeepSDK\nkind: zeepkist-mod\nblurb: SDK.');
 		const requested: string[] = [];
 		const fetch = async (url: string | URL | Request) => {
 			requested.push(String(url));
-			return json(200, { stargazers_count: 42, description: 'A modding SDK' });
+			return json(200, { stargazers_count: 42, language: 'C#', description: 'A modding SDK' });
 		};
 
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(requested).toEqual(['https://api.github.com/repos/donderjoekel/ZeepSDK']);
-		expect(await readOut()).toEqual({ 'donderjoekel/ZeepSDK': { stars: 42 } });
+		expect(await readOut()).toEqual({ 'donderjoekel/ZeepSDK': { stars: 42, language: 'C#' } });
 	});
 
 	it.each([
@@ -56,7 +56,7 @@ describe('fetch-github run()', () => {
 
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
-		expect(await readOut()).toEqual({ 'Thundernerd/Repo': { stars: 5, archived } });
+		expect(await readOut()).toEqual({ 'Thundernerd/Repo': { stars: 5, language: null, archived } });
 	});
 
 	it.each([
@@ -68,7 +68,7 @@ describe('fetch-github run()', () => {
 
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
-		expect(await readOut()).toStrictEqual({ 'Thundernerd/Repo': { stars: 5 } });
+		expect(await readOut()).toStrictEqual({ 'Thundernerd/Repo': { stars: 5, language: null } });
 	});
 
 	it('leaves out a repo whose request fails, keeping the others and warning', async () => {
@@ -82,7 +82,7 @@ describe('fetch-github run()', () => {
 
 		await run({ contentDir, outFile, fetch, env: {}, log: { ...silent, warn: (m) => warnings.push(m) } });
 
-		expect(await readOut()).toEqual({ 'Thundernerd/Online': { stars: 7 } });
+		expect(await readOut()).toEqual({ 'Thundernerd/Online': { stars: 7, language: null } });
 		expect(warnings.join('\n')).toContain('Thundernerd/Offline');
 	});
 
@@ -145,7 +145,7 @@ describe('fetch-github run()', () => {
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(calls).toBe(2);
-		expect(Object.values(await readOut())).toEqual([{ stars: 1 }]);
+		expect(Object.values(await readOut())).toEqual([{ stars: 1, language: null }]);
 	});
 
 	it.each([
@@ -190,7 +190,21 @@ describe('fetch-github run()', () => {
 		await run({ contentDir, outFile, fetch, env: {}, log: silent });
 
 		expect(requested).toEqual(['https://api.github.com/repos/Thundernerd/Shared']);
-		expect(await readOut()).toEqual({ 'Thundernerd/Shared': { stars: 3 } });
+		expect(await readOut()).toEqual({ 'Thundernerd/Shared': { stars: 3, language: null } });
+	});
+
+	it.each([
+		['null', null],
+		['missing', undefined],
+		['not a string', 42],
+		['empty', ''],
+	])('writes a null language when GitHub reports it as %s', async (_, language) => {
+		await project('a.md', 'repo: Thundernerd/Docs');
+		const fetch = async () => json(200, { stargazers_count: 5, language });
+
+		await run({ contentDir, outFile, fetch, env: {}, log: silent });
+
+		expect(await readOut()).toEqual({ 'Thundernerd/Docs': { stars: 5, language: null } });
 	});
 
 	it.each([

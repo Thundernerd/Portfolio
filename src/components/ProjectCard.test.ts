@@ -6,9 +6,9 @@ import { type AstroContainer, createContainer, fixtureImage, projectEntry } from
 vi.mock('../lib/github-stats', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('../lib/github-stats')>();
 	const fetched = {
-		'fixture-owner/fetched': { stars: 4321 },
-		'fixture-owner/fetched-archived': { stars: 4321, archived: true },
-		'fixture-owner/fetched-unarchived': { stars: 4321, archived: false },
+		'fixture-owner/fetched': { stars: 4321, language: null },
+		'fixture-owner/fetched-archived': { stars: 4321, language: null, archived: true },
+		'fixture-owner/fetched-unarchived': { stars: 4321, language: null, archived: false },
 	};
 	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
 });

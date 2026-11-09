@@ -1,7 +1,8 @@
 // @ts-check
 /**
- * Prebuild step: fetches star counts and archived flags from the GitHub API for every `repo` in the
- * content and writes them to `src/data/github-stats.json`, which `src/lib/github-stats.ts` reads.
+ * Prebuild step: fetches star counts, primary languages and archived flags from the GitHub API for
+ * every `repo` in the content and writes them to `src/data/github-stats.json`, which
+ * `src/lib/github-stats.ts` reads.
  *
  * It never fails the build over GitHub: no token is required (`GITHUB_TOKEN` is used when set), and a
  * repo that can't be fetched (offline, rate-limited, missing) is left out of the file, so the site
@@ -94,7 +95,7 @@ export async function run({ contentDir, outFile, fetch, env, log }) {
 				log.warn(`fetch-github: ${repo}: unexpected response; using frontmatter values`);
 				continue;
 			}
-			stats[repo] = { stars: body.stargazers_count };
+			stats[repo] = { stars: body.stargazers_count, language: typeof body.language === 'string' && body.language !== '' ? body.language : null };
 			// A missing or malformed `archived` stays unknown, so the site falls back to the frontmatter.
 			if (typeof body.archived === 'boolean') stats[repo].archived = body.archived;
 		} catch (error) {

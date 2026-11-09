@@ -1,6 +1,11 @@
-/** Star count and archived flag of a GitHub repo, as written by `scripts/fetch-github.mjs`. */
+/**
+ * Star count, primary language and archived flag of a GitHub repo, as written by
+ * `scripts/fetch-github.mjs`.
+ */
 export interface RepoStats {
 	stars: number;
+	/** GitHub's primary language for the repo; `null` when GitHub reports none. */
+	language: string | null;
 	/** Absent when GitHub's response didn't say. */
 	archived?: boolean;
 }
@@ -9,23 +14,46 @@ export interface RepoStats {
 export interface RepoProject {
 	repo: string;
 	stars?: number;
+	tags?: string[];
 	archived: boolean;
 }
 
 /** What to show for a project: GitHub's values where fetched, its frontmatter otherwise. */
 export interface ResolvedRepoStats {
 	stars: number | undefined;
+	language: string | undefined;
 	archived: boolean;
 }
 
 /**
- * Resolves a project's star count and archived flag from the `fetched` stats, falling back to its
- * frontmatter `stars` and `archived` when the fetcher couldn't get them from GitHub for that repo.
+ * Programming languages that can appear among a project's tags (the tags also name engines and
+ * libraries). A project's language falls back to the first of its tags found here when GitHub's
+ * isn't known.
+ */
+export const TAG_LANGUAGES: readonly string[] = [
+	'C#',
+	'C++',
+	'Rust',
+	'TypeScript',
+	'JavaScript',
+	'Python',
+	'Lua',
+	'Go',
+	'Batchfile',
+	'Shell',
+];
+
+/**
+ * Resolves a project's star count, language and archived flag from the `fetched` stats. The star
+ * count and archived flag fall back to its frontmatter `stars` and `archived` when the fetcher
+ * couldn't get them from GitHub for that repo; the language falls back to the first of its tags in
+ * `TAG_LANGUAGES` when the repo wasn't fetched or GitHub reports none.
  */
 export function resolveRepoStats(project: RepoProject, fetched: Record<string, RepoStats>): ResolvedRepoStats {
 	const stats = fetched[project.repo];
 	return {
 		stars: stats?.stars ?? project.stars,
+		language: stats?.language ?? project.tags?.find((tag) => TAG_LANGUAGES.includes(tag)),
 		archived: stats?.archived ?? project.archived,
 	};
 }
@@ -38,7 +66,10 @@ const generated = import.meta.glob<Record<string, RepoStats>>('../data/github-st
 });
 const fetchedStats: Record<string, RepoStats> = Object.values(generated)[0] ?? {};
 
-/** A project's star count and archived flag: as fetched at build time, or from its frontmatter. */
+/**
+ * A project's star count, language and archived flag: as fetched at build time, or from its
+ * frontmatter.
+ */
 export function repoStats(project: RepoProject): ResolvedRepoStats {
 	return resolveRepoStats(project, fetchedStats);
 }
