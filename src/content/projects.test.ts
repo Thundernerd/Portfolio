@@ -28,7 +28,7 @@ describe('Zeepkist GTR', () => {
 	);
 
 	// The merged Backend service is retired; the page describes the split services instead.
-	it('does not link the retired Backend repo', () => {
+	it('does not mention the retired Backend repo', () => {
 		expect(gtr?.body).not.toContain('Zeepkist.GTR.Backend');
 	});
 });

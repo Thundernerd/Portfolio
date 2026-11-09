@@ -17,12 +17,12 @@ PostgreSQL database.
 - **[Mod](https://github.com/donderjoekel/Zeepkist.GTR.Mod)**: the BepInEx mod for Zeepkist. It submits
   records, shows leaderboards and ghosts of other players' runs, and has a level browser and chat commands
   for world records, favourites and votes.
-- **Auth**: signs players in with their Steam account and hands the mod a JWT for the other services.
+- **Auth**: signs players in with their Steam account and hands the mod a JWT.
 - **Backend / JsonApi**: the REST API the mod talks to. It stores records and publishes each one to the
   `wr`, `pb` and `media` exchanges on RabbitMQ.
 - **Processors**: services that consume those exchanges. The world record processor updates world records
   and publishes each new one to a `stream` exchange, the personal best processor updates personal bests,
-  and the record media handler stores a record's media.
+  and the record media handler deals with the media attached to records.
 - **Player points and level scores**: two calculators that run on a schedule and recompute players' points
   and levels' scores from the database.
 - **Stream**: a WebSocket server that passes new world records from the `stream` exchange on to listeners
@@ -35,6 +35,6 @@ PostgreSQL database.
 - **[Discord](https://github.com/donderjoekel/Zeepkist.GTR.Discord)**: a bot that receives new world records
   from Stream over a WebSocket and posts them to Discord.
 
-The [main repo](https://github.com/donderjoekel/Zeepkist.GTR) holds the mod and database as Git submodules,
-along with a Docker Compose self-hosting guide for an earlier version of GTR that ran as a single, merged
-backend service.
+The [main repo](https://github.com/donderjoekel/Zeepkist.GTR) holds the mod, the database and the retired merged
+backend as Git submodules, with a Docker Compose self-hosting guide for that earlier, single-backend
+version of GTR.
