@@ -169,6 +169,16 @@ describe('/projects/[slug]', () => {
 		expect(without).not.toContain('site-project__media');
 	});
 
+	it("serves the project's image in sizes to fit the page, loaded first since it sits at the top", async () => {
+		const image = { ...fixtureImage, width: 3840, height: 2160 };
+		const html = await renderPage(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+		const img = html.match(/<img[^>]*class="site-project__image"[^>]*>|<img[^>]*>/)?.[0] ?? '';
+		expect([...img.matchAll(/\s(\d+)w\b/g)].map((m) => Number(m[1]))).toEqual([736, 1472]);
+		expect(img).toMatch(/\ssizes="[^"]+"/);
+		expect(img).toMatch(/\sloading="eager"/);
+		expect(img).toMatch(/\sfetchpriority="high"/);
+	});
+
 	it('shows a quiet placeholder instead of a TODO blurb', async () => {
 		const html = await renderPage(projectEntry({ kind: 'featured', blurb: 'TODO: describe it' }));
 		expect(html).not.toMatch(/\bTODO\b/);
