@@ -9,7 +9,7 @@ import { getCollection } from 'astro:content';
 import { anchor, homeSections, isShown } from '../components/home/sections';
 import ThemeInit from '../components/theme/ThemeInit.astro';
 import ThemeToggle from '../components/theme/ThemeToggle.astro';
-import { absoluteUrl, withBase } from '../lib/url';
+import { absoluteUrl, resolveHref, withBase } from '../lib/url';
 import '../styles/global.css';
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 	description?: string;
 	/**
 	 * The page's link-preview image and its alt text, in place of the site card (`public/og.png`):
-	 * an `astro:assets` image (its size is declared too) or a site path such as `'talks/cover.jpg'`.
+	 * an `astro:assets` image (its size is declared too) or a site path such as `'talks/cover.jpg'` or an absolute URL.
 	 */
 	image?: { src: ImageMetadata | string; alt: string };
 }
@@ -30,7 +30,7 @@ const canonical = new URL(Astro.url.pathname, import.meta.env.SITE).href;
 const ogImage: { url: string; width?: number; height?: number; alt: string } = !image
 	? { url: absoluteUrl('og.png'), width: 1200, height: 630, alt: '~/christiaan: game developer and programmer' }
 	: typeof image.src === 'string'
-		? { url: absoluteUrl(image.src), alt: image.alt }
+		? { url: new URL(resolveHref(image.src), import.meta.env.SITE).href, alt: image.alt }
 		: { url: new URL(image.src.src, import.meta.env.SITE).href, width: image.src.width, height: image.src.height, alt: image.alt };
 // The home page's sections, linked through the site root so the nav works from any page. Reads the
 // projects itself so every page's nav lists the same sections as the home page (see `isShown()`).

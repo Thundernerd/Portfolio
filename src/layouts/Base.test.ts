@@ -126,6 +126,12 @@ describe('Base layout', () => {
 			expect(meta(html, 'og:image:alt')).toBe('A talk');
 		});
 
+		it('previews an image given by its absolute URL as is', async () => {
+			const src = 'https://img.youtube.com/vi/abc123/maxresdefault.jpg';
+			const html = headOf(await container.renderToString(Base, { props: { title: 'Trailer', image: { src, alt: 'A trailer' } } }));
+			expect(meta(html, 'og:image')).toBe(src);
+		});
+
 		it('ships the preview image it points at, at the size it declares', () => {
 			// A PNG's width and height are the first two fields of its IHDR chunk, right after the signature.
 			const png = readFileSync(new URL('../../public/og.png', import.meta.url));
