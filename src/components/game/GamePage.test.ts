@@ -42,20 +42,27 @@ describe('GamePage', () => {
 		new RegExp(`<section[^>]*>\\s*<h2[^>]*>${heading}</h2>[\\s\\S]*?</section>`).exec(html)?.[0];
 
 	it('describes what I did on the game with its write-up', async () => {
-		const html = await render(
-			{ game: { ...gameEntry(), body: 'I built the level editor.' } },
-			{ default: '<p>I built the level editor.</p>' },
-		);
+		const html = await render({ game: gameEntry() }, { default: '<p>I built the level editor.</p>' });
 		expect(sectionHeaded(html, 'What I did')).toMatch(/<\/h2>\s*<div[^>]*>\s*<p>I built the level editor.<\/p>/);
 	});
 
-	it('shows a quiet placeholder in place of a write-up that is not filled in yet', async () => {
+	it('leaves out the parts of the write-up that are not filled in yet', async () => {
 		const html = await render(
-			{ game: { ...gameEntry(), body: 'I worked on it.\n\nTODO: describe what I built.' } },
-			{ default: '<p>I worked on it.</p><p>TODO: describe what I built.</p>' },
+			{ game: gameEntry() },
+			{ default: '<p>I worked on it.</p>\n<p>TODO: describe what I built.</p>\n<ul>\n<li>Netcode</li>\n<li>TODO: more</li>\n</ul>' },
 		);
+		const section = sectionHeaded(html, 'What I did') ?? '';
 		expect(html).not.toMatch(/\bTODO\b/);
-		expect(sectionHeaded(html, 'What I did')).toContain('Write-up coming soon.');
+		expect(section).toContain('<p>I worked on it.</p>');
+		expect(section).toMatch(/<ul>\s*<li>Netcode<\/li>\s*<\/ul>/);
+		expect(section).not.toContain('Write-up coming soon.');
+	});
+
+	it('shows a quiet placeholder while nothing of the write-up is filled in yet', async () => {
+		const todoOnly = await render({ game: gameEntry() }, { default: '<p>TODO: describe what I built.</p>' });
+		expect(todoOnly).not.toMatch(/\bTODO\b/);
+		expect(sectionHeaded(todoOnly, 'What I did')).toContain('Write-up coming soon.');
+		expect(sectionHeaded(await render({ game: gameEntry() }), 'What I did')).toContain('Write-up coming soon.');
 	});
 
 	it('shows placeholders in place of a TODO studio, role or blurb', async () => {

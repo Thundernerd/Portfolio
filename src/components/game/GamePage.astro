@@ -1,18 +1,23 @@
 ---
 /**
- * The content of a game's page (`/games/[slug]/`): the title and blurb, the role, studio, year,
- * platforms and store links; the trailer, embedded when it is on YouTube (`trailerEmbedUrl()`) and
- * linked otherwise; "What I did", the entry's rendered Markdown body passed in the default slot; and
- * the tech; and a gallery of the screenshots. `TODO` copy shows as a quiet placeholder, as on the home page; so does the whole write-up
- * while its body (`game.body`) still has a `TODO` in it.
+ * The content of a game's page (`gamePath()`), in this order:
+ *
+ * - the title and blurb, the role, studio, year, platforms and store links;
+ * - the trailer, embedded when it is on YouTube (`trailerEmbedUrl()`) and linked otherwise;
+ * - "What I did": the entry's rendered Markdown body, passed in the default slot;
+ * - the tech, and a gallery of the screenshots, each left out when the entry has none.
+ *
+ * `TODO` copy shows as a quiet placeholder, as on the home page. The write-up drops its paragraphs
+ * and list items that still hold a `TODO`, and shows a placeholder when nothing else is left.
  *
  * Structural only, like the shared section components: the site stylesheet styles it through the
- * classes below or these custom properties: `--game-tags-gap`, `--gallery-min`, `--gallery-gap`.
+ * classes below or these custom properties: `--game-list-gap` (the platform, store and tech lists),
+ * `--gallery-min` (minimum screenshot width), `--gallery-gap`.
  */
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { trailerEmbedUrl } from '../../lib/trailer';
-import { isTodo, presentableGame, WRITE_UP_PENDING } from '../placeholders';
+import { presentableGame, presentableWriteUp, WRITE_UP_PENDING } from '../placeholders';
 
 interface Props {
 	game: CollectionEntry<'games'>;
@@ -20,8 +25,7 @@ interface Props {
 
 const { game } = Astro.props;
 const { title, platforms, role, studio, year, blurb, trailer, storeLinks, tech, screenshots } = presentableGame(game).data;
-// A write-up with `TODO`s still in it isn't shown at all, so no half-written notes reach the live site.
-const hasWriteUp = game.body !== undefined && game.body.trim() !== '' && !isTodo(game.body);
+const writeUp = presentableWriteUp(Astro.slots.has('default') ? await Astro.slots.render('default') : '');
 const embedUrl = trailer && trailerEmbedUrl(trailer);
 ---
 
@@ -93,7 +97,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 	<section class="game-page__section game-page__work" aria-labelledby="work-heading">
 		<h2 class="game-page__heading" id="work-heading">What I did</h2>
 		<div class="game-page__write-up">
-			{hasWriteUp ? <slot /> : <p class="game-page__placeholder">{WRITE_UP_PENDING}</p>}
+			{writeUp !== undefined ? <Fragment set:html={writeUp} /> : <p class="game-page__placeholder">{WRITE_UP_PENDING}</p>}
 		</div>
 	</section>
 	{
@@ -138,7 +142,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 		.game-page__tags {
 			display: flex;
 			flex-wrap: wrap;
-			gap: var(--game-tags-gap, 0.5rem);
+			gap: var(--game-list-gap, 0.5rem);
 		}
 		.game-page__trailer-embed {
 			display: block;
