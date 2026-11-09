@@ -118,9 +118,9 @@ links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube li
 otherwise), the entry's Markdown body under "What I did", its `tech` and a gallery of its
 `screenshots` (each an image next to the entry, with `alt` text). While the body still has a
 `TODO` in it, the page shows "Write-up coming soon." in its place. The about & contact section's
-avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn, CV; no email address, to keep it from scrapers) are set in
-`profile` (`src/components/home/profile.ts`); put a CV PDF in `public/` and link it by its site
-path (`cv.pdf`). The
+avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn, CV) are set in `profile`
+(`src/components/home/profile.ts`); it lists no email address, to keep it from scrapers. The CV is
+`public/cv.pdf`, linked by its site path (`cv.pdf`). The
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
 
