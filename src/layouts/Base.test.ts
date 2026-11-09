@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type AstroContainer, createContainer, projectEntry, sectionsOverride } from '../components/test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, projectEntry, sectionsOverride } from '../components/test-fixtures';
 import Base from './Base.astro';
 
 vi.mock('../components/home/sections', async (importOriginal) =>
@@ -104,7 +104,7 @@ describe('Base layout', () => {
 
 		it("previews the page's own image, at its size and with its alt text, when the page passes one", async () => {
 			// An `astro:assets` image as the build emits it: its `src` is already under the base path.
-			const image = { src: '/Portfolio/_astro/cover.Bx1a2c3d.png', width: 640, height: 360, format: 'png' } as const;
+			const image = { ...fixtureImage, src: '/Portfolio/_astro/cover.Bx1a2c3d.png' };
 			const html = headOf(
 				await container.renderToString(Base, {
 					props: { title: 'ZeepSDK', image: { src: image, alt: 'Screenshot of ZeepSDK' } },
