@@ -1,12 +1,12 @@
 import type { CollectionEntry } from 'astro:content';
 
 /** `TODO` as a whole word, as the content guard in `src/content/todos.ts` matches it. */
-const isTodo = (value: string) => /\bTODO\b/.test(value);
+export const isTodo = (value: string) => /\bTODO\b/.test(value);
 
 /** Stands in for a fact that isn't confirmed yet. */
 const TO_BE_CONFIRMED = 'To be confirmed';
 /** Stands in for a description that isn't written yet. */
-const WRITE_UP_PENDING = 'Write-up coming soon.';
+export const WRITE_UP_PENDING = 'Write-up coming soon.';
 
 const orFallback = (value: string, fallback: string) => (isTodo(value) ? fallback : value);
 
