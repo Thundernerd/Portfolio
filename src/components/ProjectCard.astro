@@ -25,7 +25,6 @@ interface Props {
 
 const { project, href } = Astro.props;
 const { title, blurb, repo, tags, image } = project.data;
-// The star count and archived flag as fetched from GitHub at build time, falling back to the frontmatter.
 const { stars, archived } = repoStats(project.data);
 const repoUrl = `https://github.com/${repo}`;
 const starCount = stars?.toLocaleString('en-US');

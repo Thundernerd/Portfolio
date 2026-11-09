@@ -30,7 +30,8 @@ count and archived flag of every `repo` in `src/content/` from the GitHub API in
 that can't be fetched (offline, rate-limited, not found) falls back to the entry's frontmatter
 `stars` and `archived`, and so does every repo under `npm run dev`, which doesn't run the fetcher. So
 a repo archived on GitHub gets its "Archived" label on the next build without a frontmatter change;
-keep `archived` in the frontmatter up to date anyway, as the fallback. Project cards always show the hand-written `blurb`.
+keep `archived` in the frontmatter up to date anyway, as the fallback. Project cards always show the
+hand-written `blurb`.
 
 ## Content TODOs
 
