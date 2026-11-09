@@ -695,7 +695,7 @@
 	color: var(--accent);
 }
 
-.site .contact__link:hover {
+.site a.contact__link:hover {
 	text-decoration: underline;
 }
 
