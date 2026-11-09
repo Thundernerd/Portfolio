@@ -48,7 +48,9 @@ show the hand-written `blurb`.
 ## Content TODOs
 
 Facts in `src/content/games/` and `src/content/projects/` that still need confirming are marked
-`TODO`, in a frontmatter value (`studio: 'TODO: studio'`), a YAML comment or the body. The launch
+`TODO`, in a frontmatter value (`studio: 'TODO: studio'`), a YAML comment or the body. HTML comments
+in an entry's Markdown body (`<!-- TODO(Christiaan): ... -->`) are dropped when it is rendered
+(`src/lib/strip-html-comments.ts`), so notes kept there don't reach the built pages' source. The launch
 guard in `src/content/no-todos.test.ts` fails on any of them and lists each file, line and field. It
 is skipped by default so CI and preview deploys keep passing while content is being filled in; run it
 on demand with `CHECK_TODOS=1 npm test`. The guard also covers the home page's contact links in
@@ -71,12 +73,26 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `.site` class on `<html>`, and its own classes share the `site-` prefix. The home page (`/`) is
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
-add a section there and give it content in `Home.astro`, where the type checker asks for it. The
-about & contact section's avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn,
-email, CV) are set in `profile` (`src/components/home/profile.ts`); put a CV PDF in `public/` and
-link it by its site path (`cv.pdf`). The
+add a section there and give it content in `Home.astro`, where the type checker asks for it.
+Each game has a page at `/games/<entry id>/` (`src/pages/games/[slug].astro`), which the game cards on
+the home page link to. Its content is `src/components/game/GamePage.astro`: the facts and store
+links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube link, linked
+otherwise), the entry's Markdown body under "What I did", its `tech` and a gallery of its
+`screenshots` (each an image next to the entry, with `alt` text). While the body still has a
+`TODO` in it, the page shows "Write-up coming soon." in its place. The about & contact section's
+avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn, email, CV) are set in
+`profile` (`src/components/home/profile.ts`); put a CV PDF in `public/` and link it by its site
+path (`cv.pdf`). The
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
+
+## Featured project pages
+
+Every `featured` project in `src/content/projects/` gets a page at `/projects/<entry id>/`
+(`src/pages/projects/[slug].astro`), and its card in the home page's featured section links there. The
+page shows the title, blurb, language, tags, star count and repo link (from `repoStats()`, as on the
+cards), the frontmatter `image` when there is one, and the entry's Markdown body as a README-style
+description; write that body for the page. The other kinds have no pages.
 
 ## Section components
 

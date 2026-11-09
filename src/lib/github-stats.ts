@@ -10,6 +10,9 @@ export interface RepoStats {
 	archived?: boolean;
 }
 
+/** The GitHub page of a repo given as `owner/name`, as the project frontmatter's `repo` holds it. */
+export const repoUrl = (repo: string) => `https://github.com/${repo}`;
+
 /** The project frontmatter fields the GitHub stats can stand in for. */
 export interface RepoProject {
 	repo: string;
