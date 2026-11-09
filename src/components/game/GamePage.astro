@@ -17,6 +17,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { trailerEmbedUrl } from '../../lib/trailer';
+import GameFacts from '../GameFacts.astro';
 import { presentableGame, presentableWriteUp, WRITE_UP_PENDING } from '../placeholders';
 
 interface Props {
@@ -34,32 +35,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 		<h1 class="game-page__title">{title}</h1>
 		<p class="game-page__blurb">{blurb}</p>
 		<dl class="game-page__facts">
-			<div class="game-page__fact">
-				<dt class="game-page__label">Role</dt>
-				<dd class="game-page__role">{role}</dd>
-			</div>
-			<div class="game-page__fact">
-				<dt class="game-page__label">Studio</dt>
-				<dd class="game-page__studio">{studio}</dd>
-			</div>
-			{
-				year !== undefined && (
-					<div class="game-page__fact">
-						<dt class="game-page__label">Year</dt>
-						<dd class="game-page__year">
-							<time datetime={String(year)}>{year}</time>
-						</dd>
-					</div>
-				)
-			}
-			<div class="game-page__fact">
-				<dt class="game-page__label">Platforms</dt>
-				<dd>
-					<ul class="game-page__platforms">
-						{platforms.map((platform) => <li class="game-page__platform">{platform}</li>)}
-					</ul>
-				</dd>
-			</div>
+			<GameFacts block="game-page" role={role} studio={studio} year={year} platforms={platforms} />
 		</dl>
 		{
 			storeLinks.length > 0 && (
@@ -129,7 +105,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 <style>
 	@layer components {
 		.game-page__facts,
-		.game-page__platforms,
+		.game-page__facts :global(.game-page__platforms),
 		.game-page__stores,
 		.game-page__tags,
 		.game-page__gallery {
@@ -137,7 +113,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 			margin: 0;
 			padding: 0;
 		}
-		.game-page__platforms,
+		.game-page__facts :global(.game-page__platforms),
 		.game-page__stores,
 		.game-page__tags {
 			display: flex;

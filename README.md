@@ -136,6 +136,9 @@ component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
 `Contact` also takes an optional `avatar` image, marks a link with `download: true` (a CV) with the
 `download` attribute, and shows a link without an `href` as plain text.
+`GameFacts` renders a game's fact rows (Role, Studio, Year and, when given, Platforms) inside the
+caller's `<dl>`, under the caller's BEM block (`game-card` or `game-page`); `GameCard` and the game
+page both use it, so add or change a fact there.
 Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example
