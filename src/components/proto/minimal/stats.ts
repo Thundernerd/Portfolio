@@ -5,8 +5,9 @@ import { escapeHtml, formatCount, noun } from './text';
 type Project = CollectionEntry<'projects'>;
 
 /**
- * The colour GitHub uses for each language this prototype expects to show; any other language (one
- * GitHub reports that isn't listed here) gets `OTHER_LANGUAGE_COLOUR`.
+ * The colour GitHub uses for each language this prototype expects to show: every language in
+ * `TAG_LANGUAGES` (`src/lib/github-stats.ts`), plus ones GitHub reports for the current repos. Any
+ * other language gets `OTHER_LANGUAGE_COLOUR`.
  */
 const LANGUAGE_COLOURS: Record<string, string> = {
 	'C#': '#178600',
@@ -25,9 +26,6 @@ const OTHER_LANGUAGE_COLOUR = '#8b949e';
 
 const colourOf = (language: string) => LANGUAGE_COLOURS[language] ?? OTHER_LANGUAGE_COLOUR;
 
-/** A project's language, as resolved by `repoStats()`: GitHub's, or the first language among its tags. */
-const projectLanguage = (project: Project) => repoStats(project.data).language;
-
 /** One language in the hero's breakdown. */
 export interface LanguageShare {
 	language: string;
@@ -41,7 +39,7 @@ export interface LanguageShare {
 /** How many of `projects` use each language, most used first (ties by name). */
 export function languageBreakdown(projects: Project[]): LanguageShare[] {
 	const counts = new Map<string, number>();
-	for (const language of projects.map(projectLanguage)) {
+	for (const language of projects.map((project) => repoStats(project.data).language)) {
 		if (language) counts.set(language, (counts.get(language) ?? 0) + 1);
 	}
 	const sorted = [...counts].sort(
