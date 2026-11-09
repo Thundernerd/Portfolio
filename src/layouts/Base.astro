@@ -4,7 +4,7 @@
  * little imagery and a light/dark toggle that follows `prefers-color-scheme` by default. Owns the
  * document, the header with the section navigation, and the footer; pages fill the `<main>`.
  */
-import { homeSections } from '../components/home/sections';
+import { anchor, homeSections } from '../components/home/sections';
 import ThemeInit from '../components/theme/ThemeInit.astro';
 import ThemeToggle from '../components/theme/ThemeToggle.astro';
 import { withBase } from '../lib/url';
@@ -17,7 +17,7 @@ interface Props {
 
 const { title, description } = Astro.props;
 // The home page's sections, linked through the site root so the nav works from any page.
-const nav = homeSections.map((section) => ({ label: section.nav, href: withBase(`#${section.id}`) }));
+const nav = homeSections.map((section) => ({ label: section.navLabel, href: withBase(anchor(section.id)) }));
 ---
 
 <html lang="en" class="mn">
