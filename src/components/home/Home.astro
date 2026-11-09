@@ -1,18 +1,22 @@
 ---
 /**
- * The home page content (`/`): the hero, then the released games,
- * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
- * section components. Project cards get an inline stats line (language, stars) in their `extra`
- * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
- * quiet placeholder. The sections' ids, headings and order come from `homeSections` (`./sections`),
- * which the header nav reads too; the content of each one is keyed by its id below.
+ * The home page content (`/`): the hero, then the released games, featured projects, Zeepkist mods,
+ * Unity plugins and about/contact sections, built from the shared section components. Game cards link
+ * to the game's page (`gamePath()`); project cards link to the project's page when it has one
+ * (`projectPagePath()`) and get an inline stats line (language, stars) in their `extra` slot; games
+ * without key art get a monogram tile in their `media` slot; `TODO` copy and contact links show as a
+ * quiet placeholder. The about & contact section's avatar and links come from `profile` (`./profile`).
+ * The sections' ids, headings and order come from `homeSections` (`./sections`), which the header nav
+ * reads too; the content of each one is keyed by its id below.
  */
 import type { CollectionEntry } from 'astro:content';
+import { gamePath, projectPagePath } from '../../lib/paths';
 import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
 import { monogramHtml } from './monogram';
-import { presentableGame, presentableProject } from './placeholders';
+import { presentableContactLink, presentableGame, presentableProject } from '../placeholders';
+import { profile } from './profile';
 import { anchor, type HomeSectionId, homeSections } from './sections';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
 import { plural } from './text';
@@ -30,10 +34,12 @@ const projects = Astro.props.projects.map(presentableProject);
 
 const gameMedia = (entry: Game | Project) => (entry.collection === 'games' ? monogramHtml(entry) : undefined);
 const projectStats = (entry: Game | Project) => (entry.collection === 'projects' ? repoStatsHtml(entry) : undefined);
+const projectPage = (entry: Game | Project) => (entry.collection === 'projects' ? projectPagePath(entry) : undefined);
 const ofKind = (kind: Project['data']['kind']) => projects.filter((project) => project.data.kind === kind);
 
 interface GridContent {
 	items: Game[] | Project[];
+	itemHref?: (entry: Game | Project) => string | undefined;
 	itemMedia?: (entry: Game | Project) => string | undefined;
 	itemExtra?: (entry: Game | Project) => string | undefined;
 	intro: string;
@@ -43,21 +49,25 @@ interface GridContent {
 const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 	games: {
 		items: games,
+		itemHref: (entry) => gamePath(entry.id),
 		itemMedia: gameMedia,
 		intro: 'Commercial games I worked on, from co-founding a studio to building multiplayer systems.',
 	},
 	featured: {
 		items: ofKind('featured'),
+		itemHref: projectPage,
 		itemExtra: projectStats,
 		intro: 'Bigger personal projects, mostly around the Zeepkist modding scene.',
 	},
 	'zeepkist-mods': {
 		items: ofKind('zeepkist-mod'),
+		itemHref: projectPage,
 		itemExtra: projectStats,
 		intro: 'BepInEx mods for the soapbox racer Zeepkist, most of them built on ZeepSDK.',
 	},
 	'unity-plugins': {
 		items: ofKind('unity-plugin'),
+		itemHref: projectPage,
 		itemExtra: projectStats,
 		intro: 'Open-source editor and runtime tools for Unity, sorted by GitHub stars.',
 	},
@@ -112,10 +122,9 @@ const facts = [
 				<Contact
 					id={section.id}
 					title={section.title}
-					links={[
-						{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
-						{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
-					]}
+					avatar={profile.avatar}
+					avatarAlt={profile.avatarAlt}
+					links={profile.links.map(presentableContactLink)}
 				>
 					<p class="site-about">
 						I'm Christiaan, a game developer and programmer. Besides shipping games I build the parts players

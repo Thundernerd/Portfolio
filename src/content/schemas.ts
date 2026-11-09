@@ -4,7 +4,10 @@ import type { SchemaContext } from 'astro:content';
 /** An absolute http(s) link; other schemes (mailto:, javascript:) can't be embedded or linked safely. */
 const webUrl = () => z.url({ protocol: /^https?$/ });
 
-/** Frontmatter of a released game in `src/content/games/`. The MD/MDX body holds "what I did". */
+/**
+ * Frontmatter of a released game in `src/content/games/`. The MD/MDX body holds "what I did" (my
+ * responsibilities), shown on the game's page.
+ */
 export const gameSchema = ({ image }: SchemaContext) =>
 	z.object({
 		title: z.string(),
@@ -17,6 +20,10 @@ export const gameSchema = ({ image }: SchemaContext) =>
 		trailer: webUrl().optional(),
 		storeLinks: z.array(z.object({ label: z.string(), url: webUrl() })).default([]),
 		blurb: z.string(),
+		// The engines, languages and services I worked with on it.
+		tech: z.array(z.string()).default([]),
+		// The game page's gallery; the alt text describes what each shot shows.
+		screenshots: z.array(z.object({ image: image(), alt: z.string() })).default([]),
 	});
 
 /**

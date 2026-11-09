@@ -31,6 +31,33 @@ component's markup into the test as a string, as that test does.
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
 asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a leading `/`.
 
+## SEO and link previews
+
+`Base.astro` gives every page a canonical link, Open Graph and `twitter:card` tags, the favicons and
+a link to the sitemap. Pages pass their `title` and `description`. The canonical URL is the page's own
+path on `site`; other absolute URLs, such as the preview image's, come from `absoluteUrl()` in
+`src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
+`sitemap-index.xml` on build. `trailingSlash: 'always'` keeps each page at one URL, `/Portfolio/`,
+in the sitemap and the canonical link.
+
+Search engines won't find the sitemap by themselves: a project site can't serve the domain-root
+`robots.txt` that would name it, and crawlers ignore `<link rel="sitemap">`. Submit
+`https://thundernerd.github.io/Portfolio/sitemap-index.xml` once in Google Search Console (and
+Bing Webmaster Tools).
+
+The link-preview image `public/og.png` (1200x630) is rendered from `assets/og.svg`, and the favicons
+from `public/favicon.svg`. After editing either SVG, re-render the images with
+[resvg](https://github.com/linebender/resvg) and ImageMagick:
+
+```sh
+resvg assets/og.svg public/og.png
+resvg -w 180 -h 180 public/favicon.svg public/apple-touch-icon.png
+for s in 16 32 48; do resvg -w $s -h $s public/favicon.svg /tmp/favicon-$s.png; done
+magick /tmp/favicon-16.png /tmp/favicon-32.png /tmp/favicon-48.png public/favicon.ico
+```
+
+`og.svg` sets its text in JetBrains Mono and Noto Sans, so install those fonts before rendering it.
+
 ## GitHub stats
 
 `npm run build` first runs `scripts/fetch-github.mjs` (the `prebuild` step), which fetches the star
@@ -48,10 +75,14 @@ show the hand-written `blurb`.
 ## Content TODOs
 
 Facts in `src/content/games/` and `src/content/projects/` that still need confirming are marked
-`TODO`, in a frontmatter value (`studio: 'TODO: studio'`), a YAML comment or the body. The launch
+`TODO`, in a frontmatter value (`studio: 'TODO: studio'`), a YAML comment or the body. HTML comments
+in an entry's Markdown body (`<!-- TODO(Christiaan): ... -->`) are dropped when it is rendered
+(`src/lib/strip-html-comments.ts`), so notes kept there don't reach the built pages' source. The launch
 guard in `src/content/no-todos.test.ts` fails on any of them and lists each file, line and field. It
 is skipped by default so CI and preview deploys keep passing while content is being filled in; run it
-on demand with `CHECK_TODOS=1 npm test`. Before launch, once that passes, remove the
+on demand with `CHECK_TODOS=1 npm test`. The guard also covers the home page's contact links in
+`src/components/home/profile.ts`: a link whose `href` is a `TODO` shows as "to be confirmed",
+without a link, until it is filled in. Before launch, once that passes, remove the
 `skipIf(!process.env.CHECK_TODOS)` so the guard runs on every `npm test` and in CI.
 
 ## Deploy
@@ -69,9 +100,26 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `.site` class on `<html>`, and its own classes share the `site-` prefix. The home page (`/`) is
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
-add a section there and give it content in `Home.astro`, where the type checker asks for it. The
+add a section there and give it content in `Home.astro`, where the type checker asks for it.
+Each game has a page at `/games/<entry id>/` (`src/pages/games/[slug].astro`), which the game cards on
+the home page link to. Its content is `src/components/game/GamePage.astro`: the facts and store
+links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube link, linked
+otherwise), the entry's Markdown body under "What I did", its `tech` and a gallery of its
+`screenshots` (each an image next to the entry, with `alt` text). While the body still has a
+`TODO` in it, the page shows "Write-up coming soon." in its place. The about & contact section's
+avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn, email, CV) are set in
+`profile` (`src/components/home/profile.ts`); put a CV PDF in `public/` and link it by its site
+path (`cv.pdf`). The
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
+
+## Featured project pages
+
+Every `featured` project in `src/content/projects/` gets a page at `/projects/<entry id>/`
+(`src/pages/projects/[slug].astro`), and its card in the home page's featured section links there. The
+page shows the title, blurb, language, tags, star count and repo link (from `repoStats()`, as on the
+cards), the frontmatter `image` when there is one, and the entry's Markdown body as a README-style
+description; write that body for the page. The other kinds have no pages.
 
 ## Section components
 
@@ -82,6 +130,8 @@ list resets) inside `@layer components`, so any unlayered layout CSS wins over i
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
 component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
+`Contact` also takes an optional `avatar` image, marks a link with `download: true` (a CV) with the
+`download` attribute, and shows a link without an `href` as plain text.
 Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example

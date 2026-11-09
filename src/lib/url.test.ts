@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resolveHref, withBase } from './url';
+import { absoluteUrl, resolveHref, withBase } from './url';
 
 describe.each(['/Portfolio', '/Portfolio/'])('withBase with BASE_URL "%s"', (base) => {
 	beforeEach(() => {
@@ -46,5 +46,16 @@ describe('resolveHref', () => {
 
 	it('leaves in-page fragments untouched', () => {
 		expect(resolveHref('#contact')).toBe('#contact');
+	});
+});
+
+describe('absoluteUrl', () => {
+	beforeEach(() => vi.stubEnv('BASE_URL', '/Portfolio/'));
+	afterEach(() => vi.unstubAllEnvs());
+
+	it('builds a full URL on the deployed site, under the base path', () => {
+		expect(absoluteUrl('')).toBe('https://thundernerd.github.io/Portfolio/');
+		expect(absoluteUrl('og.png')).toBe('https://thundernerd.github.io/Portfolio/og.png');
+		expect(absoluteUrl('/games/fru/')).toBe('https://thundernerd.github.io/Portfolio/games/fru/');
 	});
 });

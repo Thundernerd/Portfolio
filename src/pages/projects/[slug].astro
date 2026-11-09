@@ -1,0 +1,88 @@
+---
+/**
+ * A page per featured project, at `/projects/<entry id>/` (see `hasPage()` in `src/lib/paths.ts`):
+ * a link back to the home page's featured section, the project's title, blurb, facts (language, tech
+ * tags, star count and a link to the GitHub repo) and the entry's Markdown body as a README-style
+ * description, after its image when it has one. A `TODO` blurb shows as a quiet placeholder, as on
+ * the home page. The language, star count and archived flag come from `repoStats()`, as on the
+ * project cards: GitHub's values when fetched, the frontmatter's otherwise.
+ */
+import { Image } from 'astro:assets';
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import { presentableProject } from '../../components/placeholders';
+import { anchor } from '../../components/home/sections';
+import { plural } from '../../components/home/text';
+import Base from '../../layouts/Base.astro';
+import { repoStats, repoUrl } from '../../lib/github-stats';
+import { hasPage } from '../../lib/paths';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('projects', hasPage);
+	return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+interface Props {
+	project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, blurb, repo, tags, image } = presentableProject(project).data;
+const { language, stars, archived } = repoStats(project.data);
+const { Content } = await render(project);
+---
+
+<Base title={`${title} · Christiaan`} description={blurb}>
+	<article class="site-project">
+		<a class="site-project__back" href={withBase(anchor('featured'))}>All featured projects</a>
+		<header class="site-project__header">
+			<h1 class="site-project__title">{title}</h1>
+			{archived && <p class="site-project__archived">Archived</p>}
+			<p class="site-project__blurb">{blurb}</p>
+			<dl class="site-project__facts">
+				{
+					language && (
+						<div class="site-project__fact">
+							<dt>Language</dt>
+							<dd>{language}</dd>
+						</div>
+					)
+				}
+				{
+					tags.length > 0 && (
+						<div class="site-project__fact">
+							<dt>Tech</dt>
+							<dd>
+								<ul class="site-project__tags">
+									{tags.map((tag) => <li class="site-project__tag">{tag}</li>)}
+								</ul>
+							</dd>
+						</div>
+					)
+				}
+				{
+					stars !== undefined && (
+						<div class="site-project__fact">
+							<dt>Stars</dt>
+							<dd>{plural(stars, 'star', 'stars')}</dd>
+						</div>
+					)
+				}
+				<div class="site-project__fact">
+					<dt>Source</dt>
+					<dd><a class="site-project__repo" href={repoUrl(repo)}>{repo}</a></dd>
+				</div>
+			</dl>
+		</header>
+		{
+			image && (
+				<figure class="site-project__media">
+					<Image class="site-project__image" src={image} alt={`Screenshot of ${title}`} />
+				</figure>
+			)
+		}
+		<div class="site-project__body">
+			<Content />
+		</div>
+	</article>
+</Base>
