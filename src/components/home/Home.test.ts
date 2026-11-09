@@ -70,6 +70,19 @@ describe('Home', () => {
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
 	});
 
+	it('links each featured project card to its page, and no other card', async () => {
+		const html = await render({
+			games: [gameEntry()],
+			projects: [
+				projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
+				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
+				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
+			],
+		});
+		const titleLinks = [...html.matchAll(/<h3[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([^<]+)/g)].map((m) => [m[2].trim(), m[1]]);
+		expect(titleLinks).toEqual([['ZeepSDK', '/Portfolio/projects/zeepsdk/']]);
+	});
+
 	/** The text of each project card's inline stats line, in page order. */
 	const statsLines = (html: string) =>
 		[...html.matchAll(/<ul class="site-stats"[^>]*>([\s\S]*?)<\/ul>/g)].map((m) => textOf(m[1]));

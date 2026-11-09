@@ -73,6 +73,14 @@ add a section there and give it content in `Home.astro`, where the type checker 
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
 
+## Featured project pages
+
+Every `featured` project in `src/content/projects/` gets a page at `/projects/<entry id>/`
+(`src/pages/projects/[slug].astro`), and its card in the home page's featured section links there. The
+page shows the title, blurb, language, tags, star count and repo link (from `repoStats()`, as on the
+cards), the frontmatter `image` when there is one, and the entry's Markdown body as a README-style
+description; write that body for the page. The other kinds have no pages.
+
 ## Section components
 
 `src/components/` holds the shared, unstyled building blocks the pages compose:

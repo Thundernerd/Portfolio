@@ -2,7 +2,7 @@
 /**
  * The home page content (`/`): the hero, then the released games,
  * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
- * section components. Project cards get an inline stats line (language, stars) in their `extra`
+ * section components. Featured project cards link to their pages; project cards get an inline stats line (language, stars) in their `extra`
  * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
  * quiet placeholder. The sections' ids, headings and order come from `homeSections` (`./sections`),
  * which the header nav reads too; the content of each one is keyed by its id below.
@@ -30,10 +30,13 @@ const projects = Astro.props.projects.map(presentableProject);
 
 const gameMedia = (entry: Game | Project) => (entry.collection === 'games' ? monogramHtml(entry) : undefined);
 const projectStats = (entry: Game | Project) => (entry.collection === 'projects' ? repoStatsHtml(entry) : undefined);
+// Featured projects have a page of their own (`src/pages/projects/[slug].astro`).
+const projectPage = (entry: Game | Project) => (entry.collection === 'projects' ? `projects/${entry.id}/` : undefined);
 const ofKind = (kind: Project['data']['kind']) => projects.filter((project) => project.data.kind === kind);
 
 interface GridContent {
 	items: Game[] | Project[];
+	itemHref?: (entry: Game | Project) => string | undefined;
 	itemMedia?: (entry: Game | Project) => string | undefined;
 	itemExtra?: (entry: Game | Project) => string | undefined;
 	intro: string;
@@ -48,6 +51,7 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 	},
 	featured: {
 		items: ofKind('featured'),
+		itemHref: projectPage,
 		itemExtra: projectStats,
 		intro: 'Bigger personal projects, mostly around the Zeepkist modding scene.',
 	},
