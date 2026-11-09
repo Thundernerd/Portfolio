@@ -1,7 +1,8 @@
 ---
 /**
  * Page-opening hero: the site title (the page's `<h1>`), a tagline, optional intro copy (default
- * slot), call-to-action links and an optional `media` slot (key art, video, canvas).
+ * slot), call-to-action links and an optional `media` slot (key art, video, canvas). Each action is a
+ * `.hero__action`; one marked `primary` also gets `.hero__action--primary`.
  *
  * A plain `<section>`, so the layout keeps control of the page's banner `<header>`.
  *
@@ -9,13 +10,13 @@
  * `--hero-gap`, `--hero-actions-gap`.
  */
 import { resolveHref } from '../lib/url';
-import type { Link } from './types';
+import type { HeroAction } from './types';
 
 interface Props {
 	title: string;
 	tagline?: string;
 	/** Site paths go through `withBase()`; absolute URLs and `#fragments` pass through. */
-	actions?: Link[];
+	actions?: HeroAction[];
 }
 
 const { title, tagline, actions = [] } = Astro.props;
@@ -31,7 +32,7 @@ const { title, tagline, actions = [] } = Astro.props;
 				<ul class="hero__actions">
 					{actions.map((action) => (
 						<li>
-							<a class="hero__action" href={resolveHref(action.href)}>{action.label}</a>
+							<a class:list={['hero__action', { 'hero__action--primary': action.primary }]} href={resolveHref(action.href)}>{action.label}</a>
 						</li>
 					))}
 				</ul>

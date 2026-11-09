@@ -38,6 +38,20 @@ describe('Hero', () => {
 		expect(html).toMatch(/<a[^>]*href="https:\/\/github.com\/Thundernerd"[^>]*>GitHub<\/a>/);
 	});
 
+	it('marks only the primary action with the primary modifier', async () => {
+		const html = await container.renderToString(Hero, {
+			props: {
+				title: 'Name',
+				actions: [
+					{ label: 'Games', href: '#games', primary: true },
+					{ label: 'CV', href: 'cv.pdf' },
+				],
+			},
+		});
+		expect(html).toMatch(/<a[^>]*class="hero__action hero__action--primary"[^>]*>Games<\/a>/);
+		expect(html).toMatch(/<a[^>]*class="hero__action"[^>]*>CV<\/a>/);
+	});
+
 	it('omits the actions list when there are none', async () => {
 		const html = await container.renderToString(Hero, { props: { title: 'Name' } });
 		expect(html).not.toContain('<ul');
