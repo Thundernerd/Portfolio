@@ -18,6 +18,21 @@ vi.mock('../../lib/github-stats', async (importOriginal) => {
 	return (await import('../test-fixtures')).withFetchedStats(await importOriginal(), fetched);
 });
 
+// A profile with one confirmed contact link and one whose target is still a TODO.
+vi.mock('./profile', async () => {
+	const { fixtureImage } = await import('../test-fixtures');
+	return {
+		profile: {
+			avatar: fixtureImage,
+			avatarAlt: 'Portrait of Christiaan',
+			links: [
+				{ label: 'GitHub', href: 'https://github.com/Thundernerd' },
+				{ label: 'LinkedIn', href: 'TODO: LinkedIn profile URL' },
+			],
+		},
+	};
+});
+
 describe('Home', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
@@ -166,5 +181,20 @@ describe('Home', () => {
 		const panel = /<div class="hero__media"[^>]*>([\s\S]*?)<\/div>/.exec(html)?.[1] ?? '';
 		const rows = [...panel.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => textOf(m[1]));
 		expect(rows).toEqual(['C# 2', 'Rust 1']);
+	});
+
+	it('shows the avatar and contact links of the profile in the contact section', async () => {
+		const html = await render({ games: [], projects: [] });
+		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		const avatar = /<img[^>]*>/.exec(contact)?.[0] ?? '';
+		expect(avatar).toContain('class="contact__avatar"');
+		expect(avatar).toContain('alt="Portrait of Christiaan"');
+		expect(contact).toMatch(/<a[^>]*href="https:\/\/github.com\/Thundernerd"[^>]*>GitHub<\/a>/);
+	});
+
+	it('shows a contact link whose target is a TODO as a quiet placeholder', async () => {
+		const html = await render({ games: [], projects: [] });
+		expect(html).not.toMatch(/\bTODO\b/);
+		expect(html).toMatch(/<span class="contact__link contact__link--pending"[^>]*>LinkedIn · to be confirmed<\/span>/);
 	});
 });

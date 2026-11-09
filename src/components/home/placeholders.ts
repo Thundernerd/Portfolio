@@ -1,4 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
+import type { ContactEntry, Link } from '../types';
 
 /** `TODO` as a whole word, as the content guard in `src/content/todos.ts` matches it. */
 const isTodo = (value: string) => /\bTODO\b/.test(value);
@@ -27,4 +28,9 @@ export function presentableGame(game: CollectionEntry<'games'>): CollectionEntry
 /** The project with a `TODO` blurb shown as a quiet placeholder. */
 export function presentableProject(project: CollectionEntry<'projects'>): CollectionEntry<'projects'> {
 	return { ...project, data: { ...project.data, blurb: orFallback(project.data.blurb, WRITE_UP_PENDING) } };
+}
+
+/** The contact link, or for a `TODO` target, its label marked as still to be confirmed, without a link. */
+export function presentableContactLink(link: Link): ContactEntry {
+	return isTodo(link.href) ? { label: `${link.label} · ${TO_BE_CONFIRMED.toLowerCase()}` } : link;
 }

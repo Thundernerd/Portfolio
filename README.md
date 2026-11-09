@@ -51,7 +51,9 @@ Facts in `src/content/games/` and `src/content/projects/` that still need confir
 `TODO`, in a frontmatter value (`studio: 'TODO: studio'`), a YAML comment or the body. The launch
 guard in `src/content/no-todos.test.ts` fails on any of them and lists each file, line and field. It
 is skipped by default so CI and preview deploys keep passing while content is being filled in; run it
-on demand with `CHECK_TODOS=1 npm test`. Before launch, once that passes, remove the
+on demand with `CHECK_TODOS=1 npm test`. The guard also covers the home page's contact links in
+`src/components/home/profile.ts`: a link whose `href` is a `TODO` shows as "to be confirmed",
+without a link, until it is filled in. Before launch, once that passes, remove the
 `skipIf(!process.env.CHECK_TODOS)` so the guard runs on every `npm test` and in CI.
 
 ## Deploy
@@ -70,6 +72,9 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
 add a section there and give it content in `Home.astro`, where the type checker asks for it. The
+about & contact section's avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn,
+email, CV) are set in `profile` (`src/components/home/profile.ts`); put a CV PDF in `public/` and
+link it by its site path (`cv.pdf`). The
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
 
@@ -82,6 +87,7 @@ list resets) inside `@layer components`, so any unlayered layout CSS wins over i
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
 component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
+`Contact` also takes an optional `avatar` image, and shows a link without an `href` as plain text.
 Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example

@@ -3,8 +3,9 @@
  * The home page content (`/`): the hero, then the released games,
  * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
  * section components. Project cards get an inline stats line (language, stars) in their `extra`
- * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
- * quiet placeholder. The sections' ids, headings and order come from `homeSections` (`./sections`),
+ * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy and contact
+ * links show as a quiet placeholder. The about & contact section's avatar and links come from
+ * `profile` (`./profile`). The sections' ids, headings and order come from `homeSections` (`./sections`),
  * which the header nav reads too; the content of each one is keyed by its id below.
  */
 import type { CollectionEntry } from 'astro:content';
@@ -12,7 +13,8 @@ import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
 import { monogramHtml } from './monogram';
-import { presentableGame, presentableProject } from './placeholders';
+import { presentableContactLink, presentableGame, presentableProject } from './placeholders';
+import { profile } from './profile';
 import { anchor, type HomeSectionId, homeSections } from './sections';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
 import { plural } from './text';
@@ -114,10 +116,9 @@ const facts = [
 				<Contact
 					id={section.id}
 					title={section.title}
-					links={[
-						{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
-						{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
-					]}
+					avatar={profile.avatar}
+					avatarAlt={profile.avatarAlt}
+					links={profile.links.map(presentableContactLink)}
 				>
 					<p class="site-about">
 						I'm Christiaan, a game developer and programmer. Besides shipping games I build the parts players
