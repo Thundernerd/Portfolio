@@ -20,10 +20,15 @@ describe('Zeepkist GTR', () => {
 	const gtr = byRepo('donderjoekel/Zeepkist.GTR');
 
 	// The system spans several repos; only the public ones are linked.
-	it.each(['Zeepkist.GTR.Mod', 'Zeepkist.GTR.Backend', 'Zeepkist.GTR.Database', 'Zeepkist.GTR.Graphql', 'Zeepkist.GTR.Discord'])(
+	it.each(['Zeepkist.GTR', 'Zeepkist.GTR.Mod', 'Zeepkist.GTR.Database', 'Zeepkist.GTR.Graphql', 'Zeepkist.GTR.Discord'])(
 		'links the public %s repo',
 		(name) => {
 			expect(gtr?.body).toContain(`(https://github.com/donderjoekel/${name})`);
 		},
 	);
+
+	// The merged Backend service is retired; the page describes the split services instead.
+	it('does not link the retired Backend repo', () => {
+		expect(gtr?.body).not.toContain('Zeepkist.GTR.Backend');
+	});
 });
