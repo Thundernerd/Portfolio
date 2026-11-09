@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { escapeHtml } from './text';
+import { escapeHtml } from '../../lib/text';
 
 /**
  * The letters of a title's monogram: the initials of its first three words, or a one-word title
