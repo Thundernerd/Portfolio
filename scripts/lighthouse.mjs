@@ -31,29 +31,39 @@ const ansiColours = /\x1b\[[0-9;]*m/g;
 /** How long the preview may take to start serving, as lhci's own `startServerReadyTimeout`. */
 const readyTimeoutMs = 10_000;
 
+/** How long the preview may take to exit once asked to stop, before it is killed outright. */
+const stopTimeoutMs = 5_000;
+
 /**
  * @typedef {object} Preview
  * @property {() => Promise<void>} stop Stops the server, resolving once it has exited.
+ * @property {Promise<void>} exited Resolves when the server exits, stopped or not.
  */
 
 /**
  * Starts `astro preview` on `host`:`port`, resolving once it serves there. Rejects with a message
  * naming the port when the preview can't bind it (Vite then moves to another port), and when it
  * exits or hasn't started serving within {@link readyTimeoutMs}; it is stopped then.
- * @param {{ host: string, port: number, outDir?: string }} options `outDir`: the build to serve,
- *   dist/ by default.
+ * @param {{ host: string, port: number, outDir?: string, signal?: AbortSignal }} options
+ *   `outDir`: the build to serve, dist/ by default. `signal`: stops the server when aborted.
  * @returns {Promise<Preview>}
  */
-export function startPreview({ host, port, outDir }) {
+export function startPreview({ host, port, outDir, signal }) {
 	const astro = packageFile('astro', 'bin/astro.mjs');
 	// `--ignore-lock` keeps the server in the foreground: when `astro preview` detects an AI agent it
 	// otherwise moves itself to the background and outlives the run.
 	const args = [astro, 'preview', '--ignore-lock', '--host', host, '--port', String(port)];
 	if (outDir) args.push('--outDir', outDir);
-	const child = spawn(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
-	const exited = new Promise((resolve) => child.once('exit', resolve));
+	const child = spawn(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'], signal });
+	/** @type {Promise<void>} */
+	const exited = new Promise((resolve) => child.once('exit', () => resolve()));
 	const stop = async () => {
-		if (child.exitCode === null && child.signalCode === null) child.kill();
+		if (child.exitCode === null && child.signalCode === null) {
+			child.kill();
+			const killer = setTimeout(() => child.kill('SIGKILL'), stopTimeoutMs);
+			await exited;
+			clearTimeout(killer);
+		}
 		await exited;
 	};
 
@@ -68,7 +78,13 @@ export function startPreview({ host, port, outDir }) {
 			stop().then(() => reject(error));
 		};
 		const timer = setTimeout(
-			() => fail(new Error(`\`astro preview\` didn't start serving on port ${port}:\n${output}`)),
+			() =>
+				fail(
+					new Error(
+						`\`astro preview\` didn't start serving on port ${port} within ${readyTimeoutMs / 1000}s` +
+							(output ? `:\n${output}` : ' and printed nothing.'),
+					),
+				),
 			readyTimeoutMs,
 		);
 		/** @param {Buffer} chunk */
@@ -88,7 +104,7 @@ export function startPreview({ host, port, outDir }) {
 			}
 			settled = true;
 			clearTimeout(timer);
-			resolve({ stop });
+			resolve({ stop, exited });
 		};
 		child.stdout.on('data', onData);
 		child.stderr.on('data', onData);
@@ -104,34 +120,54 @@ export function startPreview({ host, port, outDir }) {
 	});
 }
 
-/**
- * Runs `lhci autorun` in the foreground, resolving with its exit code.
- * @returns {Promise<number>}
- */
-function runLhci() {
-	const lhci = packageFile('@lhci/cli', 'src/cli.js');
-	const child = spawn(process.execPath, [lhci, 'autorun'], { stdio: 'inherit' });
-	return new Promise((resolve, reject) => {
-		child.once('error', reject);
-		child.once('exit', (code, signal) => resolve(code ?? (signal ? 1 : 0)));
-	});
-}
-
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
 	const { host, port } = require('../lighthouserc.cjs');
+	// Stop the preview and lhci when the run is interrupted (Ctrl-C, a cancelled CI job), so neither
+	// outlives it and keeps the port.
+	const abort = new AbortController();
+	/** @type {import('node:child_process').ChildProcess | undefined} */
+	let lhci;
+	/** @type {NodeJS.Signals | undefined} */
+	let interrupted;
+	for (const signal of /** @type {const} */ (['SIGINT', 'SIGTERM'])) {
+		process.once(signal, () => {
+			interrupted = signal;
+			lhci?.kill(signal);
+			abort.abort();
+		});
+	}
+	const interruptedCode = () => (interrupted === 'SIGINT' ? 130 : 143);
+
 	/** @type {Preview} */
 	let preview;
 	try {
-		preview = await startPreview({ host, port });
+		preview = await startPreview({ host, port, signal: abort.signal });
 	} catch (error) {
+		if (interrupted) process.exit(interruptedCode());
 		console.error(error instanceof Error ? error.message : error);
 		process.exit(1);
 	}
-	let code = 1;
-	try {
-		code = await runLhci();
-	} finally {
-		await preview.stop();
-	}
-	process.exit(code);
+
+	// lhci audits whatever answers on the port, so it must not outlive the preview.
+	let auditing = true;
+	lhci = spawn(process.execPath, [packageFile('@lhci/cli', 'src/cli.js'), 'autorun'], {
+		stdio: 'inherit',
+	});
+	const child = lhci;
+	/** @type {number} */
+	const code = await new Promise((resolve) => {
+		child.once('error', (error) => {
+			console.error(error.message);
+			resolve(1);
+		});
+		child.once('exit', (exitCode) => resolve(exitCode ?? 1));
+		preview.exited.then(() => {
+			if (!auditing || interrupted) return;
+			console.error('`astro preview` stopped during the audit, so the run has failed.');
+			child.kill();
+		});
+	});
+	auditing = false;
+	await preview.stop();
+	process.exit(interrupted ? interruptedCode() : code);
 }
