@@ -982,7 +982,8 @@
 }
 
 .site-project__body h2,
-.site-project__body h3 {
+.site-project__body h3,
+.site-project__diagram-title {
 	margin: 2rem 0 0.5rem;
 	letter-spacing: -0.02em;
 	line-height: 1.25;
@@ -1076,4 +1077,96 @@
 	.site .game-card__cover {
 		aspect-ratio: 2 / 1;
 	}
+}
+
+/* ---- Project architecture diagrams ----------------------------------------------------------- */
+
+/* A project's architecture diagram (`projectDiagram()`), after its description. As a grid item it
+   would otherwise widen to the diagram's min-width instead of letting it scroll. */
+.site-project__diagram {
+	min-width: 0;
+}
+
+.site-project__diagram-title {
+	margin: 0 0 1rem;
+	font-size: 1.5rem;
+}
+
+.site .project-diagram {
+	margin: 0;
+}
+
+/* On a narrow screen the diagram keeps a readable size and scrolls sideways. */
+.site .project-diagram__scroll {
+	overflow-x: auto;
+	padding: 1rem;
+	border: 1px solid var(--rule);
+	border-radius: 10px;
+	background: var(--bg);
+}
+
+.site .project-diagram__caption {
+	margin-top: 0.6rem;
+	font-size: 0.875rem;
+	color: var(--muted);
+}
+
+/* Inline SVG painted only with the theme tokens, so it follows the light and dark themes. Its font
+   sizes are in SVG user units (px here), which scale with the viewBox like the boxes do. */
+.site .gtr-diagram {
+	display: block;
+	width: 100%;
+	min-width: 42rem;
+	height: auto;
+	font-family: var(--font-sans);
+}
+
+.site .gtr-diagram__node rect {
+	fill: var(--surface);
+	stroke: var(--rule-strong);
+	stroke-width: 1.25;
+}
+
+.site .gtr-diagram text {
+	text-anchor: middle;
+}
+
+.site .gtr-diagram__label {
+	fill: var(--text);
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.site .gtr-diagram__sub,
+.site .gtr-diagram__note {
+	fill: var(--muted);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+}
+
+/* A halo in the page colour keeps a note readable where it crosses a line. */
+.site .gtr-diagram__note {
+	paint-order: stroke;
+	stroke: var(--bg);
+	stroke-width: 4px;
+	stroke-linejoin: round;
+}
+
+.site .gtr-diagram__edge polyline {
+	fill: none;
+	stroke: var(--muted);
+	stroke-width: 1.5;
+}
+
+.site .gtr-diagram__edge--record polyline {
+	stroke: var(--accent);
+	stroke-width: 2;
+}
+
+.site .gtr-diagram__head path {
+	fill: var(--muted);
+}
+
+.site .gtr-diagram__head--record path {
+	fill: var(--accent);
 }

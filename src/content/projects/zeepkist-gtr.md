@@ -8,7 +8,6 @@ stars: 1
 ---
 
 <!-- TODO(Christiaan): say what "GTR" stands for, add screenshots (`image` in the frontmatter) and any player or record numbers you want shown. -->
-<!-- TODO(Christiaan): decide whether the private repos (such as the JSON API, record processors, auth and stream services) may be named here; they are left out until then. -->
 
 Zeepkist GTR is a whole system rather than a single mod. Players race with the in-game mod, which sends
 their records to a backend, and the results come back to the game, to a GraphQL API and to Discord. The
