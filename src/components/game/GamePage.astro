@@ -1,0 +1,164 @@
+---
+/**
+ * The content of a game's page (`gamePath()`), in this order:
+ *
+ * - the title and blurb, the role, studio, year, platforms and store links;
+ * - the trailer, embedded when it is on YouTube (`trailerEmbedUrl()`) and linked otherwise;
+ * - "What I did": the entry's rendered Markdown body, passed in the default slot;
+ * - the tech, and a gallery of the screenshots, each left out when the entry has none.
+ *
+ * `TODO` copy shows as a quiet placeholder, as on the home page. The write-up drops its paragraphs
+ * and list items that still hold a `TODO`, and shows a placeholder when nothing else is left.
+ *
+ * Structural only, like the shared section components: the site stylesheet styles it through the
+ * classes below or these custom properties: `--game-list-gap` (the platform, store and tech lists),
+ * `--gallery-min` (minimum screenshot width), `--gallery-gap`.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { trailerEmbedUrl } from '../../lib/trailer';
+import { presentableGame, presentableWriteUp, WRITE_UP_PENDING } from '../placeholders';
+
+interface Props {
+	game: CollectionEntry<'games'>;
+}
+
+const { game } = Astro.props;
+const { title, platforms, role, studio, year, blurb, trailer, storeLinks, tech, screenshots } = presentableGame(game).data;
+const writeUp = presentableWriteUp(Astro.slots.has('default') ? await Astro.slots.render('default') : '');
+const embedUrl = trailer && trailerEmbedUrl(trailer);
+---
+
+<article class="game-page">
+	<header class="game-page__header">
+		<h1 class="game-page__title">{title}</h1>
+		<p class="game-page__blurb">{blurb}</p>
+		<dl class="game-page__facts">
+			<div class="game-page__fact">
+				<dt class="game-page__label">Role</dt>
+				<dd class="game-page__role">{role}</dd>
+			</div>
+			<div class="game-page__fact">
+				<dt class="game-page__label">Studio</dt>
+				<dd class="game-page__studio">{studio}</dd>
+			</div>
+			{
+				year !== undefined && (
+					<div class="game-page__fact">
+						<dt class="game-page__label">Year</dt>
+						<dd class="game-page__year">
+							<time datetime={String(year)}>{year}</time>
+						</dd>
+					</div>
+				)
+			}
+			<div class="game-page__fact">
+				<dt class="game-page__label">Platforms</dt>
+				<dd>
+					<ul class="game-page__platforms">
+						{platforms.map((platform) => <li class="game-page__platform">{platform}</li>)}
+					</ul>
+				</dd>
+			</div>
+		</dl>
+		{
+			storeLinks.length > 0 && (
+				<ul class="game-page__stores">
+					{storeLinks.map((link) => (
+						<li>
+							<a class="game-page__store" href={link.url}>{link.label}</a>
+						</li>
+					))}
+				</ul>
+			)
+		}
+	</header>
+	{
+		embedUrl ? (
+			<div class="game-page__trailer">
+				<iframe
+					class="game-page__trailer-embed"
+					src={embedUrl}
+					title={`${title} trailer`}
+					loading="lazy"
+					allow="encrypted-media; picture-in-picture; fullscreen"
+					referrerpolicy="strict-origin-when-cross-origin"
+					allowfullscreen
+				/>
+			</div>
+		) : (
+			trailer && (
+				<p class="game-page__trailer">
+					<a class="game-page__trailer-link" href={trailer}>Watch the trailer</a>
+				</p>
+			)
+		)
+	}
+	<section class="game-page__section game-page__work" aria-labelledby="work-heading">
+		<h2 class="game-page__heading" id="work-heading">What I did</h2>
+		<div class="game-page__write-up">
+			{writeUp !== undefined ? <Fragment set:html={writeUp} /> : <p class="game-page__placeholder">{WRITE_UP_PENDING}</p>}
+		</div>
+	</section>
+	{
+		tech.length > 0 && (
+			<section class="game-page__section game-page__tech" aria-labelledby="tech-heading">
+				<h2 class="game-page__heading" id="tech-heading">Tech</h2>
+				<ul class="game-page__tags">
+					{tech.map((item) => <li class="game-page__tag">{item}</li>)}
+				</ul>
+			</section>
+		)
+	}
+	{
+		screenshots.length > 0 && (
+			<section class="game-page__section game-page__screenshots" aria-labelledby="screenshots-heading">
+				<h2 class="game-page__heading" id="screenshots-heading">Screenshots</h2>
+				<ul class="game-page__gallery">
+					{screenshots.map((shot) => (
+						<li class="game-page__shot">
+							<Image class="game-page__shot-image" src={shot.image} alt={shot.alt} widths={[480, 960]} sizes="(min-width: 48rem) 50vw, 100vw" />
+						</li>
+					))}
+				</ul>
+			</section>
+		)
+	}
+</article>
+
+<style>
+	@layer components {
+		.game-page__facts,
+		.game-page__platforms,
+		.game-page__stores,
+		.game-page__tags,
+		.game-page__gallery {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.game-page__platforms,
+		.game-page__stores,
+		.game-page__tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--game-list-gap, 0.5rem);
+		}
+		.game-page__trailer-embed {
+			display: block;
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			border: 0;
+		}
+		.game-page__gallery {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(min(var(--gallery-min, 20rem), 100%), 1fr));
+			gap: var(--gallery-gap, 1rem);
+		}
+		.game-page__shot-image {
+			display: block;
+			max-width: 100%;
+			height: auto;
+		}
+	}
+</style>

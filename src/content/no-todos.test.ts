@@ -4,11 +4,17 @@ import { findTodos, formatTodo } from './todos';
 
 // Launch guard: opt-in until launch, see "Content TODOs" in README.md. Reads the raw files so TODOs
 // in YAML comments count too.
-const entries = rawEntries();
+// The home profile's contact links hold TODOs too (see `src/components/home/profile.ts`).
+const profile = import.meta.glob<string>('../components/home/profile.ts', { query: '?raw', import: 'default', eager: true });
+const sources = { ...rawEntries(), ...profile };
 
-describe('content entries', () => {
+describe('content entries and the home profile', () => {
+	it('include the home profile', () => {
+		expect(Object.keys(sources)).toContain('../components/home/profile.ts');
+	});
+
 	it.skipIf(!process.env.CHECK_TODOS)('hold no TODO placeholders', () => {
-		const todos = findTodos(entries).map(formatTodo);
+		const todos = findTodos(sources).map(formatTodo);
 		expect(todos).toEqual([]);
 	});
 });

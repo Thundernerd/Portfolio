@@ -7,6 +7,7 @@ import {
 	projectEntry,
 	sectionIds,
 	sectionsOverride,
+	textOf,
 } from '../test-fixtures';
 import Home from './Home.astro';
 
@@ -18,6 +19,21 @@ vi.mock('../../lib/github-stats', async (importOriginal) => {
 	return (await import('../test-fixtures')).withFetchedStats(await importOriginal(), fetched);
 });
 
+// A profile with one confirmed contact link and one whose target is still a TODO.
+vi.mock('./profile', async () => {
+	const { fixtureImage } = await import('../test-fixtures');
+	return {
+		profile: {
+			avatar: fixtureImage,
+			avatarAlt: 'Portrait of Christiaan',
+			links: [
+				{ label: 'GitHub', href: 'https://github.com/Thundernerd' },
+				{ label: 'LinkedIn', href: 'TODO: LinkedIn profile URL' },
+			],
+		},
+	};
+});
+
 describe('Home', () => {
 	let container: AstroContainer;
 	beforeEach(async () => {
@@ -25,8 +41,6 @@ describe('Home', () => {
 	});
 
 	const render = (props: Record<string, unknown>) => container.renderToString(Home, { props });
-	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
-	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 	it('renders the hero, then every section in the agreed order', async () => {
 		const html = await render({ games: [], projects: [] });
@@ -49,6 +63,11 @@ describe('Home', () => {
 		expect(headings).toEqual(['Say hi', 'Unity plugins', 'Zeepkist mods', 'Featured projects', 'Games']);
 	});
 
+	it("links each game card to the game's page", async () => {
+		const html = await render({ games: [gameEntry({ title: 'FRU' }, 'fru')], projects: [] });
+		expect(html).toMatch(/<a class="game-card__title-link"[^>]*href="\/Portfolio\/games\/fru\/"[^>]*>FRU<\/a>/);
+	});
+
 	/** The card titles inside the section with this id. */
 	const titlesIn = (html: string, id: string) => {
 		const section = new RegExp(`<section[^>]*id="${id}"[\\s\\S]*?</section>`).exec(html)?.[0] ?? '';
@@ -68,6 +87,19 @@ describe('Home', () => {
 		expect(titlesIn(html, 'featured')).toEqual(['ZeepSDK']);
 		expect(titlesIn(html, 'zeepkist-mods')).toEqual(['RTM']);
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
+	});
+
+	it('links each featured project card to its page, and no other project card', async () => {
+		const html = await render({
+			games: [],
+			projects: [
+				projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
+				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
+				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
+			],
+		});
+		const titleLinks = [...html.matchAll(/<h3[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([^<]+)/g)].map((m) => [m[2].trim(), m[1]]);
+		expect(titleLinks).toEqual([['ZeepSDK', '/Portfolio/projects/zeepsdk/']]);
 	});
 
 	/** The text of each project card's inline stats line, in page order. */
@@ -166,5 +198,20 @@ describe('Home', () => {
 		const panel = /<div class="hero__media"[^>]*>([\s\S]*?)<\/div>/.exec(html)?.[1] ?? '';
 		const rows = [...panel.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => textOf(m[1]));
 		expect(rows).toEqual(['C# 2', 'Rust 1']);
+	});
+
+	it('shows the avatar and contact links of the profile in the contact section', async () => {
+		const html = await render({ games: [], projects: [] });
+		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		const avatar = /<img[^>]*>/.exec(contact)?.[0] ?? '';
+		expect(avatar).toContain('class="contact__avatar"');
+		expect(avatar).toContain('alt="Portrait of Christiaan"');
+		expect(contact).toMatch(/<a[^>]*href="https:\/\/github.com\/Thundernerd"[^>]*>GitHub<\/a>/);
+	});
+
+	it('shows a contact link whose target is a TODO as a quiet placeholder', async () => {
+		const html = await render({ games: [], projects: [] });
+		expect(html).not.toMatch(/\bTODO\b/);
+		expect(html).toMatch(/<span class="contact__link contact__link--pending"[^>]*>LinkedIn · to be confirmed<\/span>/);
 	});
 });
