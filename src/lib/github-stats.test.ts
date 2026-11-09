@@ -10,16 +10,16 @@ const project = {
 describe('resolveRepoStats', () => {
 	it('prefers the star count fetched from GitHub', () => {
 		const fetched = { [project.repo]: { stars: 412, language: 'C#' } };
-		expect(resolveRepoStats(project, fetched).stars).toBe(412);
+		expect(resolveRepoStats(project, fetched)).toStrictEqual({ stars: 412, language: 'C#' });
 	});
 
 	it('falls back to the frontmatter stars when the repo was not fetched', () => {
-		expect(resolveRepoStats(project, {}).stars).toBe(300);
+		expect(resolveRepoStats(project, {})).toStrictEqual({ stars: 300, language: 'C#' });
 	});
 
 	it('has no star count when neither GitHub nor the frontmatter gives one', () => {
 		const { stars, ...withoutStars } = project;
-		expect(resolveRepoStats(withoutStars, {}).stars).toBeUndefined();
+		expect(resolveRepoStats(withoutStars, {})).toStrictEqual({ stars: undefined, language: 'C#' });
 	});
 
 	it('prefers the language GitHub reports over the tags', () => {
