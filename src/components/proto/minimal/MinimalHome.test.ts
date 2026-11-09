@@ -4,9 +4,8 @@ import MinimalHome from './MinimalHome.astro';
 
 // Stands in for the stats file the prebuild fetcher writes; only `fixture-owner/fetched` was fetched.
 vi.mock('../../../lib/github-stats', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('../../../lib/github-stats')>();
 	const fetched = { 'fixture-owner/fetched': { stars: 50, language: 'ShaderLab' } };
-	return { ...actual, repoStats: (project: Parameters<typeof actual.repoStats>[0]) => actual.resolveRepoStats(project, fetched) };
+	return (await import('../../test-fixtures')).withFetchedStats(await importOriginal(), fetched);
 });
 
 describe('MinimalHome', () => {

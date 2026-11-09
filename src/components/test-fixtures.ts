@@ -1,6 +1,7 @@
 import { experimental_AstroContainer } from 'astro/container';
 import type { CollectionEntry } from 'astro:content';
 import { afterEach, vi } from 'vitest';
+import type { RepoStats } from '../lib/github-stats';
 
 /** Test helpers and fixtures shaped like parsed content entries, so component tests don't depend on real content. */
 
@@ -56,4 +57,21 @@ export function gameEntry(data: Partial<CollectionEntry<'games'>['data']> = {}, 
 			...data,
 		},
 	};
+}
+
+type GithubStatsModule = typeof import('../lib/github-stats');
+
+/**
+ * Builds a mocked `src/lib/github-stats` module whose `repoStats()` reads the given `fetched` stats
+ * instead of the file the prebuild fetcher writes. Return it from a `vi.mock` factory; since
+ * `vi.mock` is hoisted above the imports, load this helper inside the factory:
+ *
+ * ```ts
+ * vi.mock('../lib/github-stats', async (importOriginal) =>
+ * 	(await import('./test-fixtures')).withFetchedStats(await importOriginal(), { 'fixture-owner/fetched': { stars: 50, language: null } }),
+ * );
+ * ```
+ */
+export function withFetchedStats(actual: GithubStatsModule, fetched: Record<string, RepoStats>): GithubStatsModule {
+	return { ...actual, repoStats: (project) => actual.resolveRepoStats(project, fetched) };
 }
