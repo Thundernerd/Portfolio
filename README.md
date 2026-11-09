@@ -31,6 +31,27 @@ component's markup into the test as a string, as that test does.
 The site is deployed under `/Portfolio` (see `base` in `astro.config.mjs`). Build internal links and
 asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a leading `/`.
 
+## SEO and link previews
+
+`Base.astro` gives every page a canonical link, Open Graph and `twitter:card` tags, the favicons and
+a link to the sitemap. Pages pass their `title` and `description`; the absolute URLs come from
+`absoluteUrl()` in `src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
+`sitemap-index.xml` on build. `trailingSlash: 'always'` keeps each page at one URL, `/Portfolio/`,
+in the sitemap and the canonical link.
+
+The link-preview image `public/og.png` (1200x630) is rendered from `assets/og.svg`, and the favicons
+from `public/favicon.svg`. After editing either SVG, re-render the images with
+[resvg](https://github.com/linebender/resvg) and ImageMagick:
+
+```sh
+resvg assets/og.svg public/og.png
+resvg -w 180 -h 180 public/favicon.svg public/apple-touch-icon.png
+for s in 16 32 48; do resvg -w $s -h $s public/favicon.svg /tmp/favicon-$s.png; done
+magick /tmp/favicon-16.png /tmp/favicon-32.png /tmp/favicon-48.png public/favicon.ico
+```
+
+`og.svg` sets its text in JetBrains Mono and Noto Sans, so install those fonts before rendering it.
+
 ## GitHub stats
 
 `npm run build` first runs `scripts/fetch-github.mjs` (the `prebuild` step), which fetches the star
