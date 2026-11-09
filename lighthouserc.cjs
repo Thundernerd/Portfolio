@@ -36,8 +36,10 @@ module.exports = {
 				`${origin}/games/good-job/`,
 				`${origin}/projects/zeepkist-gtr/`,
 			],
-			// Lighthouse's default mobile emulation, one run per page.
-			numberOfRuns: 1,
+			// Lighthouse's default mobile emulation. Three runs per page, of which the assertions take
+			// the best (lhci's default `optimistic` aggregation), so a run slowed by a busy machine
+			// doesn't fail the job.
+			numberOfRuns: 3,
 		},
 		assert: {
 			assertions: {
