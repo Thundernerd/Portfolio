@@ -41,11 +41,11 @@ describe('Contact', () => {
 		expect(html).toMatch(/<p>Say hi.<\/p>.*<address/s);
 	});
 
-	it('shows an avatar with its alt text before the heading when given one', async () => {
+	it('shows an avatar with its alt text after the heading when given one', async () => {
 		const html = await container.renderToString(Contact, {
 			props: { links, avatar: fixtureImage, avatarAlt: 'Portrait of Christiaan' },
 		});
-		expect(html).toMatch(/<img[^>]*class="contact__avatar"[^>]*>.*<h2/s);
+		expect(html).toMatch(/<\/h2>\s*<img[^>]*class="contact__avatar"/);
 		expect(html).toMatch(/<img[^>]*alt="Portrait of Christiaan"/);
 	});
 
