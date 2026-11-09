@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import type { CollectionEntry } from 'astro:content';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
@@ -46,5 +47,16 @@ describe('Home with the real content', () => {
 		const entries = [...contact.matchAll(/class="contact__link[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1]);
 		expect(entries.filter((entry) => /^Email\b/.test(entry))).toEqual([]);
 		expect(contact).not.toContain('mailto:');
+	});
+
+	it('links the CV as a download of a PDF under public/', async () => {
+		const html = await container.renderToString(Home, { props: { games: [], projects: [] } });
+		const contact = /<section[^>]*id="contact"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		expect(contact).not.toContain('contact__link--pending');
+		const cv = /<a class="contact__link" href="([^"]+)"([^>]*)>CV\b/.exec(contact);
+		expect(cv?.[1]).toMatch(/^\/Portfolio\/[^/]+\.pdf$/);
+		expect(cv?.[2]).toMatch(/\bdownload\b/);
+		const file = new URL(`../../../public/${cv?.[1].replace(/^\/Portfolio\//, '')}`, import.meta.url);
+		expect(existsSync(file), file.pathname).toBe(true);
 	});
 });
