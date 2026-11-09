@@ -1,6 +1,9 @@
-// The `prelighthouse` step: fails `npm run lighthouse` when its port is already taken. lhci only
-// warns when its `astro preview` doesn't come up, then audits whatever answers on the port, so a
-// stale server there would be audited, and pass, in place of dist/.
+// @ts-check
+/**
+ * Prelighthouse step: fails `npm run lighthouse` when its port (`port` in `lighthouserc.cjs`) is
+ * already taken. lhci only warns when its `astro preview` doesn't come up, then audits whatever
+ * answers on the port, so a stale server there would be audited, and pass, in place of dist/.
+ */
 import { createServer } from 'node:net';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
@@ -14,7 +17,7 @@ import { pathToFileURL } from 'node:url';
 export function assertPortFree(port) {
 	return new Promise((resolve, reject) => {
 		const server = createServer();
-		server.once('error', (error) => {
+		server.once('error', (/** @type {NodeJS.ErrnoException} */ error) => {
 			reject(
 				new Error(
 					`Port ${port} is already in use (${error.code ?? error.message}), so Lighthouse would ` +
