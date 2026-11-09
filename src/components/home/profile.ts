@@ -1,5 +1,13 @@
 import avatar from '../../assets/avatar.jpg';
+import type { ImageMetadata } from 'astro';
 import type { ContactLink } from '../types';
+
+/** The facts in the home page's about & contact section. */
+export interface Profile {
+	avatar: ImageMetadata;
+	avatarAlt: string;
+	links: ContactLink[];
+}
 
 /**
  * The facts the home page's about & contact section shows: the avatar and the contact links, in
@@ -7,12 +15,6 @@ import type { ContactLink } from '../types';
  * and the launch guard (`CHECK_TODOS=1 npm test`, see "Content TODOs" in README.md) lists it until
  * it is filled in. Site paths (a CV under `public/`) go through `withBase()`.
  */
-export interface Profile {
-	avatar: ImageMetadata;
-	avatarAlt: string;
-	links: ContactLink[];
-}
-
 export const profile: Profile = {
 	avatar,
 	avatarAlt: 'Portrait of Christiaan',
