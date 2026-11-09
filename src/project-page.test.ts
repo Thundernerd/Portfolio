@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createComponent, render as renderTemplate, unescapeHTML } from 'astro/runtime/server/index.js';
-import { type AstroContainer, createContainer, fixtureImage, projectEntry } from './components/test-fixtures';
+import { type AstroContainer, createContainer, fixtureImage, projectEntry, textOf } from './components/test-fixtures';
 import ProjectPage, { getStaticPaths } from './pages/projects/[slug].astro';
 
 // Astro's content layer is not populated under Vitest; the tests set the collection the page reads.
@@ -22,9 +22,6 @@ vi.mock('./lib/github-stats', async (importOriginal) => {
 	const fetched = { 'fixture-owner/fetched': { stars: 1234, language: 'ShaderLab', archived: true } };
 	return (await import('./components/test-fixtures')).withFetchedStats(await importOriginal(), fetched);
 });
-
-/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
-const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 describe('/projects/[slug]', () => {
 	let container: AstroContainer;

@@ -7,6 +7,7 @@ import {
 	projectEntry,
 	sectionIds,
 	sectionsOverride,
+	textOf,
 } from '../test-fixtures';
 import Home from './Home.astro';
 
@@ -25,8 +26,6 @@ describe('Home', () => {
 	});
 
 	const render = (props: Record<string, unknown>) => container.renderToString(Home, { props });
-	/** The visible text of an HTML fragment, tags removed and whitespace collapsed. */
-	const textOf = (fragment: string) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 	it('renders the hero, then every section in the agreed order', async () => {
 		const html = await render({ games: [], projects: [] });
