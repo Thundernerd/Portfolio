@@ -21,8 +21,7 @@ export const profile: Profile = {
 	links: [
 		{ label: 'GitHub · Thundernerd', href: 'https://github.com/Thundernerd' },
 		{ label: 'GitHub · donderjoekel', href: 'https://github.com/donderjoekel' },
-		{ label: 'LinkedIn', href: 'TODO: LinkedIn profile URL' },
-		{ label: 'Email', href: 'TODO: mailto: link to a public email address' },
-		{ label: 'CV (PDF)', href: 'TODO: put the CV in public/ and give its path, e.g. cv.pdf', download: true },
+		{ label: 'LinkedIn', href: 'https://www.linkedin.com/in/chrusb/' },
+		{ label: 'CV (PDF)', href: 'cv.pdf', download: true },
 	],
 };
