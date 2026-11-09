@@ -4,10 +4,12 @@
  * featured projects, Zeepkist mods, Unity plugins and about/contact sections, built from the shared
  * section components. Project cards get an inline stats line (language, stars) in their `extra`
  * slot; games without key art get a monogram tile in their `media` slot; `TODO` copy shows as a
- * quiet placeholder. Game cards link to the game's page. The sections' ids, headings and order come from `homeSections` (`./sections`),
- * which the header nav reads too; the content of each one is keyed by its id below.
+ * quiet placeholder; game cards link to the game's page (`gamePath()`). The sections' ids, headings
+ * and order come from `homeSections` (`./sections`), which the header nav reads too; the content of
+ * each one is keyed by its id below.
  */
 import type { CollectionEntry } from 'astro:content';
+import { gamePath } from '../../lib/paths';
 import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
@@ -44,7 +46,7 @@ interface GridContent {
 const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 	games: {
 		items: games,
-		itemHref: (entry) => `games/${entry.id}/`,
+		itemHref: (entry) => gamePath(entry.id),
 		itemMedia: gameMedia,
 		intro: 'Commercial games I worked on, from co-founding a studio to building multiplayer systems.',
 	},

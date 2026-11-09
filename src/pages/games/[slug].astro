@@ -1,5 +1,8 @@
 ---
-/** A page per released game (`/games/<entry id>/`), built from its `src/content/games/` entry. */
+/**
+ * A page per released game at `gamePath()` (`/games/<entry id>/`), built from its
+ * `src/content/games/` entry.
+ */
 import type { GetStaticPaths } from 'astro';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import GamePage from '../../components/game/GamePage.astro';

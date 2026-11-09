@@ -734,7 +734,7 @@
 
 .site .game-page__platforms,
 .site .game-page__tags {
-	--game-tags-gap: 0.35rem;
+	--game-list-gap: 0.35rem;
 }
 
 .site .game-page__platform {
@@ -746,7 +746,7 @@
 }
 
 .site .game-page__stores {
-	--game-tags-gap: 0.5rem 1.5rem;
+	--game-list-gap: 0.5rem 1.5rem;
 	font-family: var(--font-mono);
 	font-size: 0.875rem;
 }
