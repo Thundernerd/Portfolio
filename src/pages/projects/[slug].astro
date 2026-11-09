@@ -11,10 +11,10 @@ import { Image } from 'astro:assets';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import { presentableProject } from '../../components/placeholders';
 import { anchor } from '../../components/home/sections';
-import { plural } from '../../lib/text';
 import Base from '../../layouts/Base.astro';
 import { repoStats, repoUrl } from '../../lib/github-stats';
 import { hasPage } from '../../lib/paths';
+import { plural } from '../../lib/text';
 import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {

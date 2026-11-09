@@ -11,6 +11,7 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import { gamePath, projectPagePath } from '../../lib/paths';
+import { plural } from '../../lib/text';
 import CollectionGrid from '../CollectionGrid.astro';
 import Contact from '../Contact.astro';
 import Hero from '../Hero.astro';
@@ -19,7 +20,6 @@ import { presentableContactLink, presentableGame, presentableProject } from '../
 import { profile } from './profile';
 import { anchor, type HomeSectionId, homeSections, isShown } from './sections';
 import { languageBreakdown, repoStatsHtml, totalStars } from './stats';
-import { plural } from '../../lib/text';
 
 type Game = CollectionEntry<'games'>;
 type Project = CollectionEntry<'projects'>;
