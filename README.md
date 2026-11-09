@@ -128,7 +128,7 @@ description; write that body for the page. The other kinds have no pages.
 ## Section components
 
 `src/components/` holds the shared, unstyled building blocks the pages compose:
-`Hero`, `GameCard`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
+`Hero`, `GameCard`, `GameFacts`, `ProjectCard`, `CollectionGrid` and `Contact`. They render semantic markup with
 BEM-style classes (`.hero__title`, `.project-card__stars`, ...) and only structural CSS (layout,
 list resets) inside `@layer components`, so any unlayered layout CSS wins over it regardless of
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
