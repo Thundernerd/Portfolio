@@ -7,14 +7,15 @@ Personal portfolio site, built with [Astro](https://astro.build) and served from
 
 Run from the repo root (Node `>=22.23.4`):
 
-| Command           | Action                                                  |
-| :---------------- | :------------------------------------------------------ |
-| `npm install`     | Install dependencies                                    |
-| `npm run dev`     | Start the dev server at `localhost:4321/Portfolio/`     |
-| `npm run check`   | Type-check `.astro` and TypeScript files (`astro check`) |
-| `npm test`        | Run the unit tests once (Vitest)                        |
-| `npm run build`   | Build the production site to `./dist/`                  |
-| `npm run preview` | Preview the production build locally                    |
+| Command              | Action                                                   |
+| :------------------- | :------------------------------------------------------- |
+| `npm install`        | Install dependencies                                     |
+| `npm run dev`        | Start the dev server at `localhost:4321/Portfolio/`      |
+| `npm run check`      | Type-check `.astro` and TypeScript files (`astro check`) |
+| `npm test`           | Run the unit tests once (Vitest)                         |
+| `npm run build`      | Build the production site to `./dist/`                   |
+| `npm run preview`    | Preview the production build locally                     |
+| `npm run lighthouse` | Audit the production build with Lighthouse CI            |
 
 ## Testing
 
@@ -94,18 +95,21 @@ without a link, until it is filled in. Before launch, once that passes, remove t
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to `main` and on pull requests
-(using [`withastro/action`](https://github.com/withastro/action)), then checks the built site with
-[Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci). `lighthouserc.cjs` serves `dist/`
-under `/Portfolio/` with `astro preview` and audits the home page, a game page and a featured project
-page (mobile, light scheme). The job fails when any of them scores below 90 in performance,
+`.github/workflows/deploy.yml` runs `npm run check`, `npm test` and `npm run build` on pushes to
+`main` and on pull requests (using [`withastro/action`](https://github.com/withastro/action)), then
+checks the built site with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci). Pushes to
+`main` then publish `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to
+**GitHub Actions** (Settings → Pages).
+
+The Lighthouse step (`npm run lighthouse`, configured in `lighthouserc.cjs`) serves `dist/` under
+`/Portfolio/` with `astro preview` and audits the home page, a game page and a featured project page
+(mobile, light scheme). It fails the job when any of them scores below 90 in performance,
 accessibility, best practices or SEO, or fails any accessibility audit on its own (one missing `alt`
 leaves the category above 90). The reports are uploaded as the run's `lighthouse-reports` artifact.
-Run it locally after a build with `npm run build && npx lhci autorun`; it needs Chrome or Chromium
-(point `CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`.
-If you rename the audited game or project, update its URL in `lighthouserc.cjs`. Pushes to `main`
-then publish `dist/` with `actions/deploy-pages`. The repository's Pages source must be set to **GitHub Actions**
-(Settings → Pages).
+If you rename the audited game or project, update its URL in `lighthouserc.cjs`.
+
+Run it locally with `npm run build && npm run lighthouse`. It needs Chrome or Chromium (point
+`CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`.
 
 ## Layout and style
 

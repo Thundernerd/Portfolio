@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.7",
