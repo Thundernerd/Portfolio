@@ -112,6 +112,10 @@ Run it locally with `npm run build && npm run lighthouse`. It needs Chrome or Ch
 `CHROME_PATH` at it if it isn't found) and writes the reports to `.lighthouseci/reports/`. It serves
 the build on port 4400; stop anything else listening there first, or Lighthouse audits that instead.
 
+`package.json` `overrides` lifts `basic-ftp`, which `@lhci/cli` pulls in through `proxy-agent` 6,
+to 6.x for a high-severity advisory (GHSA-c475-qrg2-pj4r) that `get-uri` 6's `^5` range can't reach.
+Drop the override once an `@lhci/cli` release depends on `proxy-agent` 8 or later.
+
 ## Layout and style
 
 Pages render inside `src/layouts/Base.astro`, which owns the document, the header (brand, section
