@@ -48,8 +48,7 @@ describe('startPreview()', () => {
 		await releasePort();
 		const preview = await startPreview({ host: '127.0.0.1', port, outDir });
 		try {
-			expect(preview.origin).toBe(`http://127.0.0.1:${port}`);
-			const response = await fetch(`${preview.origin}/Portfolio/`);
+			const response = await fetch(`http://127.0.0.1:${port}/Portfolio/`);
 			expect(await response.text()).toContain('<title>test</title>');
 		} finally {
 			await preview.stop();

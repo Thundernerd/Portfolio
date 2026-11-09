@@ -26,14 +26,13 @@ const packageFile = (name, file) => join(dirname(require.resolve(`${name}/packag
 const servedUrl = /http:\/\/[^\s/"]+:(\d+)\//;
 
 /** Strips terminal colours, which `astro preview` adds when its output is a terminal. */
-const ansi = /\x1b\[[0-9;]*m/g;
+const ansiColours = /\x1b\[[0-9;]*m/g;
 
 /** How long the preview may take to start serving, as lhci's own `startServerReadyTimeout`. */
 const readyTimeoutMs = 10_000;
 
 /**
  * @typedef {object} Preview
- * @property {string} origin The served site's origin, such as `http://127.0.0.1:4400`.
  * @property {() => Promise<void>} stop Stops the server, resolving once it has exited.
  */
 
@@ -74,7 +73,7 @@ export function startPreview({ host, port, outDir }) {
 		);
 		/** @param {Buffer} chunk */
 		const onData = (chunk) => {
-			output += chunk.toString().replace(ansi, '');
+			output += chunk.toString().replace(ansiColours, '');
 			const match = servedUrl.exec(output);
 			if (!match || settled) return;
 			if (Number(match[1]) !== port) {
@@ -89,7 +88,7 @@ export function startPreview({ host, port, outDir }) {
 			}
 			settled = true;
 			clearTimeout(timer);
-			resolve({ origin: `http://${host}:${port}`, stop });
+			resolve({ stop });
 		};
 		child.stdout.on('data', onData);
 		child.stderr.on('data', onData);
