@@ -55,6 +55,7 @@ list resets) inside `@layer components`, so any unlayered layout CSS wins over i
 Astro's scoping attributes: restyle them with plain class selectors or the custom properties each
 component documents (for example `--grid-min`, `--card-gap`).
 Link props take a site path (resolved with `withBase()`), an absolute URL or a `#fragment`.
+Mark the main `Hero` action with `primary: true` to give it `.hero__action--primary`.
 
 `GameCard` and `ProjectCard` take two named slots: `media` replaces the cover or image (for example
 with a trailer embed), wrapped in `.game-card__media` / `.project-card__media`, and `extra` renders

@@ -48,7 +48,7 @@ describe('Hero', () => {
 				],
 			},
 		});
-		expect(html).toMatch(/<a[^>]*class="hero__action hero__action--primary"[^>]*>Games<\/a>/);
+		expect(html).toMatch(/<a[^>]*class="(?=[^"]*\bhero__action\b)[^"]*\bhero__action--primary\b[^"]*"[^>]*>Games<\/a>/);
 		expect(html).toMatch(/<a[^>]*class="hero__action"[^>]*>CV<\/a>/);
 	});
 
