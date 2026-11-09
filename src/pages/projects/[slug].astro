@@ -4,13 +4,15 @@
  * a link back to the home page's featured section, the project's title, blurb, facts (language, tech
  * tags, star count and a link to the GitHub repo) and the entry's Markdown body as a README-style
  * description, after its image when it has one. A `TODO` blurb shows as a quiet placeholder, as on
- * the home page. The language, star count and archived flag come from `repoStats()`, as on the
+ * the home page. A project with a diagram (`projectDiagram()`) shows it after the description under
+ * "Architecture". The language, star count and archived flag come from `repoStats()`, as on the
  * project cards: GitHub's values when fetched, the frontmatter's otherwise.
  */
 import { Image } from 'astro:assets';
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import { presentableProject } from '../../components/placeholders';
 import { anchor } from '../../components/home/sections';
+import { projectDiagram } from '../../components/project/diagrams';
 import { plural } from '../../components/home/text';
 import Base from '../../layouts/Base.astro';
 import { repoStats, repoUrl } from '../../lib/github-stats';
@@ -30,6 +32,7 @@ const { project } = Astro.props;
 const { title, blurb, repo, tags, image } = presentableProject(project).data;
 const { language, stars, archived } = repoStats(project.data);
 const { Content } = await render(project);
+const Diagram = projectDiagram(project.id);
 ---
 
 <Base title={`${title} · Christiaan`} description={blurb}>
@@ -84,5 +87,13 @@ const { Content } = await render(project);
 		<div class="site-project__body">
 			<Content />
 		</div>
+		{
+			Diagram && (
+				<section class="site-project__diagram" aria-labelledby="architecture">
+					<h2 id="architecture" class="site-project__diagram-title">Architecture</h2>
+					<Diagram />
+				</section>
+			)
+		}
 	</article>
 </Base>

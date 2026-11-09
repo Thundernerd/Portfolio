@@ -1,0 +1,62 @@
+---
+/**
+ * An inline SVG diagram of Zeepkist GTR's architecture (data in `gtr-architecture.ts`), in a figure
+ * with a caption. Its colours come only from the site's theme tokens (see `.gtr-diagram` in
+ * `src/styles/global.css`), so it follows the light and dark themes.
+ */
+import { edges, nodes, viewBox } from './gtr-architecture';
+
+const description =
+	'The Zeepkist mod signs players in through Auth, which uses Steam and hands out a JWT, and submits ' +
+	'their records to the Backend / JsonApi. The backend publishes each record to RabbitMQ, where the ' +
+	'world record, personal best and record media processors pick it up. The world record processor ' +
+	'publishes new world records back to RabbitMQ for Stream, a WebSocket server that the Discord bot ' +
+	'listens to. The player points and level score calculators run on a schedule. The services keep ' +
+	'their data in one PostgreSQL database, which PostGraphile serves as a read-only GraphQL API.';
+---
+
+<figure class="project-diagram">
+	<div class="project-diagram__scroll">
+		<svg
+			class="gtr-diagram"
+			viewBox={`0 0 ${viewBox.width} ${viewBox.height}`}
+			role="img"
+			aria-labelledby="gtr-diagram-title gtr-diagram-desc"
+		>
+			<title id="gtr-diagram-title">Zeepkist GTR architecture</title>
+			<desc id="gtr-diagram-desc">{description}</desc>
+			<defs>
+				<marker id="gtr-diagram-arrow" class="gtr-diagram__head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+					<path d="M0,0 L10,5 L0,10 z" />
+				</marker>
+				<marker id="gtr-diagram-arrow-record" class="gtr-diagram__head gtr-diagram__head--record" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+					<path d="M0,0 L10,5 L0,10 z" />
+				</marker>
+			</defs>
+			{
+				edges.map((edge) => (
+					<g class:list={['gtr-diagram__edge', { 'gtr-diagram__edge--record': edge.record }]} data-from={edge.from} data-to={edge.to}>
+						<polyline
+							points={edge.points.map(([x, y]) => `${x},${y}`).join(' ')}
+							marker-end={`url(#gtr-diagram-arrow${edge.record ? '-record' : ''})`}
+						/>
+						{edge.label && edge.labelAt && <text class="gtr-diagram__note" x={edge.labelAt[0]} y={edge.labelAt[1]}>{edge.label}</text>}
+					</g>
+				))
+			}
+			{
+				nodes.map((node) => (
+					<g class="gtr-diagram__node" data-node={node.id}>
+						<rect x={node.x} y={node.y} width={node.width} height={node.height} rx="8" />
+						<text class="gtr-diagram__label" x={node.x + node.width / 2} y={node.y + 21}>{node.label}</text>
+						<text class="gtr-diagram__sub" x={node.x + node.width / 2} y={node.y + 37}>{node.sub}</text>
+					</g>
+				))
+			}
+		</svg>
+	</div>
+	<figcaption class="project-diagram__caption">
+		Arrows point from the part that sends or asks to the part it reaches; the highlighted ones follow
+		a record from the mod to the processors.
+	</figcaption>
+</figure>

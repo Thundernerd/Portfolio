@@ -125,6 +125,12 @@ page shows the title, blurb, language, tags, star count and repo link (from `rep
 cards), the frontmatter `image` when there is one, and the entry's Markdown body as a README-style
 description; write that body for the page. The other kinds have no pages.
 
+A project can also show a diagram after its description, under "Architecture": register a component
+for its entry id in `src/components/project/diagrams.ts` (`projectDiagram()`). Zeepkist GTR's
+(`GtrArchitecture.astro`) is an inline SVG whose boxes and arrows are listed in
+`gtr-architecture.ts`; it is painted only through the theme tokens in `global.css` (no colours in
+the markup), so it follows the light and dark themes, and it scrolls sideways on narrow screens.
+
 ## Section components
 
 `src/components/` holds the shared, unstyled building blocks the pages compose:
