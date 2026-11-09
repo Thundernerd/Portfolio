@@ -94,7 +94,7 @@ export async function run({ contentDir, outFile, fetch, env, log }) {
 				log.warn(`fetch-github: ${repo}: unexpected response; using frontmatter values`);
 				continue;
 			}
-			stats[repo] = { stars: body.stargazers_count, language: typeof body.language === 'string' ? body.language : null };
+			stats[repo] = { stars: body.stargazers_count, language: typeof body.language === 'string' && body.language !== '' ? body.language : null };
 		} catch (error) {
 			// A hung connection would cost the timeout again for every remaining repo; give up instead.
 			if (error instanceof Error && error.name === 'TimeoutError') {

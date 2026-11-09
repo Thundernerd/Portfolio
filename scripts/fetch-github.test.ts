@@ -173,6 +173,7 @@ describe('fetch-github run()', () => {
 		['null', null],
 		['missing', undefined],
 		['not a string', 42],
+		['empty', ''],
 	])('writes a null language when GitHub reports it as %s', async (_, language) => {
 		await project('a.md', 'repo: Thundernerd/Docs');
 		const fetch = async () => json(200, { stargazers_count: 5, language });
