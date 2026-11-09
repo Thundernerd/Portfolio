@@ -6,13 +6,17 @@
  */
 import { edges, nodes, viewBox } from './gtr-architecture';
 
+/** The two arrowheads: muted, and in the accent colour for a record's path. */
+const arrowheadId = (recordPath = false) => `gtr-diagram-arrow${recordPath ? '-record' : ''}`;
+const arrowheads = [false, true].map((recordPath) => ({ id: arrowheadId(recordPath), recordPath }));
+
 const description =
 	'The Zeepkist mod signs players in through Auth, which uses Steam and hands out a JWT, and submits ' +
 	'their records to the Backend / JsonApi. The backend publishes each record to RabbitMQ, where the ' +
 	'world record, personal best and record media processors pick it up. The world record processor ' +
 	'publishes new world records back to RabbitMQ for Stream, a WebSocket server that the Discord bot ' +
 	'listens to. The player points and level score calculators run on a schedule. The services keep ' +
-	'their data in one PostgreSQL database, which PostGraphile serves as a read-only GraphQL API.';
+	'their data in one PostgreSQL database, which PostGraphile serves as a GraphQL API.';
 ---
 
 <figure class="project-diagram">
@@ -26,21 +30,28 @@ const description =
 			<title id="gtr-diagram-title">Zeepkist GTR architecture</title>
 			<desc id="gtr-diagram-desc">{description}</desc>
 			<defs>
-				<marker id="gtr-diagram-arrow" class="gtr-diagram__head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-					<path d="M0,0 L10,5 L0,10 z" />
-				</marker>
-				<marker id="gtr-diagram-arrow-record" class="gtr-diagram__head gtr-diagram__head--record" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-					<path d="M0,0 L10,5 L0,10 z" />
-				</marker>
+				{
+					arrowheads.map(({ id, recordPath }) => (
+						<marker
+							id={id}
+							class:list={['gtr-diagram__head', { 'gtr-diagram__head--record': recordPath }]}
+							viewBox="0 0 10 10"
+							refX="9"
+							refY="5"
+							markerWidth="7"
+							markerHeight="7"
+							orient="auto-start-reverse"
+						>
+							<path d="M0,0 L10,5 L0,10 z" />
+						</marker>
+					))
+				}
 			</defs>
 			{
 				edges.map((edge) => (
-					<g class:list={['gtr-diagram__edge', { 'gtr-diagram__edge--record': edge.record }]} data-from={edge.from} data-to={edge.to}>
-						<polyline
-							points={edge.points.map(([x, y]) => `${x},${y}`).join(' ')}
-							marker-end={`url(#gtr-diagram-arrow${edge.record ? '-record' : ''})`}
-						/>
-						{edge.label && edge.labelAt && <text class="gtr-diagram__note" x={edge.labelAt[0]} y={edge.labelAt[1]}>{edge.label}</text>}
+					<g class:list={['gtr-diagram__edge', { 'gtr-diagram__edge--record': edge.recordPath }]} data-from={edge.from} data-to={edge.to}>
+						<polyline points={edge.points.map(([x, y]) => `${x},${y}`).join(' ')} marker-end={`url(#${arrowheadId(edge.recordPath)})`} />
+						{edge.note && <text class="gtr-diagram__note" x={edge.note.at[0]} y={edge.note.at[1]}>{edge.note.text}</text>}
 					</g>
 				))
 			}

@@ -4,7 +4,9 @@ import GtrArchitecture from './GtrArchitecture.astro';
  * The diagrams drawn on a featured project's page (`src/pages/projects/[slug].astro`), by the
  * project's entry id. A diagram is a component that takes no props.
  */
-const diagrams: Readonly<Record<string, typeof GtrArchitecture>> = {
+type DiagramComponent = typeof GtrArchitecture;
+
+const diagrams: Readonly<Record<string, DiagramComponent>> = {
 	'zeepkist-gtr': GtrArchitecture,
 };
 

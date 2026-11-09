@@ -982,7 +982,8 @@
 }
 
 .site-project__body h2,
-.site-project__body h3 {
+.site-project__body h3,
+.site-project__diagram-title {
 	margin: 2rem 0 0.5rem;
 	letter-spacing: -0.02em;
 	line-height: 1.25;
@@ -1078,6 +1079,8 @@
 	}
 }
 
+/* ---- Project architecture diagrams ----------------------------------------------------------- */
+
 /* A project's architecture diagram (`projectDiagram()`), after its description. As a grid item it
    would otherwise widen to the diagram's min-width instead of letting it scroll. */
 .site-project__diagram {
@@ -1087,8 +1090,6 @@
 .site-project__diagram-title {
 	margin: 0 0 1rem;
 	font-size: 1.5rem;
-	letter-spacing: -0.02em;
-	line-height: 1.25;
 }
 
 .site .project-diagram {
@@ -1110,7 +1111,8 @@
 	color: var(--muted);
 }
 
-/* Inline SVG painted only with the theme tokens, so it follows the light and dark themes. */
+/* Inline SVG painted only with the theme tokens, so it follows the light and dark themes. Its font
+   sizes are in SVG user units (px here), which scale with the viewBox like the boxes do. */
 .site .gtr-diagram {
 	display: block;
 	width: 100%;
@@ -1139,7 +1141,7 @@
 .site .gtr-diagram__note {
 	fill: var(--muted);
 	font-family: var(--font-mono);
-	font-size: 11.5px;
+	font-size: 12.5px;
 }
 
 /* A halo in the page colour keeps a note readable where it crosses a line. */

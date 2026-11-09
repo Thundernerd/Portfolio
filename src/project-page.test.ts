@@ -113,4 +113,17 @@ describe('/projects/[slug]', () => {
 		const html = await renderPage(projectEntry({ kind: 'featured' }));
 		expect(html).toMatch(/<a class="site-project__back"[^>]*href="\/Portfolio\/#featured"[^>]*>All featured projects<\/a>/);
 	});
+
+	it('shows a project\'s architecture diagram after its description, and none for a project without one', async () => {
+		content.bodies['zeepkist-gtr'] = '<p>A whole system.</p>';
+		const html = await renderPage(projectEntry({ title: 'Zeepkist GTR', kind: 'featured' }, 'zeepkist-gtr'));
+		expect(html).toMatch(
+			/<section class="site-project__diagram"[^>]*aria-labelledby="architecture"[^>]*>\s*<h2 id="architecture"[^>]*>Architecture<\/h2>\s*<figure/,
+		);
+		expect(html).toContain('<title id="gtr-diagram-title">Zeepkist GTR architecture</title>');
+		expect(html.indexOf('A whole system.')).toBeLessThan(html.indexOf('site-project__diagram'));
+		const without = await renderPage(projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'));
+		expect(without).not.toContain('site-project__diagram');
+		expect(without).not.toContain('<svg');
+	});
 });
