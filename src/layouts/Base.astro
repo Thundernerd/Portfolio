@@ -16,10 +16,11 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-// The home page's sections, linked through the site root so the nav works from any page.
 // Search engines and link previews need absolute URLs: the page's own and the shared preview image.
+// `Astro.url.pathname` already starts with the base path, so it is resolved against `site` directly.
 const canonical = new URL(Astro.url.pathname, import.meta.env.SITE).href;
 const ogImage = { url: absoluteUrl('og.png'), width: 1200, height: 630, alt: '~/christiaan: game developer and programmer' };
+// The home page's sections, linked through the site root so the nav works from any page.
 const nav = homeSections.map((section) => ({ label: section.navLabel, href: withBase(anchor(section.id)) }));
 ---
 
@@ -41,6 +42,7 @@ const nav = homeSections.map((section) => ({ label: section.navLabel, href: with
 		<meta property="og:image:alt" content={ogImage.alt} />
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+		<!-- `sizes` on the .ico (which holds 16, 32 and 48px) makes browsers that support SVG pick the SVG. -->
 		<link rel="icon" href={withBase('favicon.ico')} sizes="32x32" />
 		<link rel="apple-touch-icon" href={withBase('apple-touch-icon.png')} />
 		<link rel="sitemap" href={withBase('sitemap-index.xml')} />

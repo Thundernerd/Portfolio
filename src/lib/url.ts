@@ -23,7 +23,7 @@ export function resolveHref(href: string): string {
 
 /**
  * The full URL of a site path on the deployed site (`site` + base path in `astro.config.mjs`), for
- * places that need an absolute URL: the canonical link, Open Graph tags and the sitemap.
+ * places that need an absolute URL, such as the Open Graph image.
  */
 export function absoluteUrl(path: string): string {
 	return new URL(withBase(path), import.meta.env.SITE).href;

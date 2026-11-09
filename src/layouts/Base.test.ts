@@ -14,6 +14,7 @@ describe('Base layout', () => {
 	});
 
 	const render = () => container.renderToString(Base, { props: { title: 'Christiaan' }, slots: { default: '<p>content</p>' } });
+	const headOf = (html: string) => /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? '';
 
 	it('links the navigation to every section of the home page, from any page', async () => {
 		const html = await render();
@@ -43,12 +44,13 @@ describe('Base layout', () => {
 	});
 
 	describe('head metadata for search engines and link previews', () => {
-		const renderPage = () =>
+		// The deployed home page, with a description, as the build renders it.
+		const renderHomeWithDescription = () =>
 			container.renderToString(Base, {
 				props: { title: 'Christiaan', description: 'Games and Unity plugins.' },
 				request: new Request('https://thundernerd.github.io/Portfolio/'),
 			});
-		const head = async () => /<head>([\s\S]*?)<\/head>/.exec(await renderPage())?.[1] ?? '';
+		const head = async () => headOf(await renderHomeWithDescription());
 		const meta = (html: string, key: string) =>
 			new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`).exec(html)?.[1];
 
@@ -90,7 +92,7 @@ describe('Base layout', () => {
 	});
 
 	it('links the site\'s icons for browser tabs and home screens', async () => {
-		const head = /<head>([\s\S]*?)<\/head>/.exec(await render())?.[1] ?? '';
+		const head = headOf(await render());
 		expect(head).toMatch(/<link rel="icon" type="image\/svg\+xml" href="\/Portfolio\/favicon.svg"/);
 		expect(head).toMatch(/<link rel="icon" href="\/Portfolio\/favicon.ico" sizes="32x32"/);
 		expect(head).toMatch(/<link rel="apple-touch-icon" href="\/Portfolio\/apple-touch-icon.png"/);
@@ -114,7 +116,7 @@ describe('Base layout', () => {
 
 	it('applies a remembered theme in the head, before the page paints', async () => {
 		const html = await render();
-		const head = /<head>([\s\S]*?)<\/head>/.exec(html)?.[1] ?? '';
+		const head = headOf(html);
 		expect(head).toContain('portfolio-theme');
 		expect(head).toContain('document.documentElement.dataset.theme');
 	});

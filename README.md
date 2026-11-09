@@ -34,10 +34,16 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 ## SEO and link previews
 
 `Base.astro` gives every page a canonical link, Open Graph and `twitter:card` tags, the favicons and
-a link to the sitemap. Pages pass their `title` and `description`; the absolute URLs come from
-`absoluteUrl()` in `src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
+a link to the sitemap. Pages pass their `title` and `description`. The canonical URL is the page's own
+path on `site`; other absolute URLs, such as the preview image's, come from `absoluteUrl()` in
+`src/lib/url.ts`, which joins `site` and `base`. `@astrojs/sitemap` writes
 `sitemap-index.xml` on build. `trailingSlash: 'always'` keeps each page at one URL, `/Portfolio/`,
 in the sitemap and the canonical link.
+
+Search engines won't find the sitemap by themselves: a project site can't serve the domain-root
+`robots.txt` that would name it, and crawlers ignore `<link rel="sitemap">`. Submit
+`https://thundernerd.github.io/Portfolio/sitemap-index.xml` once in Google Search Console (and
+Bing Webmaster Tools).
 
 The link-preview image `public/og.png` (1200x630) is rendered from `assets/og.svg`, and the favicons
 from `public/favicon.svg`. After editing either SVG, re-render the images with
