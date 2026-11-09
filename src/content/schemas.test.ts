@@ -12,6 +12,8 @@ const validGame = {
 	trailer: 'https://www.youtube.com/watch?v=abc123',
 	storeLinks: [{ label: 'Microsoft Store', url: 'https://www.xbox.com/games/store/fru' }],
 	blurb: 'A body-controlled puzzle platformer.',
+	tech: ['Unity', 'C#', 'Kinect'],
+	screenshots: [{ image: './fru-level.png', alt: 'A player bending to form a bridge.' }],
 };
 
 describe('games schema', () => {
@@ -19,9 +21,9 @@ describe('games schema', () => {
 		expect(gameSchema(context).parse(validGame)).toEqual(validGame);
 	});
 
-	it('accepts a game without media or links yet, defaulting to no store links', () => {
-		const { cover, trailer, storeLinks, ...placeholder } = validGame;
-		expect(gameSchema(context).parse(placeholder)).toEqual({ ...placeholder, storeLinks: [] });
+	it('accepts a game without media, links or tech yet, defaulting to none of them', () => {
+		const { cover, trailer, storeLinks, tech, screenshots, ...placeholder } = validGame;
+		expect(gameSchema(context).parse(placeholder)).toEqual({ ...placeholder, storeLinks: [], tech: [], screenshots: [] });
 	});
 
 	it('accepts a game whose release year is not known yet', () => {
@@ -36,6 +38,7 @@ describe('games schema', () => {
 		['a store link that is not a URL', { storeLinks: [{ label: 'Store', url: 'store page' }] }],
 		['a non-http trailer URL', { trailer: 'javascript:alert(1)' }],
 		['a non-http store link', { storeLinks: [{ label: 'Store', url: 'mailto:a@b.c' }] }],
+		['a screenshot without alt text', { screenshots: [{ image: './fru-level.png' }] }],
 	])('rejects a game with %s', (_, override) => {
 		expect(gameSchema(context).safeParse({ ...validGame, ...override }).success).toBe(false);
 	});
