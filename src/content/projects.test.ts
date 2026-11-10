@@ -38,6 +38,9 @@ describe('former featured projects and the tools', () => {
 		['GEN', 'Thundernerd/GEN', 'tool'],
 		['AliasLoginGenerator', 'Thundernerd/AliasLoginGenerator', 'tool'],
 		['MemeVault', 'Thundernerd/MemeVaultProject', 'tool'],
+		['Rule Wars', 'Thundernerd/rule-wars', 'tool'],
+		['GameSwiper', 'Thundernerd/GameSwiper', 'tool'],
+		['PlayTogether', 'Thundernerd/PlayTogether', 'tool'],
 	])('has %s, linked to %s, as a %s', (title, repo, kind) => {
 		expect(byRepo(repo)).toMatchObject({ title, kind });
 	});
