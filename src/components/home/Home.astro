@@ -83,7 +83,8 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 const sections = homeSections.filter((section) => isShown(section, projects));
 const languages = languageBreakdown(projects);
 const facts = [
-	plural(games.length, 'released game', 'released games'),
+	// A game pulled after its soft launch is on the page but was never released.
+	plural(games.filter((game) => !game.data.softLaunchOnly).length, 'released game', 'released games'),
 	plural(projects.length, 'open-source project', 'open-source projects'),
 	plural(totalStars(projects), 'GitHub star', 'GitHub stars'),
 ];

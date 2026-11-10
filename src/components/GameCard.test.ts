@@ -34,6 +34,12 @@ describe('GameCard', () => {
 		expect(html).not.toContain('<time');
 	});
 
+	it('labels a game that only reached soft launch, and no other', async () => {
+		const html = await render({ game: gameEntry({ softLaunchOnly: true }) });
+		expect(html).toMatch(/<\/h3>\s*<p class="game-card__status"[^>]*>Soft launch · pulled<\/p>/);
+		expect(await render({ game: gameEntry() })).not.toContain('game-card__status');
+	});
+
 	it('lists every platform', async () => {
 		const html = await render({ game: gameEntry({ platforms: ['Nintendo Switch', 'PC'] }) });
 		expect(html).toMatch(/<li[^>]*>Nintendo Switch<\/li>\s*<li[^>]*>PC<\/li>/);

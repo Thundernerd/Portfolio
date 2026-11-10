@@ -2,7 +2,8 @@
 /**
  * The content of a game's page (`gamePath()`), in this order:
  *
- * - the title and blurb, the role, studio, year, platforms and store links;
+ * - the title, a "Soft launch · pulled" label for a game that only reached soft launch, the blurb,
+ *   the role, studio, year, platforms and store links;
  * - the trailer, embedded when it is on YouTube (`trailerEmbedUrl()`) and linked otherwise;
  * - "What I did": the entry's rendered Markdown body, passed in the default slot;
  * - the tech, and a gallery of the screenshots, each left out when the entry has none.
@@ -28,7 +29,7 @@ interface Props {
 // each at most 28rem in the page's 56rem (`.game-page` in `global.css`).
 const shotSizes = '(min-width: 61rem) 28rem, (min-width: 45rem) 50vw, 100vw';
 const { game } = Astro.props;
-const { title, platforms, role, studio, year, blurb, trailer, storeLinks, tech, screenshots } = presentableGame(game).data;
+const { title, platforms, role, studio, year, blurb, trailer, storeLinks, tech, screenshots, softLaunchOnly } = presentableGame(game).data;
 const writeUp = presentableWriteUp(Astro.slots.has('default') ? await Astro.slots.render('default') : '');
 const embedUrl = trailer && trailerEmbedUrl(trailer);
 ---
@@ -36,6 +37,7 @@ const embedUrl = trailer && trailerEmbedUrl(trailer);
 <article class="game-page">
 	<header class="game-page__header">
 		<h1 class="game-page__title">{title}</h1>
+		{softLaunchOnly && <p class="game-page__status">Soft launch · pulled</p>}
 		<p class="game-page__blurb">{blurb}</p>
 		<dl class="game-page__facts">
 			<GameFacts block="game-page" role={role} studio={studio} year={year} platforms={platforms} />

@@ -25,6 +25,9 @@ export const gameSchema = ({ image }: SchemaContext) =>
 		tech: z.array(z.string()).default([]),
 		// The game page's gallery; the alt text describes what each shot shows.
 		screenshots: z.array(z.object({ image: image(), alt: z.string() })).default([]),
+		// The game soft-launched but was pulled before a full release: it gets a "Soft launch · pulled"
+		// label and doesn't count towards the home page's released games.
+		softLaunchOnly: z.boolean().default(false),
 	});
 
 /**

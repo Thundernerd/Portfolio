@@ -14,6 +14,7 @@ const validGame = {
 	blurb: 'A body-controlled puzzle platformer.',
 	tech: ['Unity', 'C#', 'Kinect'],
 	screenshots: [{ image: './fru-level.png', alt: 'A player bending to form a bridge.' }],
+	softLaunchOnly: false,
 };
 
 describe('games schema', () => {
@@ -22,13 +23,17 @@ describe('games schema', () => {
 	});
 
 	it('accepts a game without media, links or tech yet, defaulting to none of them', () => {
-		const { cover, trailer, storeLinks, tech, screenshots, ...placeholder } = validGame;
-		expect(gameSchema(context).parse(placeholder)).toEqual({ ...placeholder, storeLinks: [], tech: [], screenshots: [] });
+		const { cover, trailer, storeLinks, tech, screenshots, softLaunchOnly, ...placeholder } = validGame;
+		expect(gameSchema(context).parse(placeholder)).toEqual({ ...placeholder, storeLinks: [], tech: [], screenshots: [], softLaunchOnly: false });
 	});
 
 	it('accepts a game whose release year is not known yet', () => {
 		const { year, ...withoutYear } = validGame;
 		expect(gameSchema(context).parse(withoutYear)).toEqual(withoutYear);
+	});
+
+	it('keeps a game that only reached soft launch (games default to released, as above)', () => {
+		expect(gameSchema(context).parse({ ...validGame, softLaunchOnly: true })).toMatchObject({ softLaunchOnly: true });
 	});
 
 	it.each([
