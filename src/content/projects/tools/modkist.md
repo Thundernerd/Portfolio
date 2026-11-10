@@ -1,5 +1,5 @@
 ---
-title: ModkistMKII
+title: Modkist
 repo: Thundernerd/ModkistMKII
 kind: tool
 tags: [Rust, Tauri, Vue, Nuxt, TypeScript]

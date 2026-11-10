@@ -89,12 +89,12 @@ describe('Home', () => {
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
 	});
 
-	it('adds a Tools section after Unity plugins when a tool project exists, with unlinked cards and their stats', async () => {
+	it('adds a Tools section right after the games when a tool project exists, with unlinked cards and their stats', async () => {
 		const html = await render({
 			games: [],
 			projects: [projectEntry({ title: 'Code generator', kind: 'tool', tags: ['C#'], stars: 12 }, 'code-generator')],
 		});
-		expect(sectionIds(html)).toEqual(['games', 'zeepkist-mods', 'unity-plugins', 'tools', 'contact']);
+		expect(sectionIds(html)).toEqual(['games', 'tools', 'zeepkist-mods', 'unity-plugins', 'contact']);
 		expect(html).toMatch(/<section[^>]*id="tools"[^>]*>[\s\S]*?<h2[^>]*>\s*Tools\s*<\/h2>/);
 		expect(titlesIn(html, 'tools')).toEqual(['Code generator']);
 		const tools = /<section[^>]*id="tools"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
@@ -146,9 +146,10 @@ describe('Home', () => {
 			],
 		});
 		const titleLinks = [...html.matchAll(/<h3[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([^<]+)/g)].map((m) => [m[2].trim(), m[1]]);
+		// In page order: the Tools section comes before the mods.
 		expect(titleLinks).toEqual([
-			['ZeepSDK', '/Portfolio/projects/zeepsdk/'],
 			['FMD2r', '/Portfolio/projects/fmd2r/'],
+			['ZeepSDK', '/Portfolio/projects/zeepsdk/'],
 		]);
 	});
 
@@ -161,12 +162,12 @@ describe('Home', () => {
 			games: [],
 			projects: [
 				projectEntry({ title: 'Serializable Interface', tags: ['Unity', 'C#'], stars: 1300 }, 'si'),
-				projectEntry({ title: 'ModkistMKII', kind: 'tool', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
+				projectEntry({ title: 'Modkist', kind: 'tool', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
 			],
 		});
 		expect(html).toMatch(/Unity inspector.<\/p>\s*<ul class="site-stats"/);
-		// The plugin's section comes before the Tools section.
-		expect(statsLines(html)).toEqual(['C# 1,300 stars', 'Rust 1 star']);
+		// The Tools section comes before the plugins.
+		expect(statsLines(html)).toEqual(['Rust 1 star', 'C# 1,300 stars']);
 	});
 
 	it("shows GitHub's language for a fetched repo instead of the one its tags name", async () => {

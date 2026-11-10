@@ -40,14 +40,14 @@ describe('Base layout', () => {
 	const navLinks = (html: string) =>
 		[...(/<nav[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '').matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
 
-	it('links the Tools section after Unity plugins once a tool project exists', async () => {
+	it('links the Tools section right after the games once a tool project exists', async () => {
 		content.projects = [projectEntry({ title: 'Code generator', kind: 'tool' }, 'code-generator')];
 		const html = await render();
 		expect(navLinks(html)).toEqual([
 			'/Portfolio/#games',
+			'/Portfolio/#tools',
 			'/Portfolio/#zeepkist-mods',
 			'/Portfolio/#unity-plugins',
-			'/Portfolio/#tools',
 			'/Portfolio/#contact',
 		]);
 		expect(html).toMatch(/<a href="\/Portfolio\/#tools">tools<\/a>/);
