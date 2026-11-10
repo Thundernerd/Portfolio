@@ -1,7 +1,7 @@
 ---
 title: Modkist
 repo: Thundernerd/ModkistMKII
-kind: tool
+kind: app
 tags: [Rust, Tauri, Vue, Nuxt, TypeScript]
 blurb: A desktop mod manager for Zeepkist that installs mods from mod.io, manages BepInEx and supports local sideloads.
 stars: 0

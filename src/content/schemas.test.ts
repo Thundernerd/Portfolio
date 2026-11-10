@@ -73,7 +73,7 @@ describe('projects schema', () => {
 		expect(projectSchema(context).parse({ ...validProject, archived: true }).archived).toBe(true);
 	});
 
-	it.each(['zeepkist-mod', 'unity-plugin', 'tool'])('accepts kind %s', (kind) => {
+	it.each(['zeepkist-mod', 'unity-plugin', 'app'])('accepts kind %s', (kind) => {
 		expect(projectSchema(context).parse({ ...validProject, kind }).kind).toBe(kind);
 	});
 

@@ -29,15 +29,18 @@ describe('project files', () => {
 	});
 });
 
-describe('former featured projects and the tools', () => {
+describe('former featured projects and the apps', () => {
 	it.each([
 		['ZeepSDK', 'donderjoekel/ZeepSDK', 'zeepkist-mod'],
 		['Zeepkist GTR', 'donderjoekel/Zeepkist.GTR', 'zeepkist-mod'],
-		['Modkist', 'Thundernerd/ModkistMKII', 'tool'],
-		['FMD2r', 'Thundernerd/FMD2r', 'tool'],
-		['GEN', 'Thundernerd/GEN', 'tool'],
-		['AliasLoginGenerator', 'Thundernerd/AliasLoginGenerator', 'tool'],
-		['MemeVault', 'Thundernerd/MemeVaultProject', 'tool'],
+		['Modkist', 'Thundernerd/ModkistMKII', 'app'],
+		['FMD2r', 'Thundernerd/FMD2r', 'app'],
+		['GEN', 'Thundernerd/GEN', 'app'],
+		['AliasLoginGenerator', 'Thundernerd/AliasLoginGenerator', 'app'],
+		['MemeVault', 'Thundernerd/MemeVaultProject', 'app'],
+		['Rule Wars', 'Thundernerd/rule-wars', 'app'],
+		['GameSwiper', 'Thundernerd/GameSwiper', 'app'],
+		['PlayTogether', 'Thundernerd/PlayTogether', 'app'],
 	])('has %s, linked to %s, as a %s', (title, repo, kind) => {
 		expect(byRepo(repo)).toMatchObject({ title, kind });
 	});

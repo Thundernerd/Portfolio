@@ -21,7 +21,7 @@ export interface HomeSection {
 
 export const homeSections = [
 	{ id: 'games', navLabel: 'games', title: 'Released games' },
-	{ id: 'tools', navLabel: 'tools', title: 'Tools', onlyWithKind: 'tool' },
+	{ id: 'apps', navLabel: 'apps', title: 'Apps', onlyWithKind: 'app' },
 	{ id: 'zeepkist-mods', navLabel: 'mods', title: 'Zeepkist mods' },
 	{ id: 'unity-plugins', navLabel: 'plugins', title: 'Unity plugins' },
 	{ id: 'contact', navLabel: 'contact', title: 'About & contact' },
@@ -40,7 +40,7 @@ export type HomeSectionId = (typeof homeSections)[number]['id'];
 export const sectionOfKind = {
 	'zeepkist-mod': 'zeepkist-mods',
 	'unity-plugin': 'unity-plugins',
-	tool: 'tools',
+	app: 'apps',
 } as const satisfies Record<ProjectKind, HomeSectionId>;
 
 /** The fragment linking to the home section with this id; typed so a renamed section breaks its links. */
