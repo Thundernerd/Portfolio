@@ -73,8 +73,12 @@ describe('projects schema', () => {
 		expect(projectSchema(context).parse({ ...validProject, archived: true }).archived).toBe(true);
 	});
 
-	it.each(['featured', 'zeepkist-mod', 'unity-plugin', 'tool'])('accepts kind %s', (kind) => {
+	it.each(['zeepkist-mod', 'unity-plugin', 'tool'])('accepts kind %s', (kind) => {
 		expect(projectSchema(context).parse({ ...validProject, kind }).kind).toBe(kind);
+	});
+
+	it('rejects the retired featured kind (a page now follows the write-up, not the kind)', () => {
+		expect(projectSchema(context).safeParse({ ...validProject, kind: 'featured' }).success).toBe(false);
 	});
 
 	it.each([

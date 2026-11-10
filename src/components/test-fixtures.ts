@@ -73,10 +73,13 @@ export const sizesOf = (img: string) => img.match(/\ssizes="([^"]*)"/)?.[1];
 export function projectEntry(
 	data: Partial<CollectionEntry<'projects'>['data']> = {},
 	id = 'serializable-interface',
+	body?: string,
 ): CollectionEntry<'projects'> {
 	return {
 		id,
 		collection: 'projects',
+		// The raw Markdown body; a project with a write-up here gets a page (`hasPage()`).
+		...(body === undefined ? {} : { body }),
 		data: {
 			title: 'SerializableInterface',
 			// A fictional owner, so stats fetched from GitHub for real repos never apply to fixtures.

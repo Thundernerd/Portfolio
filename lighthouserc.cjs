@@ -40,7 +40,7 @@ module.exports = {
 		collect: {
 			url: [
 				`${origin}/`,
-				// A game page (src/content/games/) and a featured project page (src/content/projects/).
+				// A game page (src/content/games/) and a project page (src/content/projects/).
 				`${origin}/games/good-job/`,
 				`${origin}/projects/zeepkist-gtr/`,
 			],

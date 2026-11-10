@@ -47,7 +47,7 @@ describe('Home', () => {
 		const html = await render({ games: [], projects: [] });
 		expect(html).toMatch(/<h1[^>]*>/);
 		expect(html.indexOf('<h1')).toBeLessThan(html.search(/<section[^>]*id="games"/));
-		expect(sectionIds(html)).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'contact']);
+		expect(sectionIds(html)).toEqual(['games', 'zeepkist-mods', 'unity-plugins', 'contact']);
 	});
 
 	it('takes the order and headings of its sections from the home sections list', async () => {
@@ -55,13 +55,12 @@ describe('Home', () => {
 			{ id: 'contact', navLabel: 'contact', title: 'Say hi' },
 			{ id: 'unity-plugins', navLabel: 'plugins', title: 'Unity plugins' },
 			{ id: 'zeepkist-mods', navLabel: 'mods', title: 'Zeepkist mods' },
-			{ id: 'featured', navLabel: 'projects', title: 'Featured projects' },
 			{ id: 'games', navLabel: 'games', title: 'Games' },
 		];
 		const html = await render({ games: [], projects: [] });
-		expect(sectionIds(html)).toEqual(['contact', 'unity-plugins', 'zeepkist-mods', 'featured', 'games']);
+		expect(sectionIds(html)).toEqual(['contact', 'unity-plugins', 'zeepkist-mods', 'games']);
 		const headings = [...html.matchAll(/<h2[^>]*>([^<]+)<\/h2>/g)].map((m) => m[1].trim());
-		expect(headings).toEqual(['Say hi', 'Unity plugins', 'Zeepkist mods', 'Featured projects', 'Games']);
+		expect(headings).toEqual(['Say hi', 'Unity plugins', 'Zeepkist mods', 'Games']);
 	});
 
 	it("links each game card to the game's page", async () => {
@@ -79,14 +78,14 @@ describe('Home', () => {
 		const html = await render({
 			games: [gameEntry({ title: 'Good Job!' }), gameEntry({ title: 'FRU' }, 'fru')],
 			projects: [
-				projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
 				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
 				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
+				projectEntry({ title: 'FMD2r', kind: 'tool' }, 'fmd2r'),
 			],
 		});
 		expect(titlesIn(html, 'games').sort()).toEqual(['FRU', 'Good Job!']);
-		expect(titlesIn(html, 'featured')).toEqual(['ZeepSDK']);
 		expect(titlesIn(html, 'zeepkist-mods')).toEqual(['RTM']);
+		expect(titlesIn(html, 'tools')).toEqual(['FMD2r']);
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
 	});
 
@@ -95,7 +94,7 @@ describe('Home', () => {
 			games: [],
 			projects: [projectEntry({ title: 'Code generator', kind: 'tool', tags: ['C#'], stars: 12 }, 'code-generator')],
 		});
-		expect(sectionIds(html)).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'tools', 'contact']);
+		expect(sectionIds(html)).toEqual(['games', 'zeepkist-mods', 'unity-plugins', 'tools', 'contact']);
 		expect(html).toMatch(/<section[^>]*id="tools"[^>]*>[\s\S]*?<h2[^>]*>\s*Tools\s*<\/h2>/);
 		expect(titlesIn(html, 'tools')).toEqual(['Code generator']);
 		const tools = /<section[^>]*id="tools"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
@@ -136,17 +135,21 @@ describe('Home', () => {
 		expect(shown.sort()).toEqual(projects.map((project) => project.data.title).sort());
 	});
 
-	it('links each featured project card to its page, and no other project card', async () => {
+	it('links each project card with a write-up to its page, in any section, and no other', async () => {
 		const html = await render({
 			games: [],
 			projects: [
-				projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
+				projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod' }, 'zeepsdk', 'An SDK for Zeepkist mods.'),
 				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
 				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
+				projectEntry({ title: 'FMD2r', kind: 'tool' }, 'fmd2r', 'A manga downloader.'),
 			],
 		});
 		const titleLinks = [...html.matchAll(/<h3[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([^<]+)/g)].map((m) => [m[2].trim(), m[1]]);
-		expect(titleLinks).toEqual([['ZeepSDK', '/Portfolio/projects/zeepsdk/']]);
+		expect(titleLinks).toEqual([
+			['ZeepSDK', '/Portfolio/projects/zeepsdk/'],
+			['FMD2r', '/Portfolio/projects/fmd2r/'],
+		]);
 	});
 
 	/** The text of each project card's inline stats line, in page order. */
@@ -158,11 +161,12 @@ describe('Home', () => {
 			games: [],
 			projects: [
 				projectEntry({ title: 'Serializable Interface', tags: ['Unity', 'C#'], stars: 1300 }, 'si'),
-				projectEntry({ title: 'ModkistMKII', kind: 'featured', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
+				projectEntry({ title: 'ModkistMKII', kind: 'tool', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
 			],
 		});
 		expect(html).toMatch(/Unity inspector.<\/p>\s*<ul class="site-stats"/);
-		expect(statsLines(html)).toEqual(['Rust 1 star', 'C# 1,300 stars']);
+		// The plugin's section comes before the Tools section.
+		expect(statsLines(html)).toEqual(['C# 1,300 stars', 'Rust 1 star']);
 	});
 
 	it("shows GitHub's language for a fetched repo instead of the one its tags name", async () => {

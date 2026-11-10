@@ -26,6 +26,8 @@ describe('Zeepkist mods collection', () => {
 				'Thundernerd/Zeepkist-Utilities',
 				'Thundernerd/Zeepkist-Events',
 				'Thundernerd/Zeepkist-LevelEditorMovementSpeed',
+				'donderjoekel/ZeepSDK',
+				'donderjoekel/Zeepkist.GTR',
 			].sort(),
 		);
 	});

@@ -9,12 +9,18 @@ describe('gamePath', () => {
 });
 
 describe('projectPagePath', () => {
-	it("is a featured project's entry id under projects/, as its page is served", () => {
-		expect(projectPagePath(projectEntry({ kind: 'featured' }, 'zeepsdk'))).toBe('projects/zeepsdk/');
+	it("is a project's entry id under projects/ when it has a write-up, whatever its kind", () => {
+		const kinds = ['zeepkist-mod', 'unity-plugin', 'tool'] as const;
+		expect(kinds.map((kind) => projectPagePath(projectEntry({ kind }, 'zeepsdk', 'An SDK for mods.')))).toEqual([
+			'projects/zeepsdk/',
+			'projects/zeepsdk/',
+			'projects/zeepsdk/',
+		]);
 	});
 
-	it('is undefined for the kinds without a page', () => {
-		const kinds = ['zeepkist-mod', 'unity-plugin', 'tool'] as const;
-		expect(kinds.map((kind) => projectPagePath(projectEntry({ kind }, 'rtm')))).toEqual([undefined, undefined, undefined]);
+	it('is undefined for a project without a write-up, or with only notes in HTML comments', () => {
+		expect(projectPagePath(projectEntry({}, 'rtm'))).toBeUndefined();
+		expect(projectPagePath(projectEntry({}, 'rtm', '  \n'))).toBeUndefined();
+		expect(projectPagePath(projectEntry({}, 'rtm', '<!-- TODO: write this up -->\n'))).toBeUndefined();
 	});
 });

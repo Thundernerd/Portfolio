@@ -1,7 +1,7 @@
 ---
 title: Zeepkist GTR
 repo: donderjoekel/Zeepkist.GTR
-kind: featured
+kind: zeepkist-mod
 tags: [C#, .NET, PostgreSQL, GraphQL, RabbitMQ, Docker, Discord]
 blurb: A records and leaderboards system for Zeepkist, from the in-game mod to the backend services, database, GraphQL API and Discord bot.
 stars: 1

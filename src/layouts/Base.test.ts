@@ -30,7 +30,6 @@ describe('Base layout', () => {
 		const nav = /<nav[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '';
 		expect([...nav.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual([
 			'/Portfolio/#games',
-			'/Portfolio/#featured',
 			'/Portfolio/#zeepkist-mods',
 			'/Portfolio/#unity-plugins',
 			'/Portfolio/#contact',
@@ -46,7 +45,6 @@ describe('Base layout', () => {
 		const html = await render();
 		expect(navLinks(html)).toEqual([
 			'/Portfolio/#games',
-			'/Portfolio/#featured',
 			'/Portfolio/#zeepkist-mods',
 			'/Portfolio/#unity-plugins',
 			'/Portfolio/#tools',

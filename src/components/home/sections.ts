@@ -21,7 +21,6 @@ export interface HomeSection {
 
 export const homeSections = [
 	{ id: 'games', navLabel: 'games', title: 'Released games' },
-	{ id: 'featured', navLabel: 'projects', title: 'Featured projects' },
 	{ id: 'zeepkist-mods', navLabel: 'mods', title: 'Zeepkist mods' },
 	{ id: 'unity-plugins', navLabel: 'plugins', title: 'Unity plugins' },
 	{ id: 'tools', navLabel: 'tools', title: 'Tools', onlyWithKind: 'tool' },
@@ -36,6 +35,13 @@ export const isShown = (section: HomeSection, projects: readonly CollectionEntry
 	section.onlyWithKind === undefined || projects.some((project) => project.data.kind === section.onlyWithKind);
 
 export type HomeSectionId = (typeof homeSections)[number]['id'];
+
+/** The home section that lists each kind of project, which a project's page links back to. */
+export const sectionOfKind = {
+	'zeepkist-mod': 'zeepkist-mods',
+	'unity-plugin': 'unity-plugins',
+	tool: 'tools',
+} as const satisfies Record<ProjectKind, HomeSectionId>;
 
 /** The fragment linking to the home section with this id; typed so a renamed section breaks its links. */
 export const anchor = (id: HomeSectionId) => `#${id}`;

@@ -33,13 +33,13 @@ describe('/projects/[slug]', () => {
 
 	const renderPage = (project: CollectionEntry<'projects'>) => container.renderToString(ProjectPage, { props: { project } });
 
-	it('has a page for each featured project, at its entry id, and none for the other kinds', async () => {
+	it('has a page for each project with a write-up, at its entry id, whatever its kind', async () => {
 		content.projects = [
-			projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'),
+			projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod' }, 'zeepsdk', 'An SDK for Zeepkist mods.'),
 			projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'zeepkist-rtm'),
-			projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
+			projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event', '<!-- TODO: write up -->'),
 			projectEntry({ title: 'Code generator', kind: 'tool' }, 'code-generator'),
-			projectEntry({ title: 'FMD2r', kind: 'featured' }, 'fmd2r'),
+			projectEntry({ title: 'FMD2r', kind: 'tool' }, 'fmd2r', 'A manga downloader.'),
 		];
 		const paths = await getStaticPaths();
 		expect(paths.map((path) => path.params.slug)).toEqual(['zeepsdk', 'fmd2r']);
@@ -47,7 +47,7 @@ describe('/projects/[slug]', () => {
 	});
 
 	it('renders the title, blurb and README body inside the site layout', async () => {
-		const project = projectEntry({ title: 'ZeepSDK', kind: 'featured', blurb: 'A modding SDK for Zeepkist.' }, 'zeepsdk');
+		const project = projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod', blurb: 'A modding SDK for Zeepkist.' }, 'zeepsdk');
 		content.bodies.zeepsdk = '<p>ZeepSDK is a <strong>software development kit</strong>.</p>';
 		const html = await renderPage(project);
 		expect(html).toMatch(/<html[^>]*class="site"/);
@@ -60,7 +60,7 @@ describe('/projects/[slug]', () => {
 	});
 
 	it('describes itself for link previews with its own title, blurb and URL', async () => {
-		const project = projectEntry({ title: 'ZeepSDK', kind: 'featured', blurb: 'A modding SDK for Zeepkist.' }, 'zeepsdk');
+		const project = projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod', blurb: 'A modding SDK for Zeepkist.' }, 'zeepsdk');
 		const html = await container.renderToString(ProjectPage, {
 			props: { project },
 			request: new Request('https://thundernerd.github.io/Portfolio/projects/zeepsdk/'),
@@ -90,7 +90,7 @@ describe('/projects/[slug]', () => {
 		it("previews the project's image when it has one, as a PNG of its own size", async () => {
 			// As the build emits it: an `astro:assets` image's `src` is already under the base path.
 			const image = { ...fixtureImage, src: '/Portfolio/_astro/zeepsdk.Ab12Cd34.png' };
-			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured', image }, 'zeepsdk'));
+			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod', image }, 'zeepsdk'));
 			expect(meta(html, 'og:image')).toMatch(/^https:\/\/thundernerd\.github\.io\/Portfolio\//);
 			expect(variant(html)).toEqual({ format: 'png', width: '640' });
 			expect(meta(html, 'og:image:width')).toBe('640');
@@ -100,7 +100,7 @@ describe('/projects/[slug]', () => {
 
 		it('previews an AVIF image as a JPEG of at most 1200px wide', async () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.avif', width: 2400, height: 1200, format: 'avif' } as const;
-			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured', image }, 'zeepsdk'));
+			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod', image }, 'zeepsdk'));
 			expect(variant(html)).toEqual({ format: 'jpg', width: '1200' });
 			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
 			expect(meta(html, 'og:image:width')).toBe('1200');
@@ -110,14 +110,14 @@ describe('/projects/[slug]', () => {
 
 		it('previews a WebP image as a JPEG', async () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.webp', width: 800, height: 600, format: 'webp' } as const;
-			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+			const html = await renderDeployed(projectEntry({ kind: 'zeepkist-mod', image }, 'zeepsdk'));
 			expect(variant(html)).toEqual({ format: 'jpg', width: '800' });
 			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
 		});
 
 		it('keeps a JPEG image a JPEG', async () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.jpg', width: 1920, height: 1080, format: 'jpg' } as const;
-			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+			const html = await renderDeployed(projectEntry({ kind: 'zeepkist-mod', image }, 'zeepsdk'));
 			expect(variant(html)).toEqual({ format: 'jpg', width: '1200' });
 			expect(meta(html, 'og:image:type')).toBe('image/jpeg');
 			expect(meta(html, 'og:image:height')).toBe('675');
@@ -125,13 +125,13 @@ describe('/projects/[slug]', () => {
 
 		it('previews a GIF image as a PNG', async () => {
 			const image = { src: '/Portfolio/_astro/cover.Ab12Cd34.gif', width: 800, height: 600, format: 'gif' } as const;
-			const html = await renderDeployed(projectEntry({ kind: 'featured', image }, 'zeepsdk'));
+			const html = await renderDeployed(projectEntry({ kind: 'zeepkist-mod', image }, 'zeepsdk'));
 			expect(variant(html)).toEqual({ format: 'png', width: '800' });
 			expect(meta(html, 'og:image:type')).toBe('image/png');
 		});
 
 		it('previews the site card when it has none', async () => {
-			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'));
+			const html = await renderDeployed(projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod' }, 'zeepsdk'));
 			expect(meta(html, 'og:image')).toBe('https://thundernerd.github.io/Portfolio/og.png');
 			expect(meta(html, 'og:image:type')).toBe('image/png');
 		});
@@ -143,7 +143,7 @@ describe('/projects/[slug]', () => {
 
 	it('lists the tech and links to the GitHub repo with its star count', async () => {
 		const html = await renderPage(
-			projectEntry({ kind: 'featured', repo: 'fixture-owner/zeepsdk', tags: ['C#', 'Unity', 'BepInEx'], stars: 1 }, 'zeepsdk'),
+			projectEntry({ kind: 'zeepkist-mod', repo: 'fixture-owner/zeepsdk', tags: ['C#', 'Unity', 'BepInEx'], stars: 1 }, 'zeepsdk'),
 		);
 		expect(factsOf(html)).toEqual({ Language: 'C#', Tech: 'C# Unity BepInEx', Stars: '1 star', Source: 'fixture-owner/zeepsdk' });
 		expect(html).toMatch(/<a[^>]*href="https:\/\/github.com\/fixture-owner\/zeepsdk"[^>]*>fixture-owner\/zeepsdk<\/a>/);
@@ -151,26 +151,26 @@ describe('/projects/[slug]', () => {
 	});
 
 	it("prefers GitHub's fetched stats and marks an archived repo", async () => {
-		const html = await renderPage(projectEntry({ kind: 'featured', repo: 'fixture-owner/fetched', tags: ['C#'], stars: 1 }, 'fetched'));
+		const html = await renderPage(projectEntry({ kind: 'zeepkist-mod', repo: 'fixture-owner/fetched', tags: ['C#'], stars: 1 }, 'fetched'));
 		expect(factsOf(html)).toMatchObject({ Language: 'ShaderLab', Stars: '1,234 stars' });
 		expect(html).toMatch(/<p class="site-project__archived"[^>]*>Archived<\/p>/);
 	});
 
 	it('leaves out the facts a project does not have', async () => {
-		const html = await renderPage(projectEntry({ kind: 'featured', tags: [], stars: undefined }));
+		const html = await renderPage(projectEntry({ kind: 'zeepkist-mod', tags: [], stars: undefined }));
 		expect(Object.keys(factsOf(html))).toEqual(['Source']);
 	});
 
 	it("shows the project's image, described by its title, and no image when it has none", async () => {
-		const html = await renderPage(projectEntry({ title: 'ZeepSDK', kind: 'featured', image: fixtureImage }, 'zeepsdk'));
+		const html = await renderPage(projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod', image: fixtureImage }, 'zeepsdk'));
 		expect(html).toMatch(/<figure class="site-project__media"[^>]*>\s*<img[^>]*alt="Screenshot of ZeepSDK"/);
-		const without = await renderPage(projectEntry({ kind: 'featured' }));
+		const without = await renderPage(projectEntry({ kind: 'zeepkist-mod' }));
 		expect(without).not.toContain('<img');
 		expect(without).not.toContain('site-project__media');
 	});
 
 	it("serves the project's image in sizes to fit the page, loaded first since it sits at the top", async () => {
-		const html = await renderPage(projectEntry({ kind: 'featured', image: largeImage }, 'zeepsdk'));
+		const html = await renderPage(projectEntry({ kind: 'zeepkist-mod', image: largeImage }, 'zeepsdk'));
 		const img = imgTag(html, 'class="site-project__image"');
 		expect(srcsetWidths(img)).toEqual([736, 1472]);
 		expect(sizesOf(img)).toBe('(min-width: 52rem) 46rem, 100vw');
@@ -179,25 +179,29 @@ describe('/projects/[slug]', () => {
 	});
 
 	it('shows a quiet placeholder instead of a TODO blurb', async () => {
-		const html = await renderPage(projectEntry({ kind: 'featured', blurb: 'TODO: describe it' }));
+		const html = await renderPage(projectEntry({ kind: 'zeepkist-mod', blurb: 'TODO: describe it' }));
 		expect(html).not.toMatch(/\bTODO\b/);
 		expect(html).toMatch(/<p class="site-project__blurb"[^>]*>Write-up coming soon.<\/p>/);
 	});
 
-	it('links back to the featured projects on the home page', async () => {
-		const html = await renderPage(projectEntry({ kind: 'featured' }));
-		expect(html).toMatch(/<a class="site-project__back"[^>]*href="\/Portfolio\/#featured"[^>]*>All featured projects<\/a>/);
+	it.each([
+		['zeepkist-mod', 'zeepkist-mods', 'Zeepkist mods'],
+		['unity-plugin', 'unity-plugins', 'Unity plugins'],
+		['tool', 'tools', 'Tools'],
+	] as const)('links a %s back to its section on the home page', async (kind, id, title) => {
+		const html = await renderPage(projectEntry({ kind }));
+		expect(html).toMatch(new RegExp(`<a class="site-project__back"[^>]*href="/Portfolio/#${id}"[^>]*>Back to ${title}</a>`));
 	});
 
 	it('shows a project\'s architecture diagram after its description, and none for a project without one', async () => {
 		content.bodies['zeepkist-gtr'] = '<p>A whole system.</p>';
-		const html = await renderPage(projectEntry({ title: 'Zeepkist GTR', kind: 'featured' }, 'zeepkist-gtr'));
+		const html = await renderPage(projectEntry({ title: 'Zeepkist GTR', kind: 'zeepkist-mod' }, 'zeepkist-gtr'));
 		expect(html).toMatch(
 			/<section class="site-project__diagram"[^>]*aria-labelledby="architecture"[^>]*>\s*<h2 id="architecture"[^>]*>Architecture<\/h2>\s*<figure/,
 		);
 		expect(html).toContain('<title id="gtr-diagram-title">Zeepkist GTR architecture</title>');
 		expect(html.indexOf('A whole system.')).toBeLessThan(html.indexOf('site-project__diagram'));
-		const without = await renderPage(projectEntry({ title: 'ZeepSDK', kind: 'featured' }, 'zeepsdk'));
+		const without = await renderPage(projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod' }, 'zeepsdk'));
 		expect(without).not.toContain('site-project__diagram');
 		expect(without).not.toContain('<svg');
 	});
