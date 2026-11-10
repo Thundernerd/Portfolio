@@ -7,7 +7,7 @@ const games = defineCollection({
 	schema: gameSchema,
 });
 
-// Projects live in one folder per kind (`featured/`, `mods/`, `plugins/`, `tools/`), but an entry's id
+// Projects live in one folder per kind (`mods/`, `plugins/`, `tools/`), but an entry's id
 // is its file name alone, so its page URL (`/projects/<id>/`) doesn't depend on the folder.
 const projects = defineCollection({
 	loader: glob({

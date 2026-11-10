@@ -86,8 +86,8 @@ describe('CollectionGrid', () => {
 
 	it('links each card to the page itemHref gives it', async () => {
 		const html = await render({
-			id: 'featured',
-			title: 'Featured',
+			id: 'zeepkist-mods',
+			title: 'Zeepkist mods',
 			items: [projectEntry({ title: 'ZeepSDK' }, 'zeepsdk')],
 			itemHref: (entry: { id: string }) => `projects/${entry.id}/`,
 		});

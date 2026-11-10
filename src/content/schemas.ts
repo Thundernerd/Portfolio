@@ -34,17 +34,16 @@ export const gameSchema = ({ image }: SchemaContext) =>
  * The kinds of project, one per home-page section that lists projects. A kind with no section would
  * leave its entries off the page, so add the section with the kind (`Home.test.ts` checks this).
  */
-export const projectKinds = ['featured', 'zeepkist-mod', 'unity-plugin', 'tool'] as const;
+export const projectKinds = ['zeepkist-mod', 'unity-plugin', 'tool'] as const;
 
 /** The folder under `src/content/projects/` that holds each kind's entries (`projects.test.ts` checks this). */
 export const projectKindFolders: Record<(typeof projectKinds)[number], string> = {
-	featured: 'featured',
 	'zeepkist-mod': 'mods',
 	'unity-plugin': 'plugins',
 	tool: 'tools',
 };
 
-/** Frontmatter of a project in `src/content/projects/`: featured work and the mod/plugin collections. */
+/** Frontmatter of a project in `src/content/projects/`: the mods, plugins and tools. */
 export const projectSchema = ({ image }: SchemaContext) =>
 	z.object({
 		title: z.string(),

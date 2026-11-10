@@ -37,7 +37,7 @@ asset URLs with `withBase()` from `src/lib/url.ts` rather than hard-coding a lea
 `Base.astro` gives every page a canonical link, Open Graph (with the preview image's type and size
 when known) and `twitter:card` tags, the favicons and a link to the sitemap. Pages pass their `title`
 and `description`, and may pass an `image` (`{ src, alt }`: an `astro:assets` image, a site path or
-an absolute URL) to preview in place of the site card; a featured project page passes a JPEG (a
+an absolute URL) to preview in place of the site card; a project page passes a JPEG (a
 PNG for a PNG or GIF source) of its `image`, at most 1200px wide, when the entry has one, since
 crawlers render AVIF and WebP unevenly. A lossy AVIF or WebP cover becomes a JPEG because, as a
 PNG, it could outweigh crawlers' size caps (X: 5MB); a transparent one therefore previews without
@@ -102,7 +102,7 @@ checks the built site with [Lighthouse CI](https://github.com/GoogleChrome/light
 **GitHub Actions** (Settings → Pages).
 
 The Lighthouse step (`npm run lighthouse`, configured in `lighthouserc.cjs`) serves `dist/` under
-`/Portfolio/` with `astro preview` and audits the home page, a game page and a featured project page
+`/Portfolio/` with `astro preview` and audits the home page, a game page and a project page
 (mobile, light scheme). It fails the job when any of them scores below 90 in performance,
 accessibility, best practices or SEO, or fails any accessibility audit on its own (one missing `alt`
 leaves the category above 90). The reports are uploaded as the run's `lighthouse-reports` artifact.
@@ -132,11 +132,11 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
 add a section there and give it content in `Home.astro`, where the type checker asks for it.
-In order they are released games, featured projects, Zeepkist mods, Unity plugins, tools and about &
+In order they are released games, Zeepkist mods, Unity plugins, tools and about &
 contact; each project `kind` in `src/content/projects/` has its section. The tools section has
 `onlyWithKind: 'tool'`, so it and its nav link only appear once a project has `kind: tool`
 (`isShown()`).
-Projects are filed in one folder per kind: `featured/`, `mods/` (`zeepkist-mod`), `plugins/`
+Projects are filed in one folder per kind: `mods/` (`zeepkist-mod`), `plugins/`
 (`unity-plugin`) and `tools/` (`tool`), as `projectKindFolders` in `src/content/schemas.ts` lists and
 `projects.test.ts` checks. An entry's id is its file name alone, so moving it between folders doesn't
 change its page URL, and file names must be unique across the folders.
@@ -152,13 +152,14 @@ avatar (`src/assets/avatar.jpg`) and contact links (GitHub, LinkedIn, CV) are se
 toggle lives in `src/components/theme/` and remembers the visitor's pick in `localStorage` under
 `portfolio-theme`.
 
-## Featured project pages
+## Project pages
 
-Every `featured` project (in `src/content/projects/featured/`) gets a page at `/projects/<entry id>/`
-(`src/pages/projects/[slug].astro`), and its card in the home page's featured section links there. The
-page shows the title, blurb, language, tags, star count and repo link (from `repoStats()`, as on the
-cards), the frontmatter `image` when there is one, and the entry's Markdown body as a README-style
-description; write that body for the page. The other kinds have no pages.
+Every project with a write-up (a Markdown body with text; HTML comments don't count) gets a page at
+`/projects/<entry id>/` (`src/pages/projects/[slug].astro`), whatever its kind, and its card on the
+home page links there (`hasPage()` in `src/lib/paths.ts`). The page links back to its kind's section
+(`sectionOfKind` in `src/components/home/sections.ts`) and shows the title, blurb, language, tags,
+star count and repo link (from `repoStats()`, as on the cards), the frontmatter `image` when there is
+one, and the body as a README-style description. A project without a write-up has only its card.
 
 A project can also show a diagram after its description, under "Architecture": register a component
 for its entry id in `src/components/project/diagrams.ts` (`projectDiagram()`). Zeepkist GTR's

@@ -1,7 +1,7 @@
 import GtrArchitecture from './GtrArchitecture.astro';
 
 /**
- * The diagrams drawn on a featured project's page (`src/pages/projects/[slug].astro`), by the
+ * The diagrams drawn on a project's page (`src/pages/projects/[slug].astro`), by the
  * project's entry id. A diagram is a component that takes no props.
  */
 type DiagramComponent = typeof GtrArchitecture;

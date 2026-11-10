@@ -3,7 +3,7 @@ import { type AstroContainer, createContainer, sectionIds } from './components/t
 import Index from './pages/index.astro';
 
 describe('pages', () => {
-	it('serves the home page, a page per game and per featured project, and no prototype routes', () => {
+	it('serves the home page, a page per game and per project with a write-up, and no prototype routes', () => {
 		// Astro serves every file under `src/pages/` (tests too), so this lists every route the site has.
 		expect(Object.keys(import.meta.glob('./pages/**/*')).sort()).toEqual([
 			'./pages/games/[slug].astro',
@@ -22,7 +22,7 @@ describe('pages', () => {
 			const html = await container.renderToString(Index);
 			expect(html).toMatch(/<html[^>]*class="site"/);
 			expect(html).toMatch(/<a class="site-brand"[^>]*href="\/Portfolio\/"/);
-			expect(sectionIds(html)).toEqual(['games', 'featured', 'zeepkist-mods', 'unity-plugins', 'contact']);
+			expect(sectionIds(html)).toEqual(['games', 'zeepkist-mods', 'unity-plugins', 'contact']);
 		});
 	});
 });

@@ -75,10 +75,12 @@ describe('ProjectCard', () => {
 		expect(img).toMatch(/\sloading="lazy"/);
 	});
 
-	it("sizes the image for its kind's grid: the featured grid's cards are wider than the others'", async () => {
-		const sizes = async (kind: 'featured' | 'unity-plugin') => sizesOf(imgTag(await render({ project: projectEntry({ kind, image: largeImage }) })));
-		expect(await sizes('featured')).toMatch(/\(min-width: 72rem\) 33rem/);
+	it("sizes the image for a column of its section's grid, the same for every kind", async () => {
+		const sizes = async (kind: 'zeepkist-mod' | 'unity-plugin' | 'tool') =>
+			sizesOf(imgTag(await render({ project: projectEntry({ kind, image: largeImage }) })));
 		expect(await sizes('unity-plugin')).toMatch(/\(min-width: 72rem\) 21rem/);
+		expect(await sizes('zeepkist-mod')).toBe(await sizes('unity-plugin'));
+		expect(await sizes('tool')).toBe(await sizes('unity-plugin'));
 	});
 
 	it('renders slotted media in place of the image', async () => {

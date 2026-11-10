@@ -1,7 +1,7 @@
 ---
 title: ZeepSDK
 repo: donderjoekel/ZeepSDK
-kind: featured
+kind: zeepkist-mod
 tags: [C#, Unity, BepInEx, Harmony]
 blurb: A community-built modding SDK for Zeepkist that other mods build on, with high-level APIs over the game's internals.
 stars: 1

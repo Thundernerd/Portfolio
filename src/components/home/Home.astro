@@ -1,6 +1,6 @@
 ---
 /**
- * The home page content (`/`): the hero, then the released games, featured projects, Zeepkist mods,
+ * The home page content (`/`): the hero, then the released games, Zeepkist mods,
  * Unity plugins, tools (only when a tool project exists) and about/contact sections, built from the shared section components. Game cards link
  * to the game's page (`gamePath()`); project cards link to the project's page when it has one
  * (`projectPagePath()`) and get an inline stats line (language, stars) in their `extra` slot; games
@@ -53,12 +53,6 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 		itemMedia: gameMedia,
 		intro: 'Commercial games I worked on, from co-founding a studio to building multiplayer systems.',
 	},
-	featured: {
-		items: ofKind('featured'),
-		itemHref: projectPage,
-		itemExtra: projectStats,
-		intro: 'Bigger personal projects, mostly around the Zeepkist modding scene.',
-	},
 	'zeepkist-mods': {
 		items: ofKind('zeepkist-mod'),
 		itemHref: projectPage,
@@ -95,7 +89,7 @@ const facts = [
 	tagline="Game developer & programmer."
 	actions={[
 		{ label: 'Released games', href: anchor('games') },
-		{ label: 'Open source', href: anchor('featured') },
+		{ label: 'Open source', href: anchor('zeepkist-mods') },
 		{ label: 'Get in touch', href: anchor('contact') },
 	]}
 >
