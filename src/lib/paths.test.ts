@@ -10,7 +10,7 @@ describe('gamePath', () => {
 
 describe('projectPagePath', () => {
 	it("is a project's entry id under projects/ when it has a write-up, whatever its kind", () => {
-		const kinds = ['zeepkist-mod', 'unity-plugin', 'tool'] as const;
+		const kinds = ['zeepkist-mod', 'unity-plugin', 'app'] as const;
 		expect(kinds.map((kind) => projectPagePath(projectEntry({ kind }, 'zeepsdk', 'An SDK for mods.')))).toEqual([
 			'projects/zeepsdk/',
 			'projects/zeepsdk/',

@@ -1,6 +1,6 @@
 ---
 /**
- * The home page content (`/`): the hero, then the released games, tools (only when a tool
+ * The home page content (`/`): the hero, then the released games, apps (only when an app
  * project exists), Zeepkist mods, Unity plugins and about/contact sections, built from the shared section components. Game cards link
  * to the game's page (`gamePath()`); project cards link to the project's page when it has one
  * (`projectPagePath()`) and get an inline stats line (language, stars) in their `extra` slot; games
@@ -65,15 +65,15 @@ const grids: Record<Exclude<HomeSectionId, 'contact'>, GridContent> = {
 		itemExtra: projectStats,
 		intro: 'Open-source editor and runtime tools for Unity, sorted by GitHub stars.',
 	},
-	tools: {
-		items: ofKind('tool'),
+	apps: {
+		items: ofKind('app'),
 		itemHref: projectPage,
 		itemExtra: projectStats,
-		intro: 'Standalone tools and utilities, outside Unity and Zeepkist.',
+		intro: 'Web, desktop and browser apps, outside Unity and Zeepkist.',
 	},
 };
 
-// The sections on this page: the Tools section only appears once a tool project exists.
+// The sections on this page: the Apps section only appears once an app project exists.
 const sections = homeSections.filter((section) => isShown(section, projects));
 const languages = languageBreakdown(projects);
 const facts = [

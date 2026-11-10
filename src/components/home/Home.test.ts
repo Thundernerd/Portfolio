@@ -80,26 +80,26 @@ describe('Home', () => {
 			projects: [
 				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
 				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
-				projectEntry({ title: 'FMD2r', kind: 'tool' }, 'fmd2r'),
+				projectEntry({ title: 'FMD2r', kind: 'app' }, 'fmd2r'),
 			],
 		});
 		expect(titlesIn(html, 'games').sort()).toEqual(['FRU', 'Good Job!']);
 		expect(titlesIn(html, 'zeepkist-mods')).toEqual(['RTM']);
-		expect(titlesIn(html, 'tools')).toEqual(['FMD2r']);
+		expect(titlesIn(html, 'apps')).toEqual(['FMD2r']);
 		expect(titlesIn(html, 'unity-plugins')).toEqual(['ExtendedEvent']);
 	});
 
-	it('adds a Tools section right after the games when a tool project exists, with unlinked cards and their stats', async () => {
+	it('adds an Apps section right after the games when an app project exists, with unlinked cards and their stats', async () => {
 		const html = await render({
 			games: [],
-			projects: [projectEntry({ title: 'Code generator', kind: 'tool', tags: ['C#'], stars: 12 }, 'code-generator')],
+			projects: [projectEntry({ title: 'Code generator', kind: 'app', tags: ['C#'], stars: 12 }, 'code-generator')],
 		});
-		expect(sectionIds(html)).toEqual(['games', 'tools', 'zeepkist-mods', 'unity-plugins', 'contact']);
-		expect(html).toMatch(/<section[^>]*id="tools"[^>]*>[\s\S]*?<h2[^>]*>\s*Tools\s*<\/h2>/);
-		expect(titlesIn(html, 'tools')).toEqual(['Code generator']);
-		const tools = /<section[^>]*id="tools"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
-		expect(tools).not.toMatch(/<h3[^>]*>\s*<a/);
-		expect(textOf(/<ul class="site-stats"[^>]*>([\s\S]*?)<\/ul>/.exec(tools)?.[1] ?? '')).toBe('C# 12 stars');
+		expect(sectionIds(html)).toEqual(['games', 'apps', 'zeepkist-mods', 'unity-plugins', 'contact']);
+		expect(html).toMatch(/<section[^>]*id="apps"[^>]*>[\s\S]*?<h2[^>]*>\s*Apps\s*<\/h2>/);
+		expect(titlesIn(html, 'apps')).toEqual(['Code generator']);
+		const apps = /<section[^>]*id="apps"[\s\S]*?<\/section>/.exec(html)?.[0] ?? '';
+		expect(apps).not.toMatch(/<h3[^>]*>\s*<a/);
+		expect(textOf(/<ul class="site-stats"[^>]*>([\s\S]*?)<\/ul>/.exec(apps)?.[1] ?? '')).toBe('C# 12 stars');
 	});
 
 	it('counts only released games in the hero facts, not ones pulled after soft launch', async () => {
@@ -111,12 +111,12 @@ describe('Home', () => {
 		expect(textOf(/<li[^>]*>([\s\S]*?)<\/li>/.exec(facts)?.[1] ?? '')).toBe('1 released game');
 	});
 
-	it('counts tool projects in the hero facts and language breakdown', async () => {
+	it('counts app projects in the hero facts and language breakdown', async () => {
 		const html = await render({
 			games: [],
 			projects: [
 				projectEntry({ title: 'RTM', kind: 'zeepkist-mod', tags: ['C#'], stars: 3 }, 'rtm'),
-				projectEntry({ title: 'Code generator', kind: 'tool', tags: ['Rust'], stars: 4 }, 'code-generator'),
+				projectEntry({ title: 'Code generator', kind: 'app', tags: ['Rust'], stars: 4 }, 'code-generator'),
 			],
 		});
 		const facts = /<ul class="site-facts"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? '';
@@ -142,11 +142,11 @@ describe('Home', () => {
 				projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod' }, 'zeepsdk', 'An SDK for Zeepkist mods.'),
 				projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm'),
 				projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event'),
-				projectEntry({ title: 'FMD2r', kind: 'tool' }, 'fmd2r', 'A manga downloader.'),
+				projectEntry({ title: 'FMD2r', kind: 'app' }, 'fmd2r', 'A manga downloader.'),
 			],
 		});
 		const titleLinks = [...html.matchAll(/<h3[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([^<]+)/g)].map((m) => [m[2].trim(), m[1]]);
-		// In page order: the Tools section comes before the mods.
+		// In page order: the Apps section comes before the mods.
 		expect(titleLinks).toEqual([
 			['FMD2r', '/Portfolio/projects/fmd2r/'],
 			['ZeepSDK', '/Portfolio/projects/zeepsdk/'],
@@ -162,11 +162,11 @@ describe('Home', () => {
 			games: [],
 			projects: [
 				projectEntry({ title: 'Serializable Interface', tags: ['Unity', 'C#'], stars: 1300 }, 'si'),
-				projectEntry({ title: 'Modkist', kind: 'tool', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
+				projectEntry({ title: 'Modkist', kind: 'app', tags: ['Rust', 'Tauri'], stars: 1 }, 'modkist'),
 			],
 		});
 		expect(html).toMatch(/Unity inspector.<\/p>\s*<ul class="site-stats"/);
-		// The Tools section comes before the plugins.
+		// The Apps section comes before the plugins.
 		expect(statsLines(html)).toEqual(['Rust 1 star', 'C# 1,300 stars']);
 	});
 

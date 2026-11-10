@@ -38,8 +38,8 @@ describe('/projects/[slug]', () => {
 			projectEntry({ title: 'ZeepSDK', kind: 'zeepkist-mod' }, 'zeepsdk', 'An SDK for Zeepkist mods.'),
 			projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'zeepkist-rtm'),
 			projectEntry({ title: 'ExtendedEvent', kind: 'unity-plugin' }, 'extended-event', '<!-- TODO: write up -->'),
-			projectEntry({ title: 'Code generator', kind: 'tool' }, 'code-generator'),
-			projectEntry({ title: 'FMD2r', kind: 'tool' }, 'fmd2r', 'A manga downloader.'),
+			projectEntry({ title: 'Code generator', kind: 'app' }, 'code-generator'),
+			projectEntry({ title: 'FMD2r', kind: 'app' }, 'fmd2r', 'A manga downloader.'),
 		];
 		const paths = await getStaticPaths();
 		expect(paths.map((path) => path.params.slug)).toEqual(['zeepsdk', 'fmd2r']);
@@ -187,7 +187,7 @@ describe('/projects/[slug]', () => {
 	it.each([
 		['zeepkist-mod', 'zeepkist-mods', 'Zeepkist mods'],
 		['unity-plugin', 'unity-plugins', 'Unity plugins'],
-		['tool', 'tools', 'Tools'],
+		['app', 'apps', 'Apps'],
 	] as const)('links a %s back to its section on the home page', async (kind, id, title) => {
 		const html = await renderPage(projectEntry({ kind }));
 		expect(html).toMatch(new RegExp(`<a class="site-project__back"[^>]*href="/Portfolio/#${id}"[^>]*>Back to ${title}</a>`));

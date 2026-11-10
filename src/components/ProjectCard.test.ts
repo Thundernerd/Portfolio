@@ -76,11 +76,11 @@ describe('ProjectCard', () => {
 	});
 
 	it("sizes the image for a column of its section's grid, the same for every kind", async () => {
-		const sizes = async (kind: 'zeepkist-mod' | 'unity-plugin' | 'tool') =>
+		const sizes = async (kind: 'zeepkist-mod' | 'unity-plugin' | 'app') =>
 			sizesOf(imgTag(await render({ project: projectEntry({ kind, image: largeImage }) })));
 		expect(await sizes('unity-plugin')).toMatch(/\(min-width: 72rem\) 21rem/);
 		expect(await sizes('zeepkist-mod')).toBe(await sizes('unity-plugin'));
-		expect(await sizes('tool')).toBe(await sizes('unity-plugin'));
+		expect(await sizes('app')).toBe(await sizes('unity-plugin'));
 	});
 
 	it('renders slotted media in place of the image', async () => {

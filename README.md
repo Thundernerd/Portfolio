@@ -132,12 +132,12 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
 add a section there and give it content in `Home.astro`, where the type checker asks for it.
-In order they are released games, tools, Zeepkist mods, Unity plugins and about &
-contact; each project `kind` in `src/content/projects/` has its section. The tools section has
-`onlyWithKind: 'tool'`, so it and its nav link only appear once a project has `kind: tool`
+In order they are released games, apps, Zeepkist mods, Unity plugins and about &
+contact; each project `kind` in `src/content/projects/` has its section. The apps section has
+`onlyWithKind: 'app'`, so it and its nav link only appear once a project has `kind: app`
 (`isShown()`).
 Projects are filed in one folder per kind: `mods/` (`zeepkist-mod`), `plugins/`
-(`unity-plugin`) and `tools/` (`tool`), as `projectKindFolders` in `src/content/schemas.ts` lists and
+(`unity-plugin`) and `apps/` (`app`), as `projectKindFolders` in `src/content/schemas.ts` lists and
 `projects.test.ts` checks. An entry's id is its file name alone, so moving it between folders doesn't
 change its page URL, and file names must be unique across the folders.
 Each game has a page at `/games/<entry id>/` (`src/pages/games/[slug].astro`), which the game cards on

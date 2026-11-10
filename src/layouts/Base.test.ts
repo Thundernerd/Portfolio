@@ -40,22 +40,22 @@ describe('Base layout', () => {
 	const navLinks = (html: string) =>
 		[...(/<nav[^>]*>([\s\S]*?)<\/nav>/.exec(html)?.[1] ?? '').matchAll(/href="([^"]+)"/g)].map((m) => m[1]);
 
-	it('links the Tools section right after the games once a tool project exists', async () => {
-		content.projects = [projectEntry({ title: 'Code generator', kind: 'tool' }, 'code-generator')];
+	it('links the Apps section right after the games once an app project exists', async () => {
+		content.projects = [projectEntry({ title: 'Code generator', kind: 'app' }, 'code-generator')];
 		const html = await render();
 		expect(navLinks(html)).toEqual([
 			'/Portfolio/#games',
-			'/Portfolio/#tools',
+			'/Portfolio/#apps',
 			'/Portfolio/#zeepkist-mods',
 			'/Portfolio/#unity-plugins',
 			'/Portfolio/#contact',
 		]);
-		expect(html).toMatch(/<a href="\/Portfolio\/#tools">tools<\/a>/);
+		expect(html).toMatch(/<a href="\/Portfolio\/#apps">apps<\/a>/);
 	});
 
-	it('leaves the Tools link out while no tool project exists', async () => {
+	it('leaves the Apps link out while no app project exists', async () => {
 		content.projects = [projectEntry({ title: 'RTM', kind: 'zeepkist-mod' }, 'rtm')];
-		expect(navLinks(await render())).not.toContain('/Portfolio/#tools');
+		expect(navLinks(await render())).not.toContain('/Portfolio/#apps');
 	});
 
 	it('puts a section added to the home sections list in the navigation', async () => {

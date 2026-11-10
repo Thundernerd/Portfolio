@@ -1,7 +1,7 @@
 ---
 title: FMD2r
 repo: Thundernerd/FMD2r
-kind: tool
+kind: app
 tags: [Rust, Svelte, TypeScript, Lua]
 blurb: A self-hosted Rust port of the manga downloader FMD2, with a Svelte web UI.
 stars: 0
