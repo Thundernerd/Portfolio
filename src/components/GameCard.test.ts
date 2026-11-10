@@ -36,7 +36,7 @@ describe('GameCard', () => {
 
 	it('labels a game that only reached soft launch, and no other', async () => {
 		const html = await render({ game: gameEntry({ softLaunchOnly: true }) });
-		expect(html).toMatch(/<\/h3>\s*<p class="game-card__status"[^>]*>Soft launch · pulled<\/p>/);
+		expect(html).toMatch(/<\/h3>\s*<p class="game-card__status"[^>]*>Soft launch<\/p>/);
 		expect(await render({ game: gameEntry() })).not.toContain('game-card__status');
 	});
 

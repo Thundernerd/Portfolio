@@ -23,7 +23,7 @@ describe('GamePage', () => {
 
 	it('labels a game that only reached soft launch under its title, and no other', async () => {
 		const html = await render({ game: gameEntry({ softLaunchOnly: true }) });
-		expect(html).toMatch(/<\/h1>\s*<p class="game-page__status"[^>]*>Soft launch · pulled<\/p>/);
+		expect(html).toMatch(/<\/h1>\s*<p class="game-page__status"[^>]*>Soft launch<\/p>/);
 		expect(await render({ game: gameEntry() })).not.toContain('game-page__status');
 	});
 
