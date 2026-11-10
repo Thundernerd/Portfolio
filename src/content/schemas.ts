@@ -36,6 +36,14 @@ export const gameSchema = ({ image }: SchemaContext) =>
  */
 export const projectKinds = ['featured', 'zeepkist-mod', 'unity-plugin', 'tool'] as const;
 
+/** The folder under `src/content/projects/` that holds each kind's entries (`projects.test.ts` checks this). */
+export const projectKindFolders: Record<(typeof projectKinds)[number], string> = {
+	featured: 'featured',
+	'zeepkist-mod': 'mods',
+	'unity-plugin': 'plugins',
+	tool: 'tools',
+};
+
 /** Frontmatter of a project in `src/content/projects/`: featured work and the mod/plugin collections. */
 export const projectSchema = ({ image }: SchemaContext) =>
 	z.object({

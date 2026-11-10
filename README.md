@@ -136,6 +136,10 @@ In order they are released games, featured projects, Zeepkist mods, Unity plugin
 contact; each project `kind` in `src/content/projects/` has its section. The tools section has
 `onlyWithKind: 'tool'`, so it and its nav link only appear once a project has `kind: tool`
 (`isShown()`).
+Projects are filed in one folder per kind: `featured/`, `mods/` (`zeepkist-mod`), `plugins/`
+(`unity-plugin`) and `tools/` (`tool`), as `projectKindFolders` in `src/content/schemas.ts` lists and
+`projects.test.ts` checks. An entry's id is its file name alone, so moving it between folders doesn't
+change its page URL, and file names must be unique across the folders.
 Each game has a page at `/games/<entry id>/` (`src/pages/games/[slug].astro`), which the game cards on
 the home page link to. Its content is `src/components/game/GamePage.astro`: the facts and store
 links, the trailer (embedded from `youtube-nocookie.com` when it is a YouTube link, linked
@@ -150,7 +154,7 @@ toggle lives in `src/components/theme/` and remembers the visitor's pick in `loc
 
 ## Featured project pages
 
-Every `featured` project in `src/content/projects/` gets a page at `/projects/<entry id>/`
+Every `featured` project (in `src/content/projects/featured/`) gets a page at `/projects/<entry id>/`
 (`src/pages/projects/[slug].astro`), and its card in the home page's featured section links there. The
 page shows the title, blurb, language, tags, star count and repo link (from `repoStats()`, as on the
 cards), the frontmatter `image` when there is one, and the entry's Markdown body as a README-style
