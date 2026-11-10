@@ -104,6 +104,7 @@ export function gameEntry(data: Partial<CollectionEntry<'games'>['data']> = {}, 
 			blurb: 'A puzzle game about being the boss’s kid.',
 			tech: [],
 			screenshots: [],
+			softLaunchOnly: false,
 			...data,
 		},
 	};

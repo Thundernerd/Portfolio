@@ -454,7 +454,8 @@
 	line-height: 1.3;
 }
 
-.site .project-card__archived {
+.site .project-card__archived,
+.site .game-card__status {
 	align-self: flex-start;
 	margin: -0.1rem 0 0;
 	padding: 0.1rem 0.45rem;
@@ -466,7 +467,8 @@
 	letter-spacing: 0.02em;
 }
 
-.site .project-card__archived::before {
+.site .project-card__archived::before,
+.site .game-card__status::before {
 	content: '● ' / '';
 	font-size: 0.6em;
 	vertical-align: 0.15em;
@@ -897,7 +899,8 @@
 	letter-spacing: -0.035em;
 }
 
-.site-project__archived {
+.site-project__archived,
+.site .game-page__status {
 	justify-self: start;
 	margin: 0;
 	padding: 0.1rem 0.45rem;

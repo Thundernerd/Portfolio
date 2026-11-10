@@ -21,6 +21,12 @@ describe('GamePage', () => {
 		expect(html).toMatch(/<dt[^>]*>Platforms<\/dt>\s*<dd[^>]*>\s*<ul[^>]*>\s*<li[^>]*>Nintendo Switch<\/li>\s*<li[^>]*>PC<\/li>/);
 	});
 
+	it('labels a game that only reached soft launch under its title, and no other', async () => {
+		const html = await render({ game: gameEntry({ softLaunchOnly: true }) });
+		expect(html).toMatch(/<\/h1>\s*<p class="game-page__status"[^>]*>Soft launch<\/p>/);
+		expect(await render({ game: gameEntry() })).not.toContain('game-page__status');
+	});
+
 	it('embeds a YouTube trailer, titled after the game', async () => {
 		const html = await render({ game: gameEntry({ trailer: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }) });
 		expect(html).toMatch(/<iframe[^>]*src="https:\/\/www.youtube-nocookie.com\/embed\/dQw4w9WgXcQ"/);

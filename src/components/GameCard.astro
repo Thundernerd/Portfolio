@@ -5,7 +5,8 @@
  * path, e.g. a game page) when given, as `.game-card__title-link`. Each fact is a
  * `.game-card__fact` pairing a `.game-card__label` (`<dt>`) with its value. Each link is described
  * by the title, so "Trailer" stays meaningful out of context; the title's id is
- * `game-<entry id>-title`.
+ * `game-<entry id>-title`. A game that only reached soft launch (`softLaunchOnly`) gets a
+ * "Soft launch" label (`.game-card__status`) after the title.
  *
  * Slots: `media` (wrapped in `.game-card__media`) replaces the cover when filled (e.g. with a
  * trailer embed); `extra` renders right after the blurb.
@@ -24,7 +25,7 @@ interface Props {
 }
 
 const { game, href } = Astro.props;
-const { title, platforms, role, studio, year, cover, trailer, storeLinks, blurb } = game.data;
+const { title, platforms, role, studio, year, cover, trailer, storeLinks, blurb, softLaunchOnly } = game.data;
 const titleId = `game-${game.id}-title`;
 // The cover fills its card: the full width on a phone, a column of the games grid (`--grid-min:
 // 19rem` and `--grid-gap` in `global.css`) above that: two columns from 44rem, three from 66rem,
@@ -47,6 +48,7 @@ const hasMedia = Astro.slots.has('media') && (await Astro.slots.render('media'))
 		)
 	}
 	<h3 class="game-card__title" id={titleId}>{href === undefined ? title : <a class="game-card__title-link" href={resolveHref(href)}>{title}</a>}</h3>
+	{softLaunchOnly && <p class="game-card__status">Soft launch</p>}
 	<dl class="game-card__meta">
 		<GameFacts block="game-card" role={role} studio={studio} year={year} />
 	</dl>

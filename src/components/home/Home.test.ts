@@ -103,6 +103,15 @@ describe('Home', () => {
 		expect(textOf(/<ul class="site-stats"[^>]*>([\s\S]*?)<\/ul>/.exec(tools)?.[1] ?? '')).toBe('C# 12 stars');
 	});
 
+	it('counts only released games in the hero facts, not ones pulled after soft launch', async () => {
+		const html = await render({
+			games: [gameEntry({}, 'good-job'), gameEntry({ title: 'SuperCar City', softLaunchOnly: true }, 'supercar-city')],
+			projects: [],
+		});
+		const facts = /<ul class="site-facts"[^>]*>([\s\S]*?)<\/ul>/.exec(html)?.[1] ?? '';
+		expect(textOf(/<li[^>]*>([\s\S]*?)<\/li>/.exec(facts)?.[1] ?? '')).toBe('1 released game');
+	});
+
 	it('counts tool projects in the hero facts and language breakdown', async () => {
 		const html = await render({
 			games: [],
