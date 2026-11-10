@@ -33,7 +33,7 @@ describe('former featured projects and the tools', () => {
 	it.each([
 		['ZeepSDK', 'donderjoekel/ZeepSDK', 'zeepkist-mod'],
 		['Zeepkist GTR', 'donderjoekel/Zeepkist.GTR', 'zeepkist-mod'],
-		['ModkistMKII', 'Thundernerd/ModkistMKII', 'tool'],
+		['Modkist', 'Thundernerd/ModkistMKII', 'tool'],
 		['FMD2r', 'Thundernerd/FMD2r', 'tool'],
 		['GEN', 'Thundernerd/GEN', 'tool'],
 		['AliasLoginGenerator', 'Thundernerd/AliasLoginGenerator', 'tool'],

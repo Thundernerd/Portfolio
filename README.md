@@ -132,7 +132,7 @@ navigation and light/dark toggle) and the footer, and loads the site's styleshee
 `src/components/home/Home.astro`. Its sections (anchor id, nav label, heading, order) are listed once in
 `homeSections` (`src/components/home/sections.ts`), which both the header nav and the home page read:
 add a section there and give it content in `Home.astro`, where the type checker asks for it.
-In order they are released games, Zeepkist mods, Unity plugins, tools and about &
+In order they are released games, tools, Zeepkist mods, Unity plugins and about &
 contact; each project `kind` in `src/content/projects/` has its section. The tools section has
 `onlyWithKind: 'tool'`, so it and its nav link only appear once a project has `kind: tool`
 (`isShown()`).

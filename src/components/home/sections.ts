@@ -21,9 +21,9 @@ export interface HomeSection {
 
 export const homeSections = [
 	{ id: 'games', navLabel: 'games', title: 'Released games' },
+	{ id: 'tools', navLabel: 'tools', title: 'Tools', onlyWithKind: 'tool' },
 	{ id: 'zeepkist-mods', navLabel: 'mods', title: 'Zeepkist mods' },
 	{ id: 'unity-plugins', navLabel: 'plugins', title: 'Unity plugins' },
-	{ id: 'tools', navLabel: 'tools', title: 'Tools', onlyWithKind: 'tool' },
 	{ id: 'contact', navLabel: 'contact', title: 'About & contact' },
 ] as const satisfies readonly HomeSection[];
 
