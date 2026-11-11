@@ -41,6 +41,7 @@ describe('former featured projects and the apps', () => {
 		['Rule Wars', 'Thundernerd/rule-wars', 'app'],
 		['GameSwiper', 'Thundernerd/GameSwiper', 'app'],
 		['PlayTogether', 'Thundernerd/PlayTogether', 'app'],
+		['Day One', 'Thundernerd/dayone', 'app'],
 	])('has %s, linked to %s, as a %s', (title, repo, kind) => {
 		expect(byRepo(repo)).toMatchObject({ title, kind });
 	});
